@@ -6,10 +6,10 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/noovertime7/gin-mysqlbakv2/dao"
-	"github.com/noovertime7/gin-mysqlbakv2/dto"
-	"github.com/noovertime7/gin-mysqlbakv2/middleware"
-	"github.com/noovertime7/gin-mysqlbakv2/public"
+	"github.com/noovertime7/gin-mysqlbak/dao"
+	"github.com/noovertime7/gin-mysqlbak/dto"
+	"github.com/noovertime7/gin-mysqlbak/middleware"
+	"github.com/noovertime7/gin-mysqlbak/public"
 )
 
 type AdminController struct {

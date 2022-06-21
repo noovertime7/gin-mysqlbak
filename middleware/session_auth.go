@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/noovertime7/gin-mysqlbakv2/public"
+	"github.com/noovertime7/gin-mysqlbak/public"
 )
 
 func SessionAuthMiddleware() gin.HandlerFunc {

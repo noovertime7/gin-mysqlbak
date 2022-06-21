@@ -1,3 +1,4 @@
 *.log
+*.sql
 .idea
 gin_scaffold

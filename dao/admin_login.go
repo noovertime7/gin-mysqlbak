@@ -2,8 +2,8 @@ package dao
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/noovertime7/gin-mysqlbakv2/dto"
-	"github.com/noovertime7/gin-mysqlbakv2/public"
+	"github.com/noovertime7/gin-mysqlbak/dto"
+	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"time"

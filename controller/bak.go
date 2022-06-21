@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
-	"github.com/noovertime7/gin-mysqlbakv2/core"
-	"github.com/noovertime7/gin-mysqlbakv2/dao"
-	"github.com/noovertime7/gin-mysqlbakv2/dto"
-	"github.com/noovertime7/gin-mysqlbakv2/middleware"
-	"github.com/noovertime7/gin-mysqlbakv2/public"
+	"github.com/noovertime7/gin-mysqlbak/core"
+	"github.com/noovertime7/gin-mysqlbak/dao"
+	"github.com/noovertime7/gin-mysqlbak/dto"
+	"github.com/noovertime7/gin-mysqlbak/middleware"
+	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"gorm.io/gorm"
 	"time"
@@ -21,6 +21,7 @@ type BakController struct {
 func BakRegister(group *gin.RouterGroup) {
 	bak := &BakController{}
 	group.POST("/start", bak.StartBak)
+	group.POST("/stop", bak.StopBak)
 }
 
 func (b *BakController) StartBak(c *gin.Context) {
@@ -58,6 +59,22 @@ func (b *BakController) StartBak(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, "启动任务成功")
+}
+
+func (b *BakController) StopBak(c *gin.Context) {
+	params := &dto.Bak{}
+	if err := params.BindValidParm(c); err != nil {
+		log.Logger.Error("BakHandleController 解析参数失败")
+		middleware.ResponseError(c, 1007, err)
+		return
+	}
+	var bakhandler = &core.BakHandler{}
+	if err := bakhandler.StopBak(params.ID); err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 1008, err)
+		return
+	}
+	middleware.ResponseSuccess(c, "任务停止成功")
 }
 
 func (b *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakChan chan *core.BakHandler) {

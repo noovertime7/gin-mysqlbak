@@ -3,8 +3,8 @@ package core
 import (
 	"fmt"
 	"github.com/go-xorm/xorm"
-	"github.com/noovertime7/gin-mysqlbakv2/dao"
-	"github.com/noovertime7/gin-mysqlbakv2/public"
+	"github.com/noovertime7/gin-mysqlbak/dao"
+	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -99,9 +99,11 @@ func (b *BakHandler) StopBak(tid int) error {
 	for id, cronjob := range CronJob {
 		if id == tid {
 			cronjob.Stop()
+			log.Logger.Infof("任务ID:%s,备份库名:%s 停止成功", id, b.DbName)
 			return nil
 		}
 	}
+
 	return nil
 }
 

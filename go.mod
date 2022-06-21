@@ -1,4 +1,4 @@
-module github.com/noovertime7/gin-mysqlbakv2
+module github.com/noovertime7/gin-mysqlbak
 
 go 1.14
 
