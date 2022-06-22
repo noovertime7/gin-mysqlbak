@@ -49,6 +49,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 		BackupCycle: params.BackupCycle,
 		KeepNumber:  params.KeepNumber,
 		IsAllDBBak:  params.IsAllDBBak,
+		Status:      0,
 		IsDelete:    0,
 	}
 	if err = taskinfo.Save(c, tx); err != nil {
@@ -148,8 +149,8 @@ func (t *TaskController) TaskList(c *gin.Context) {
 			DBName:      listIterm.DBName,
 			BackupCycle: cronstr,
 			KeepNumber:  listIterm.KeepNumber,
-			Status:      true,
-			CreateAt:    listIterm.CreatedAt,
+			Status:      public.IntToBool(listIterm.Status),
+			CreateAt:    listIterm.CreatedAt.Format("2006年01月02日15:04"),
 		}
 		outList = append(outList, outItem)
 	}

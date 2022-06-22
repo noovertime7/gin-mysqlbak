@@ -3,7 +3,6 @@ package dto
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/public"
-	"time"
 )
 
 // TaskAddInput 新增task
@@ -71,8 +70,8 @@ type TaskListOutItem struct {
 	DBName      string `json:"db_name" form:"id"`
 	BackupCycle string `json:"backup_cycle" form:"id"`
 	KeepNumber  int    `json:"keep_number" form:"id"`
-	Status      bool
-	CreateAt    time.Time `json:"create_at" form:"id"`
+	Status      bool   `json:"status" form:"status"`
+	CreateAt    string `json:"create_at" form:"id"`
 }
 
 //删除task

@@ -17,6 +17,7 @@ type TaskInfo struct {
 	KeepNumber  int       `gorm:"column:keep_number" description:"数据保留周期"`
 	IsAllDBBak  int       `gorm:"column:is_all_dbbak" description:"是否全库备份"`
 	IsDelete    int       `gorm:"column:is_delete" description:"是否删除"`
+	Status      int       `gorm:"column:status" description:"开关"`
 	UpdatedAt   time.Time `gorm:"column:create_at" description:"更新时间"`
 	CreatedAt   time.Time `gorm:"column:update_at" description:"添加时间"`
 }

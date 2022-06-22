@@ -58,7 +58,7 @@ func NewBakController(detail *dao.TaskDetail, afterBakChan chan *BakHandler) (*B
 		return nil, err
 	}
 	bakhandler.Engine = en
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	jobmap := make(map[int]*cron.Cron)
 	jobmap[bakhandler.TaskID] = c
 	CronJob = jobmap
@@ -99,7 +99,7 @@ func (b *BakHandler) StopBak(tid int) error {
 	for id, cronjob := range CronJob {
 		if id == tid {
 			cronjob.Stop()
-			log.Logger.Infof("任务ID:%s,备份库名:%s 停止成功", id, b.DbName)
+			log.Logger.Infof("任务ID:%d,备份库名:%s 停止成功", id, b.DbName)
 			return nil
 		}
 	}

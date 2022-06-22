@@ -1,12 +1,10 @@
 package public
 
 import (
-	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
 	"github.com/gorhill/cronexpr"
 	"github.com/noovertime7/mysqlbak/pkg/log"
-	"io"
 	"os"
 	"time"
 )
@@ -21,11 +19,11 @@ func GenSaltPassword(salt, password string) string {
 	return str2
 }
 
-//MD5 md5加密
-func MD5(s string) string {
-	h := md5.New()
-	io.WriteString(h, s)
-	return fmt.Sprintf("%x", h.Sum(nil))
+func IntToBool(a int) bool {
+	if a == 0 {
+		return false
+	}
+	return true
 }
 
 func GetFileSize(fileanme string) int {

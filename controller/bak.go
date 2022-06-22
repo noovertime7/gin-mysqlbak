@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/core"
@@ -20,8 +19,8 @@ type BakController struct {
 
 func BakRegister(group *gin.RouterGroup) {
 	bak := &BakController{}
-	group.POST("/start", bak.StartBak)
-	group.POST("/stop", bak.StopBak)
+	group.GET("/start", bak.StartBak)
+	group.GET("/stop", bak.StopBak)
 }
 
 func (b *BakController) StartBak(c *gin.Context) {
@@ -58,6 +57,11 @@ func (b *BakController) StartBak(c *gin.Context) {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
+	taskinfo.Status = 1
+	if err = taskinfo.Updates(c, tx); err != nil {
+		middleware.ResponseError(c, 2004, err)
+		return
+	}
 	middleware.ResponseSuccess(c, "启动任务成功")
 }
 
@@ -68,8 +72,28 @@ func (b *BakController) StopBak(c *gin.Context) {
 		middleware.ResponseError(c, 1007, err)
 		return
 	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	//将任务状态改为false
+	taskinfo := &dao.TaskInfo{
+		Id: params.ID,
+	}
+	taskinfo, err = taskinfo.Find(c, tx, taskinfo)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	taskinfo.Status = 0
+	if err = taskinfo.Save(c, tx); err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
 	var bakhandler = &core.BakHandler{}
-	if err := bakhandler.StopBak(params.ID); err != nil {
+	if err = bakhandler.StopBak(params.ID); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 1008, err)
 		return
@@ -79,7 +103,6 @@ func (b *BakController) StopBak(c *gin.Context) {
 
 func (b *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakChan chan *core.BakHandler) {
 	log.Logger.Info("开始监听备份状态消息")
-	fmt.Println("ListenAndSave", AfterBakChan)
 	for {
 		select {
 		case afterbakhandler := <-AfterBakChan:
@@ -95,8 +118,8 @@ func (b *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakCha
 			}
 			log.Logger.Info("接收到备份消息，数据入库")
 			if err := bakhistory.Save(ctx, tx); err != nil {
+				tx.Rollback()
 				log.Logger.Error("保存备份历史到数据库失败", err)
-				return
 			}
 		}
 	}
