@@ -17,7 +17,7 @@ type TaskController struct{}
 func TaskRegister(group *gin.RouterGroup) {
 	task := &TaskController{}
 	group.POST("/taskadd", task.TaskAdd)
-	group.POST("/tasklist", task.TaskList)
+	group.GET("/tasklist", task.TaskList)
 	group.POST("/taskdetail", task.TaskDetail)
 	group.DELETE("/taskdelete", task.TaskDelete)
 	group.PUT("/taskupdate", task.TaskUpdate)
@@ -141,12 +141,14 @@ func (t *TaskController) TaskList(c *gin.Context) {
 	}
 	var outList []dto.TaskListOutItem
 	for _, listIterm := range list {
+		cronstr := public.Cronexpr(listIterm.BackupCycle)
 		outItem := dto.TaskListOutItem{
 			ID:          listIterm.Id,
 			Host:        listIterm.Host,
 			DBName:      listIterm.DBName,
-			BackupCycle: listIterm.BackupCycle,
+			BackupCycle: cronstr,
 			KeepNumber:  listIterm.KeepNumber,
+			Status:      true,
 			CreateAt:    listIterm.CreatedAt,
 		}
 		outList = append(outList, outItem)

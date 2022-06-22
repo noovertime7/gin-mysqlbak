@@ -12,6 +12,7 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-xorm/xorm v0.7.9
+	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/noovertime7/mysqlbak v0.0.0-20220612083217-fdb12cd90242
 	github.com/pkg/errors v0.9.1

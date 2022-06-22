@@ -4,9 +4,11 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
+	"github.com/gorhill/cronexpr"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"io"
 	"os"
+	"time"
 )
 
 func GenSaltPassword(salt, password string) string {
@@ -63,4 +65,14 @@ func HasDir(path string) (bool, error) {
 		return false, nil
 	}
 	return false, _err
+}
+
+func Cronexpr(exprstr string) string {
+	expr, err := cronexpr.Parse(exprstr) // 如果表达式解析错误将返回一个错误
+	if err != nil {
+		fmt.Println(err)
+		return "unknown"
+	}
+	nextTime := expr.Next(time.Now())
+	return nextTime.Format("2006年01月02日15:04:01")
 }

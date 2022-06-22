@@ -66,11 +66,12 @@ type TaskListOutput struct {
 }
 
 type TaskListOutItem struct {
-	ID          int       `json:"id" form:"id"`
-	Host        string    `json:"host" form:"id"`
-	DBName      string    `json:"db_name" form:"id"`
-	BackupCycle string    `json:"backup_cycle" form:"id"`
-	KeepNumber  int       `json:"keep_number" form:"id"`
+	ID          int    `json:"id" form:"id"`
+	Host        string `json:"host" form:"id"`
+	DBName      string `json:"db_name" form:"id"`
+	BackupCycle string `json:"backup_cycle" form:"id"`
+	KeepNumber  int    `json:"keep_number" form:"id"`
+	Status      bool
 	CreateAt    time.Time `json:"create_at" form:"id"`
 }
 
