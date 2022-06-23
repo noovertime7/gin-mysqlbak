@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
@@ -10,6 +11,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
+	"time"
 )
 
 type TaskController struct{}
@@ -32,7 +34,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 	}
 	if err := TaskPingCheck(params); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, 10000, err)
+		middleware.ResponseError(c, 10000, errors.New("数据库连接失败"))
 		return
 	}
 	tx, err := lib.GetGormPool("default")
@@ -250,11 +252,13 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 
 func TaskPingCheck(task *dto.TaskAddInput) error {
 	en, err := xorm.NewEngine("mysql", task.User+":"+task.Password+"@tcp("+task.Host+")/"+task.DBName+"?charset=utf8&parseTime=true")
+	defer en.Close()
 	if err != nil {
 		log.Logger.Errorf("创建数据库连接失败:%s", err)
 		return err
 	}
-	if err = en.Ping(); err != nil {
+	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+	if err = en.PingContext(ctx); err != nil {
 		return err
 	}
 	return nil

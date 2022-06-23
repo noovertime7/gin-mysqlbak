@@ -17,13 +17,13 @@ type TaskAddInput struct {
 	IsDingSend      int    `json:"is_ding_send"`
 	DingAccessToken string `json:"ding_access_token"`
 	DingSecret      string `json:"ding_secret"`
-	OssType         int    `json:"oss_type" validate:"required" `
-	IsOssSave       int    `json:"is_oss_save" validate:"required" `
-	Endpoint        string `json:"endpoint" validate:"required" `
-	OssAccess       string `json:"oss_access" validate:"required" `
-	OssSecret       string `json:"oss_secret" validate:"required" `
-	BucketName      string `json:"bucket_name" validate:"required" `
-	Directory       string `json:"directory" validate:"required" `
+	OssType         int    `json:"oss_type" validate:"" `
+	IsOssSave       int    `json:"is_oss_save" validate:"" `
+	Endpoint        string `json:"endpoint" validate:"" `
+	OssAccess       string `json:"oss_access" validate:"" `
+	OssSecret       string `json:"oss_secret" validate:"" `
+	BucketName      string `json:"bucket_name" validate:"" `
+	Directory       string `json:"directory" validate:"" `
 }
 
 // TaskUpdateInput 更新任务
@@ -39,13 +39,13 @@ type TaskUpdateInput struct {
 	IsDingSend      int    `json:"is_ding_send"`
 	DingAccessToken string `json:"ding_access_token"`
 	DingSecret      string `json:"ding_secret"`
-	OssType         int    `json:"oss_type" validate:"required" `
-	IsOssSave       int    `json:"is_oss_save" validate:"required" `
-	Endpoint        string `json:"endpoint" validate:"required" `
-	OssAccess       string `json:"oss_access" validate:"required" `
-	OssSecret       string `json:"oss_secret" validate:"required" `
-	BucketName      string `json:"bucket_name" validate:"required" `
-	Directory       string `json:"directory" validate:"required" `
+	OssType         int    `json:"oss_type" validate:"" `
+	IsOssSave       int    `json:"is_oss_save" validate:"" `
+	Endpoint        string `json:"endpoint" validate:"" `
+	OssAccess       string `json:"oss_access" validate:"" `
+	OssSecret       string `json:"oss_secret" validate:"" `
+	BucketName      string `json:"bucket_name" validate:"" `
+	Directory       string `json:"directory" validate:"" `
 }
 
 func (d *TaskUpdateInput) BindValidParm(ctx *gin.Context) error {
