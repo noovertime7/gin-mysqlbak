@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/noovertime7/gin-mysqlbak/router"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,7 +12,7 @@ import (
 func main() {
 	err := lib.InitModule("./conf/dev/", []string{"base", "mysql"})
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	defer lib.Destroy()
 	router.HttpServerRun()

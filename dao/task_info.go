@@ -19,12 +19,12 @@ type TaskInfo struct {
 	IsAllDBBak  int       `json:"is_all_dbbak" gorm:"column:is_all_dbbak" description:"是否全库备份"`
 	IsDelete    int       `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
 	Status      int       `json:"status" gorm:"column:status" description:"开关"`
-	UpdatedAt   time.Time `json:"updated_at" gorm:"column:create_at" description:"更新时间"`
-	CreatedAt   time.Time `json:"created_at" gorm:"column:update_at" description:"添加时间"`
+	UpdatedAt   time.Time `json:"updated_at" gorm:"column:updated_at" description:"更新时间"`
+	CreatedAt   time.Time `json:"created_at" gorm:"column:created_at" description:"添加时间"`
 }
 
 func (s *TaskInfo) TableName() string {
-	return "task_info"
+	return "t_taskinfo"
 }
 
 func (s *TaskInfo) Save(c *gin.Context, tx *gorm.DB) error {
@@ -39,6 +39,15 @@ func (s *TaskInfo) Find(c *gin.Context, tx *gorm.DB, search *TaskInfo) (*TaskInf
 		return nil, err
 	}
 	return out, nil
+}
+
+func (s *TaskInfo) FindStatusUpTask(c *gin.Context, tx *gorm.DB) ([]*TaskInfo, error) {
+	var result []*TaskInfo
+	err := tx.WithContext(c).Where("status = ? AND is_delete = ?", 1, 0).Find(&result).Error
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (d *TaskInfo) Updates(c *gin.Context, tx *gorm.DB) error {

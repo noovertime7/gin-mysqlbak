@@ -109,7 +109,6 @@ func (b *BakHandler) StopBak(tid int) error {
 
 func (b *BakHandler) Run() {
 	log.Logger.Info("BakHandler 开始备份数据库")
-	fmt.Println(b.FileName)
 	err := b.Engine.DumpAllToFile(b.FileName)
 	if err != nil {
 		b.BakStatus = 1
