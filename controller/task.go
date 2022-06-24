@@ -20,7 +20,7 @@ func TaskRegister(group *gin.RouterGroup) {
 	task := &TaskController{}
 	group.POST("/taskadd", task.TaskAdd)
 	group.GET("/tasklist", task.TaskList)
-	group.POST("/taskdetail", task.TaskDetail)
+	group.GET("/taskdetail", task.TaskDetail)
 	group.DELETE("/taskdelete", task.TaskDelete)
 	group.PUT("/taskupdate", task.TaskUpdate)
 }
@@ -122,6 +122,63 @@ func (s *TaskController) TaskDelete(ctx *gin.Context) {
 	middleware.ResponseSuccess(ctx, "删除成功")
 }
 
+func (t *TaskController) TaskUpdate(c *gin.Context) {
+	params := &dto.TaskUpdateInput{}
+	if err := params.BindValidParm(c); err != nil {
+		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		return
+	}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 30002, err)
+		return
+	}
+	tx = tx.Begin()
+	taskinfo := &dao.TaskInfo{
+		Id:          params.ID,
+		Host:        params.Host,
+		User:        params.User,
+		DBName:      params.DBName,
+		Password:    params.Password,
+		BackupCycle: params.BackupCycle,
+		KeepNumber:  params.KeepNumber,
+		IsAllDBBak:  params.IsAllDBBak,
+	}
+	if err = taskinfo.Updates(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 30002, err)
+		return
+	}
+	ding := &dao.DingDatabase{
+		TaskID:          taskinfo.Id,
+		DingSecret:      params.DingSecret,
+		DingAccessToken: params.DingAccessToken,
+		IsDingSend:      params.IsDingSend}
+	if err = ding.Updates(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 30002, err)
+		return
+	}
+
+	oss := &dao.OssDatabase{
+		TaskID:     taskinfo.Id,
+		IsOssSave:  params.IsOssSave,
+		OssType:    params.OssType,
+		Endpoint:   params.Endpoint,
+		OssAccess:  params.OssAccess,
+		OssSecret:  params.OssSecret,
+		BucketName: params.BucketName,
+		Directory:  params.Directory,
+	}
+	if err = oss.Updates(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 30002, err)
+		return
+	}
+	tx.Commit()
+	middleware.ResponseSuccess(c, "任务更改成功")
+}
+
 func (t *TaskController) TaskList(c *gin.Context) {
 	params := &dto.TaskListInput{}
 	if err := params.BindValidParm(c); err != nil {
@@ -193,63 +250,6 @@ func (s *TaskController) TaskDetail(ctx *gin.Context) {
 	middleware.ResponseSuccess(ctx, taskdetail)
 }
 
-func (t *TaskController) TaskUpdate(c *gin.Context) {
-	params := &dto.TaskUpdateInput{}
-	if err := params.BindValidParm(c); err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
-		return
-	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(c, 30002, err)
-		return
-	}
-	tx = tx.Begin()
-	taskinfo := &dao.TaskInfo{
-		Id:          params.ID,
-		Host:        params.Host,
-		User:        params.User,
-		DBName:      params.DBName,
-		Password:    params.Password,
-		BackupCycle: params.BackupCycle,
-		KeepNumber:  params.KeepNumber,
-		IsAllDBBak:  params.IsAllDBBak,
-	}
-	if err := taskinfo.Updates(c, tx); err != nil {
-		tx.Rollback()
-		middleware.ResponseError(c, 30002, err)
-		return
-	}
-	ding := &dao.DingDatabase{
-		TaskID:          taskinfo.Id,
-		DingSecret:      params.DingSecret,
-		DingAccessToken: params.DingAccessToken,
-		IsDingSend:      params.IsDingSend}
-	if err := ding.Updates(c, tx); err != nil {
-		tx.Rollback()
-		middleware.ResponseError(c, 30002, err)
-		return
-	}
-
-	oss := &dao.OssDatabase{
-		TaskID:     taskinfo.Id,
-		IsOssSave:  params.IsOssSave,
-		OssType:    params.OssType,
-		Endpoint:   params.Endpoint,
-		OssAccess:  params.OssAccess,
-		OssSecret:  params.OssSecret,
-		BucketName: params.BucketName,
-		Directory:  params.Directory,
-	}
-	if err := oss.Updates(c, tx); err != nil {
-		tx.Rollback()
-		middleware.ResponseError(c, 30002, err)
-		return
-	}
-	tx.Commit()
-	middleware.ResponseSuccess(c, "任务更改成功")
-}
-
 func TaskPingCheck(task *dto.TaskAddInput) error {
 	en, err := xorm.NewEngine("mysql", task.User+":"+task.Password+"@tcp("+task.Host+")/"+task.DBName+"?charset=utf8&parseTime=true")
 	defer en.Close()
@@ -257,7 +257,7 @@ func TaskPingCheck(task *dto.TaskAddInput) error {
 		log.Logger.Errorf("创建数据库连接失败:%s", err)
 		return err
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
 	if err = en.PingContext(ctx); err != nil {
 		return err
 	}

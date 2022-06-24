@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"gorm.io/gorm"
@@ -9,17 +10,17 @@ import (
 
 type TaskInfo struct {
 	Id          int       `gorm:"primary_key" description:"自增主键"`
-	Host        string    `gorm:"column:host" description:"数据库主机"`
-	Password    string    `gorm:"column:password" description:"密码"`
-	User        string    `gorm:"column:user" description:"用户名"`
-	DBName      string    `gorm:"column:db_name" description:"备份库名"`
-	BackupCycle string    `gorm:"column:backup_cycle" description:"备份周期"`
-	KeepNumber  int       `gorm:"column:keep_number" description:"数据保留周期"`
-	IsAllDBBak  int       `gorm:"column:is_all_dbbak" description:"是否全库备份"`
-	IsDelete    int       `gorm:"column:is_delete" description:"是否删除"`
-	Status      int       `gorm:"column:status" description:"开关"`
-	UpdatedAt   time.Time `gorm:"column:create_at" description:"更新时间"`
-	CreatedAt   time.Time `gorm:"column:update_at" description:"添加时间"`
+	Host        string    `json:"host" gorm:"column:host" description:"数据库主机"`
+	Password    string    `json:"password" gorm:"column:password" description:"密码"`
+	User        string    `json:"user"  gorm:"column:user" description:"用户名"`
+	DBName      string    `json:"db_name" gorm:"column:db_name" description:"备份库名"`
+	BackupCycle string    `json:"backup_cycle" gorm:"column:backup_cycle" description:"备份周期"`
+	KeepNumber  int       `json:"keep_number"  gorm:"column:keep_number" description:"数据保留周期"`
+	IsAllDBBak  int       `json:"is_all_dbbak" gorm:"column:is_all_dbbak" description:"是否全库备份"`
+	IsDelete    int       `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
+	Status      int       `json:"status" gorm:"column:status" description:"开关"`
+	UpdatedAt   time.Time `json:"updated_at" gorm:"column:create_at" description:"更新时间"`
+	CreatedAt   time.Time `json:"created_at" gorm:"column:update_at" description:"添加时间"`
 }
 
 func (s *TaskInfo) TableName() string {
@@ -27,6 +28,7 @@ func (s *TaskInfo) TableName() string {
 }
 
 func (s *TaskInfo) Save(c *gin.Context, tx *gorm.DB) error {
+	fmt.Println(s)
 	return tx.WithContext(c).Save(s).Error
 }
 

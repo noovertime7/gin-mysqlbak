@@ -7,14 +7,14 @@ import (
 
 type OssDatabase struct {
 	Id         int    `gorm:"primary_key" description:"自增主键"`
-	TaskID     int    `gorm:"column:task_id" description:"任务id"`
-	IsOssSave  int    `gorm:"column:is_oss_save" description:"是否保存到oss中 0关闭1开启"`
-	OssType    int    `gorm:"column:oss_type" description:"oss类型"`
-	Endpoint   string `gorm:"column:endpoint" description:"endpoint"`
-	OssAccess  string `gorm:"column:oss_access" description:"ossaccess"`
-	OssSecret  string `gorm:"column:oss_secret" description:"secret"`
-	BucketName string `gorm:"column:bucket_name" description:"bucket名字"`
-	Directory  string `gorm:"column:directory" description:"目录"`
+	TaskID     int    `json:"task_id" gorm:"column:task_id" description:"任务id"`
+	IsOssSave  int    `json:"is_oss_save" gorm:"column:is_oss_save" description:"是否保存到oss中 0关闭1开启"`
+	OssType    int    `json:"oss_type" gorm:"column:oss_type" description:"oss类型"`
+	Endpoint   string `json:"endpoint"  gorm:"column:endpoint" description:"endpoint"`
+	OssAccess  string `json:"oss_access"  gorm:"column:oss_access" description:"ossaccess"`
+	OssSecret  string `json:"oss_secret"  gorm:"column:oss_secret" description:"secret"`
+	BucketName string `json:"bucket_name"  gorm:"column:bucket_name" description:"bucket名字"`
+	Directory  string `json:"directory" gorm:"column:directory" description:"目录"`
 }
 
 func (s *OssDatabase) TableName() string {
@@ -35,5 +35,13 @@ func (s *OssDatabase) Find(c *gin.Context, tx *gorm.DB, search *OssDatabase) (*O
 }
 
 func (d *OssDatabase) Updates(c *gin.Context, tx *gorm.DB) error {
-	return tx.WithContext(c).Where("task_id = ?", d.TaskID).Updates(d).Error
+	return tx.WithContext(c).Table(d.TableName()).Where("task_id = ?", d.TaskID).Updates(map[string]interface{}{
+		"is_oss_save": d.IsOssSave,
+		"oss_type":    d.OssType,
+		"endpoint":    d.Endpoint,
+		"oss_access":  d.OssAccess,
+		"oss_secret":  d.OssSecret,
+		"bucket_name": d.BucketName,
+		"directory":   d.Directory,
+	}).Error
 }
