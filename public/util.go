@@ -65,12 +65,12 @@ func HasDir(path string) (bool, error) {
 	return false, _err
 }
 
-func Cronexpr(exprstr string) string {
+func Cronexpr(exprstr string) (string, error) {
 	expr, err := cronexpr.Parse(exprstr) // 如果表达式解析错误将返回一个错误
 	if err != nil {
-		fmt.Println(err)
-		return "unknown"
+		log.Logger.Error(err)
+		return "unknown", err
 	}
 	nextTime := expr.Next(time.Now())
-	return nextTime.Format("2006年01月02日15:04:01")
+	return nextTime.Format("2006年01月02日15:04:01"), nil
 }

@@ -11,7 +11,7 @@ type TaskAddInput struct {
 	Password        string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
 	User            string `form:"user" json:"user" comment:"用户"   validate:"required" example:"123456"`
 	DBName          string `form:"db_name" json:"db_name" comment:"库名"   validate:"required" example:"123456"`
-	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"备份时间"   validate:"required" example:"123456"`
+	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
 	KeepNumber      int    `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
 	IsAllDBBak      int    `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
 	IsDingSend      int    `json:"is_ding_send"`
@@ -33,7 +33,7 @@ type TaskUpdateInput struct {
 	Password        string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
 	User            string `form:"user" json:"user" comment:"用户"   validate:"required" example:"123456"`
 	DBName          string `form:"db_name" json:"db_name" comment:"库名"   validate:"required" example:"123456"`
-	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"备份时间"   validate:"required" example:"123456"`
+	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
 	KeepNumber      int    `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
 	IsAllDBBak      int    `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
 	IsDingSend      int    `json:"is_ding_send"`

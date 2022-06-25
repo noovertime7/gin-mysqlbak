@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"github.com/e421083458/gin_scaffold/public"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/zh"
 	"github.com/go-playground/universal-translator"
+	"github.com/noovertime7/gin-mysqlbak/public"
 	"gopkg.in/go-playground/validator.v9"
 	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
 	zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
@@ -32,31 +32,62 @@ func TranslationMiddleware() gin.HandlerFunc {
 		//翻译器注册到validator
 		switch locale {
 		case "en":
-			en_translations.RegisterDefaultTranslations(val, trans)
+			err := en_translations.RegisterDefaultTranslations(val, trans)
+			if err != nil {
+				return
+			}
 			val.RegisterTagNameFunc(func(fld reflect.StructField) string {
 				return fld.Tag.Get("en_comment")
 			})
 			break
 		default:
-			zh_translations.RegisterDefaultTranslations(val, trans)
+			err := zh_translations.RegisterDefaultTranslations(val, trans)
+			if err != nil {
+				return
+			}
 			val.RegisterTagNameFunc(func(fld reflect.StructField) string {
 				return fld.Tag.Get("comment")
 			})
 
 			//自定义验证方法
 			//https://github.com/go-playground/validator/blob/v9/_examples/custom-validation/main.go
-			val.RegisterValidation("is_valid_username", func(fl validator.FieldLevel) bool {
+			err = val.RegisterValidation("is_valid_username", func(fl validator.FieldLevel) bool {
 				return fl.Field().String() == "admin"
 			})
+			if err != nil {
+				return
+			}
 
 			//自定义验证器
 			//https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
-			val.RegisterTranslation("is_valid_username", trans, func(ut ut.Translator) error {
+			err = val.RegisterTranslation("is_valid_username", trans, func(ut ut.Translator) error {
 				return ut.Add("is_valid_username", "{0} 填写不正确哦", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
 				t, _ := ut.T("is_valid_username", fe.Field())
 				return t
 			})
+			if err != nil {
+				return
+			}
+
+			//ParseValidation
+			//自定义验证方法
+			_ = val.RegisterValidation("is_valid_bycle", func(fl validator.FieldLevel) bool {
+				_, err = public.Cronexpr(fl.Field().String())
+				if err != nil {
+					return false
+				}
+				return true
+			})
+			//自定义验证器
+
+			_ = val.RegisterTranslation("is_valid_bycle", trans, func(ut ut.Translator) error {
+				return ut.Add("is_valid_bycle", "{0}格式不正确,正确格式: 30 12 * * ?", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("is_valid_bycle", fe.Field())
+				return t
+			})
+
 			break
 		}
 		c.Set(public.TranslatorKey, trans)
