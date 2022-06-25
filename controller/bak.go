@@ -108,41 +108,6 @@ func (b *BakController) StopBak(c *gin.Context) {
 	middleware.ResponseSuccess(c, "任务停止成功")
 }
 
-//// InitBak 程序启动初始化备份任务
-//func (b *BakController) InitBak(ctx *gin.Context) {
-//	tx, _ := lib.GetGormPool("default")
-//	b.AfterBakChan = make(chan *core.BakHandler, 10)
-//	go b.ListenAndSave(ctx, tx, b.AfterBakChan)
-//	taskinfo := &dao.TaskInfo{}
-//	result, err := taskinfo.FindStatusUpTask(ctx, tx)
-//	if err != nil {
-//		middleware.ResponseError(ctx, 1009, err)
-//		return
-//	}
-//	for _, task := range result {
-//		taskdetail, err := taskinfo.TaskDetail(ctx, tx, task)
-//		if err != nil {
-//			middleware.ResponseError(ctx, 2002, err)
-//			return
-//		}
-//		bakhandler, err := core.NewBakController(taskdetail, b.AfterBakChan)
-//		if err != nil {
-//			middleware.ResponseError(ctx, 2003, err)
-//			return
-//		}
-//		if err = bakhandler.StartBak(); err != nil {
-//			middleware.ResponseError(ctx, 2003, err)
-//			return
-//		}
-//		taskinfo.Status = 1
-//		if err = taskinfo.Updates(ctx, tx); err != nil {
-//			middleware.ResponseError(ctx, 2004, err)
-//			return
-//		}
-//		middleware.ResponseSuccess(ctx, "初始化任务成功")
-//	}
-//}
-
 func (b *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakChan chan *core.BakHandler) {
 	log.Logger.Info("开始监听备份状态消息")
 	for {

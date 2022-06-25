@@ -82,11 +82,11 @@ func (b *BakHandler) BeforBak() {
 }
 
 func (b *BakHandler) StartBak() error {
-	eid, err := b.Cron.AddJob(b.BackupCycle, b)
+	_, err := b.Cron.AddJob(b.BackupCycle, b)
 	if err != nil {
 		return err
 	}
-	log.Logger.Infof("创建备份任务成功，任务id：%d", eid)
+	log.Logger.Infof("创建备份任务成功，任务id：%d", b.TaskID)
 	// 备份前准备工作
 	b.BeforBak()
 	//启动数据库备份服务
