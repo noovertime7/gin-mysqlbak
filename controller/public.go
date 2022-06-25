@@ -22,19 +22,16 @@ func (p *PublicController) InitBak(ctx *gin.Context) {
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(ctx, 2001, err)
 		return
 	}
 	taskinfo := &dao.TaskInfo{}
 	result, err := taskinfo.FindStatusUpTask(ctx, tx)
 	if err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(ctx, 1009, err)
 		return
 	}
 	if len(result) == 0 {
-		log.Logger.Error(err)
-		middleware.ResponseSuccess(ctx, "当前备份列表都为停止状态,无需初始化")
+		log.Logger.Info("当前备份列表都为停止状态,无需初始化")
 		return
 	}
 	b.AfterBakChan = make(chan *core.BakHandler, 10)
@@ -43,24 +40,20 @@ func (p *PublicController) InitBak(ctx *gin.Context) {
 		taskdetail, err := taskinfo.TaskDetail(ctx, tx, task)
 		if err != nil {
 			log.Logger.Error(err)
-			middleware.ResponseError(ctx, 2002, err)
 			return
 		}
 		bakhandler, err := core.NewBakController(taskdetail, b.AfterBakChan)
 		if err != nil {
 			log.Logger.Error(err)
-			middleware.ResponseError(ctx, 2003, err)
 			return
 		}
 		if err = bakhandler.StartBak(); err != nil {
 			log.Logger.Error(err)
-			middleware.ResponseError(ctx, 2003, err)
 			return
 		}
 		taskinfo.Status = 1
 		if err = taskinfo.Updates(ctx, tx); err != nil {
 			log.Logger.Error(err)
-			middleware.ResponseError(ctx, 2004, err)
 			return
 		}
 		middleware.ResponseSuccess(ctx, "初始化任务成功")
