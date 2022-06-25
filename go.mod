@@ -5,7 +5,6 @@ go 1.14
 require (
 	github.com/e421083458/gin_scaffold v0.0.0-20211226015300-616fc31c0400
 	github.com/e421083458/golang_common v1.2.1
-	github.com/fatih/structs v1.1.0
 	github.com/gin-gonic/contrib v0.0.0-20190526021735-7fb7810ed2a0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-openapi/spec v0.20.6 // indirect

@@ -21,7 +21,6 @@ func TaskRegister(group *gin.RouterGroup) {
 	group.POST("/taskadd", task.TaskAdd)
 	group.GET("/tasklist", task.TaskList)
 	group.GET("/taskdetail", task.TaskDetail)
-	group.GET("/taskinit", task.TaskInit)
 	group.DELETE("/taskdelete", task.TaskDelete)
 	group.PUT("/taskupdate", task.TaskUpdate)
 }
@@ -263,26 +262,4 @@ func TaskPingCheck(task *dto.TaskAddInput) error {
 		return err
 	}
 	return nil
-}
-
-func (t *TaskController) TaskInit(ctx *gin.Context) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(ctx, 30004, err)
-		return
-	}
-	taskinfo := &dao.TaskInfo{}
-	result, err := taskinfo.FindStatusUpTask(ctx, tx)
-	if err != nil {
-		middleware.ResponseError(ctx, 30004, err)
-		return
-	}
-	for _, task := range result {
-		taskdetail, err := task.TaskDetail(ctx, tx, task)
-		if err != nil {
-			middleware.ResponseError(ctx, 2002, err)
-			return
-		}
-		middleware.ResponseSuccess(ctx, taskdetail)
-	}
 }
