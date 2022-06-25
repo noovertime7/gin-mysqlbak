@@ -125,5 +125,14 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	{
 		controller.BakRegister(BakRouter)
 	}
+
+	PublicRouter := router.Group("/public")
+	PublicRouter.Use(
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+	)
+	{
+		controller.PublicRegister(PublicRouter)
+	}
 	return router
 }

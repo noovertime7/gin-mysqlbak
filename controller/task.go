@@ -34,7 +34,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 	}
 	if err := TaskPingCheck(params); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, 10000, errors.New("数据库连接失败"))
+		middleware.ResponseError(c, 10000, err)
 		return
 	}
 	tx, err := lib.GetGormPool("default")
@@ -254,7 +254,7 @@ func TaskPingCheck(task *dto.TaskAddInput) error {
 	en, err := xorm.NewEngine("mysql", task.User+":"+task.Password+"@tcp("+task.Host+")/"+task.DBName+"?charset=utf8&parseTime=true")
 	defer en.Close()
 	if err != nil {
-		log.Logger.Errorf("创建数据库连接失败:%s", err)
+		log.Logger.Errorf("创建数据库连接失败:%s", err.Error())
 		return err
 	}
 	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)

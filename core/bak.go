@@ -59,6 +59,9 @@ func NewBakController(detail *dao.TaskDetail, afterBakChan chan *BakHandler) (*B
 	}
 	bakhandler.Engine = en
 	c := cron.New()
+	if _, ok := CronJob[bakhandler.TaskID]; ok {
+		return nil, errors.New("当前备份任务已启动，切勿重复启动")
+	}
 	jobmap := make(map[int]*cron.Cron)
 	jobmap[bakhandler.TaskID] = c
 	CronJob = jobmap
@@ -91,19 +94,23 @@ func (b *BakHandler) StartBak() error {
 	return nil
 }
 
+func (b *BakHandler) IsStart(tid int) bool {
+	if _, ok := CronJob[tid]; !ok {
+		return false
+	}
+	return true
+}
+
 func (b *BakHandler) StopBak(tid int) error {
 	log.Logger.Debug("StopBak", CronJob)
-	if _, ok := CronJob[tid]; !ok {
-		return errors.New("备份任务不存在请检查备份id")
-	}
 	for id, cronjob := range CronJob {
 		if id == tid {
 			cronjob.Stop()
+			delete(CronJob, tid)
 			log.Logger.Infof("任务ID:%d,备份库名:%s 停止成功", id, b.DbName)
 			return nil
 		}
 	}
-
 	return nil
 }
 

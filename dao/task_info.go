@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"gorm.io/gorm"
@@ -28,7 +27,6 @@ func (s *TaskInfo) TableName() string {
 }
 
 func (s *TaskInfo) Save(c *gin.Context, tx *gorm.DB) error {
-	fmt.Println(s)
 	return tx.WithContext(c).Save(s).Error
 }
 

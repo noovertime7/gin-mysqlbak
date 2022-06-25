@@ -21,7 +21,7 @@ func BakRegister(group *gin.RouterGroup) {
 	bak := &BakController{}
 	group.GET("/start", bak.StartBak)
 	group.GET("/stop", bak.StopBak)
-	group.GET("/init", bak.InitBak)
+	//group.GET("/init", bak.InitBak)
 }
 
 func (b *BakController) StartBak(c *gin.Context) {
@@ -33,17 +33,20 @@ func (b *BakController) StartBak(c *gin.Context) {
 	}
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
+		log.Logger.Error(err)
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
 	taskinfo := &dao.TaskInfo{Id: params.ID}
 	taskdetail, err := taskinfo.TaskDetail(c, tx, taskinfo)
 	if err != nil {
+		log.Logger.Error(err)
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
 	tx, err = lib.GetGormPool("default")
 	if err != nil {
+		log.Logger.Error(err)
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
@@ -51,15 +54,18 @@ func (b *BakController) StartBak(c *gin.Context) {
 	go b.ListenAndSave(c, tx, b.AfterBakChan)
 	bakhandler, err := core.NewBakController(taskdetail, b.AfterBakChan)
 	if err != nil {
+		log.Logger.Error(err)
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
 	if err = bakhandler.StartBak(); err != nil {
+		log.Logger.Error(err)
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
 	taskinfo.Status = 1
 	if err = taskinfo.Updates(c, tx); err != nil {
+		log.Logger.Error(err)
 		middleware.ResponseError(c, 2004, err)
 		return
 	}
@@ -102,40 +108,40 @@ func (b *BakController) StopBak(c *gin.Context) {
 	middleware.ResponseSuccess(c, "任务停止成功")
 }
 
-// InitBak 程序启动初始化备份任务
-func (b *BakController) InitBak(ctx *gin.Context) {
-	tx, _ := lib.GetGormPool("default")
-	b.AfterBakChan = make(chan *core.BakHandler, 10)
-	go b.ListenAndSave(ctx, tx, b.AfterBakChan)
-	taskinfo := &dao.TaskInfo{}
-	result, err := taskinfo.FindStatusUpTask(ctx, tx)
-	if err != nil {
-		middleware.ResponseError(ctx, 1009, err)
-		return
-	}
-	for _, task := range result {
-		taskdetail, err := taskinfo.TaskDetail(ctx, tx, task)
-		if err != nil {
-			middleware.ResponseError(ctx, 2002, err)
-			return
-		}
-		bakhandler, err := core.NewBakController(taskdetail, b.AfterBakChan)
-		if err != nil {
-			middleware.ResponseError(ctx, 2003, err)
-			return
-		}
-		if err = bakhandler.StartBak(); err != nil {
-			middleware.ResponseError(ctx, 2003, err)
-			return
-		}
-		taskinfo.Status = 1
-		if err = taskinfo.Updates(ctx, tx); err != nil {
-			middleware.ResponseError(ctx, 2004, err)
-			return
-		}
-		middleware.ResponseSuccess(ctx, "初始化任务成功")
-	}
-}
+//// InitBak 程序启动初始化备份任务
+//func (b *BakController) InitBak(ctx *gin.Context) {
+//	tx, _ := lib.GetGormPool("default")
+//	b.AfterBakChan = make(chan *core.BakHandler, 10)
+//	go b.ListenAndSave(ctx, tx, b.AfterBakChan)
+//	taskinfo := &dao.TaskInfo{}
+//	result, err := taskinfo.FindStatusUpTask(ctx, tx)
+//	if err != nil {
+//		middleware.ResponseError(ctx, 1009, err)
+//		return
+//	}
+//	for _, task := range result {
+//		taskdetail, err := taskinfo.TaskDetail(ctx, tx, task)
+//		if err != nil {
+//			middleware.ResponseError(ctx, 2002, err)
+//			return
+//		}
+//		bakhandler, err := core.NewBakController(taskdetail, b.AfterBakChan)
+//		if err != nil {
+//			middleware.ResponseError(ctx, 2003, err)
+//			return
+//		}
+//		if err = bakhandler.StartBak(); err != nil {
+//			middleware.ResponseError(ctx, 2003, err)
+//			return
+//		}
+//		taskinfo.Status = 1
+//		if err = taskinfo.Updates(ctx, tx); err != nil {
+//			middleware.ResponseError(ctx, 2004, err)
+//			return
+//		}
+//		middleware.ResponseSuccess(ctx, "初始化任务成功")
+//	}
+//}
 
 func (b *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakChan chan *core.BakHandler) {
 	log.Logger.Info("开始监听备份状态消息")
