@@ -200,7 +200,6 @@ func (t *TaskController) TaskList(c *gin.Context) {
 		return
 	}
 	var outList []dto.TaskListOutItem
-
 	for _, listIterm := range list {
 		nexttime, _ := public.Cronexpr(listIterm.BackupCycle)
 		cronstr := nexttime

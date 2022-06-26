@@ -22,6 +22,7 @@ func BakRegister(group *gin.RouterGroup) {
 	group.GET("/start", bak.StartBak)
 	group.GET("/stop", bak.StopBak)
 	group.GET("/findallhistory", bak.FindAllHistory)
+	group.GET("/historylist", bak.HistoryList)
 }
 
 func (b *BakController) FindAllHistory(c *gin.Context) {
@@ -134,20 +135,64 @@ func (b *BakController) StopBak(c *gin.Context) {
 	middleware.ResponseSuccess(c, "任务停止成功")
 }
 
+func (b *BakController) HistoryList(c *gin.Context) {
+	params := &dto.HistoryListInput{}
+	if err := params.BindValidParm(c); err != nil {
+		log.Logger.Error("BakHandleController 解析参数失败")
+		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		return
+	}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 10003, err)
+		return
+	}
+	his := &dao.BakHistory{}
+	list, total, err := his.PageList(c, tx, params)
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 10004, err)
+		return
+	}
+	var outlist []dto.HistoryListOutItem
+	for _, listIterm := range list {
+		outItem := dto.HistoryListOutItem{
+			ID:         listIterm.Id,
+			Host:       listIterm.Host,
+			DBName:     listIterm.DBName,
+			DingStatus: listIterm.DingStatus,
+			OSSStatus:  listIterm.OssStatus,
+			Message:    listIterm.Msg,
+			FileSize:   listIterm.FileSize,
+			FileName:   listIterm.FileName,
+			BakTime:    listIterm.BakTime.Format("2006年01月02日15:04:01"),
+		}
+		outlist = append(outlist, outItem)
+	}
+	out := &dto.HistoryListOutput{
+		Total: total,
+		List:  outlist,
+	}
+	middleware.ResponseSuccess(c, out)
+}
+
 func (b *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakChan chan *core.BakHandler) {
 	log.Logger.Info("开始监听备份状态消息")
 	for {
 		select {
 		case afterbakhandler := <-AfterBakChan:
 			bakhistory := &dao.BakHistory{
-				TaskID:    afterbakhandler.TaskID,
-				Host:      afterbakhandler.Host,
-				DBName:    afterbakhandler.DbName,
-				BakStatus: afterbakhandler.BakStatus,
-				Msg:       afterbakhandler.BakMsg,
-				FileSize:  afterbakhandler.FileSize,
-				FileName:  afterbakhandler.FileName,
-				BakTime:   time.Now(),
+				TaskID:     afterbakhandler.TaskID,
+				Host:       afterbakhandler.Host,
+				DBName:     afterbakhandler.DbName,
+				BakStatus:  afterbakhandler.BakStatus,
+				Msg:        afterbakhandler.BakMsg,
+				OssStatus:  afterbakhandler.OSSSaveStatus,
+				DingStatus: afterbakhandler.DingSendStatus,
+				FileSize:   afterbakhandler.FileSize,
+				FileName:   afterbakhandler.FileName,
+				BakTime:    time.Now(),
 			}
 			log.Logger.Info("接收到备份消息，数据入库")
 			if err := bakhistory.Save(ctx, tx); err != nil {

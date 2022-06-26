@@ -15,25 +15,27 @@ import (
 )
 
 type BakHandler struct {
-	TaskID       int
-	Cron         *cron.Cron
-	Engine       *xorm.Engine
-	Host         string
-	BackInfoId   string
-	PassWord     string
-	User         string
-	Port         string
-	DbName       string
-	BackupCycle  string
-	KeepNumber   int
-	ISAllDBBak   int
-	ISDingSender int
-	ISOssSave    int
-	BakStatus    int
-	BakMsg       string
-	FileName     string
-	FileSize     int
-	AfterBakChan chan *BakHandler
+	TaskID         int
+	Cron           *cron.Cron
+	Engine         *xorm.Engine
+	Host           string
+	BackInfoId     string
+	PassWord       string
+	User           string
+	Port           string
+	DbName         string
+	BackupCycle    string
+	KeepNumber     int
+	ISAllDBBak     int
+	ISDingSender   int
+	ISOssSave      int
+	OSSSaveStatus  int
+	DingSendStatus int
+	BakStatus      int
+	BakMsg         string
+	FileName       string
+	FileSize       int
+	AfterBakChan   chan *BakHandler
 }
 
 var CronJob = make(map[int]*cron.Cron)
@@ -119,11 +121,15 @@ func (b *BakHandler) Run() {
 	err := b.Engine.DumpAllToFile(b.FileName)
 	if err != nil {
 		b.BakStatus = 1
+		b.OSSSaveStatus = 0
+		b.DingSendStatus = 0
 		b.BakMsg = fmt.Sprintf("%s", err)
 		b.FileName = ""
 		log.Logger.Error("备份失败", err)
 		return
 	}
+	b.OSSSaveStatus = 1
+	b.DingSendStatus = 1
 	b.FileSize = public.GetFileSize(b.FileName)
 	b.BakStatus = 0
 	b.BakMsg = "success"
