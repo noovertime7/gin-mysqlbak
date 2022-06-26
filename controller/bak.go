@@ -21,7 +21,33 @@ func BakRegister(group *gin.RouterGroup) {
 	bak := &BakController{}
 	group.GET("/start", bak.StartBak)
 	group.GET("/stop", bak.StopBak)
-	//group.GET("/init", bak.InitBak)
+	group.GET("/findallhistory", bak.FindAllHistory)
+}
+
+func (b *BakController) FindAllHistory(c *gin.Context) {
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	bakhis := &dao.BakHistory{}
+	bakhistorys, err := bakhis.FindAllHistory(c, tx, "")
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 2002, err)
+	}
+	var bakhistorysOutputs []*dto.BakHistoryOutPut
+	for _, bakhistory := range bakhistorys {
+		his := &dto.BakHistoryOutPut{
+			Host:    bakhistory.Host,
+			DBName:  bakhistory.DBName,
+			Message: bakhistory.Msg,
+			Baktime: bakhistory.BakTime.Format("2006年01月02日15:04:01"),
+		}
+		bakhistorysOutputs = append(bakhistorysOutputs, his)
+	}
+	middleware.ResponseSuccess(c, bakhistorysOutputs)
 }
 
 func (b *BakController) StartBak(c *gin.Context) {
