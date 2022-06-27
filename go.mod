@@ -3,6 +3,8 @@ module github.com/noovertime7/gin-mysqlbak
 go 1.14
 
 require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
+	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/e421083458/gin_scaffold v0.0.0-20211226015300-616fc31c0400
 	github.com/e421083458/golang_common v1.2.1
 	github.com/gin-gonic/contrib v0.0.0-20190526021735-7fb7810ed2a0

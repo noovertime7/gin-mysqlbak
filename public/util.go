@@ -74,3 +74,15 @@ func Cronexpr(exprstr string) (string, error) {
 	nextTime := expr.Next(time.Now())
 	return nextTime.Format("2006年01月02日15:04:01"), nil
 }
+
+func StatusConversion(a int) string {
+	switch a {
+	case 0:
+		return "失败"
+	case 1:
+		return "成功"
+	case 2:
+		return "未启用"
+	}
+	return "unknown"
+}

@@ -5,6 +5,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/alioss"
 	"github.com/noovertime7/gin-mysqlbak/public/ding"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
@@ -130,7 +131,6 @@ func (b *BakHandler) Run() {
 		log.Logger.Error("备份失败", err)
 		return
 	}
-
 	b.BakMsg = "success"
 	b.BakStatus = 1
 	b.FileSize = public.GetFileSize(b.FileName)
@@ -152,7 +152,7 @@ func AfterBak(b *BakHandler) {
 		markcontent := map[string]string{
 			"title": b.Host + b.DbName + "备份状态",
 			"text": fmt.Sprintf(
-				"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png)\n", baktime, b.BakMsg, b.OssStatus, b.FileName),
+				"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName),
 		}
 		webhook := ding.Webhook{AtAll: true, Secret: b.DingConfig.DingSecret, AccessToken: b.DingConfig.DingAccessToken}
 		log.Logger.Infof("%s:%s开始发送钉钉消息", b.Host, b.DbName)
@@ -161,11 +161,27 @@ func AfterBak(b *BakHandler) {
 			log.Logger.Error("钉钉消息发送失败", err)
 			return
 		}
+		// 钉钉消息发送成功，更新状态
+		b.DingStatus = 1
+		log.Logger.Infof("%s:%s发送钉钉消息成功", b.Host, b.DbName)
 	}
-	b.DingStatus = 1
-	log.Logger.Infof("%s:%s发送钉钉消息成功", b.Host, b.DbName)
 	//判断是否启动OSS保存
 	if b.OssConfig.IsOssSave == 1 {
-
+		if b.OssConfig.OssType == 0 {
+			FileName := b.FileName
+			Endpoint := b.OssConfig.Endpoint
+			Accesskey := b.OssConfig.OssAccess
+			Secretkey := b.OssConfig.OssSecret
+			BucketName := b.OssConfig.BucketName
+			Directory := b.OssConfig.Directory
+			log.Logger.Infof("%s:%s开始保存至阿里云对象存储OSS", b.Host, b.DbName)
+			if err := alioss.AliOssUploadFile(FileName, Endpoint, Accesskey, Secretkey, BucketName, Directory); err != nil {
+				log.Logger.Errorf("%s:%s保存阿里云对象存储OSS失败:", b.Host, b.DbName)
+				b.OssStatus = 0
+				return
+			}
+			log.Logger.Infof("%s:%s阿里云对象存储OSS上传成功", b.Host, b.DbName)
+			b.OssStatus = 1
+		}
 	}
 }
