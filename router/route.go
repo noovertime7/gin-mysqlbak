@@ -130,6 +130,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	PublicRouter.Use(
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
+		middleware.TranslationMiddleware(),
 	)
 	{
 		controller.PublicRegister(PublicRouter)

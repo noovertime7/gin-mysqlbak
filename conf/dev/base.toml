@@ -3,6 +3,7 @@
 [base]
     debug_mode="debug"
     time_location="Asia/Chongqing"
+    cluster_url="http://127.0.0.1:8880"
 
 [http]
     addr = ":8880"                       # 监听地址, default ":8700"

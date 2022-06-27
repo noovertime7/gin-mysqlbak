@@ -32,6 +32,5 @@ func AliOssUploadFile(filename, Endpoint, Accesskey, Secretkey, BucketName, Dire
 		log.Logger.Error("Error:", err)
 		return err
 	}
-	log.Logger.Info("阿里云对象存储OSS上传成功")
 	return nil
 }

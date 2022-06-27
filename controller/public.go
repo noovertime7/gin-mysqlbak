@@ -5,8 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/core"
 	"github.com/noovertime7/gin-mysqlbak/dao"
+	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/mysqlbak/pkg/log"
+	"strings"
 )
 
 type PublicController struct{}
@@ -14,6 +16,7 @@ type PublicController struct{}
 func PublicRegister(group *gin.RouterGroup) {
 	pb := &PublicController{}
 	group.GET("/initbak", pb.InitBak)
+	group.GET("/download", pb.DownLoadBakfile)
 }
 
 // InitBak 公共接口无需鉴权，用于程序崩溃后，重启会自动启动数据库备份任务
@@ -58,4 +61,28 @@ func (p *PublicController) InitBak(ctx *gin.Context) {
 		}
 		middleware.ResponseSuccess(ctx, "初始化任务成功")
 	}
+}
+
+func (p *PublicController) DownLoadBakfile(ctx *gin.Context) {
+	params := &dto.Bak{}
+	if err := params.BindValidParm(ctx); err != nil {
+		log.Logger.Error(err)
+		return
+	}
+	tx, _ := lib.GetGormPool("default")
+	bakhistory := &dao.BakHistory{
+		Id: params.ID,
+	}
+	resBakHistory, err := bakhistory.Find(ctx, tx, bakhistory)
+	if err != nil {
+		log.Logger.Error(err)
+		return
+	}
+	filepath := resBakHistory.FileName
+	filename := strings.Split(filepath, "/")[len(strings.Split(filepath, "/"))-1]
+	ctx.Header("Content-Disposition", "attachment; filename="+filename)
+	////ctx.Header("Content-Disposition", "inline;filename="+filename)
+	ctx.Header("Content-Transfer-Encoding", "binary")
+	ctx.Header("Cache-Control", "no-cache")
+	ctx.File(filepath)
 }
