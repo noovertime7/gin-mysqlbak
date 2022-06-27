@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/noovertime7/gin-mysqlbak/router"
 	"github.com/noovertime7/gin-mysqlbak/services"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,7 +13,7 @@ import (
 func main() {
 	err := lib.InitModule("./conf/dev/", []string{"base", "mysql"})
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("加载配置文件失败", err)
 	}
 	defer lib.Destroy()
 	router.HttpServerRun()

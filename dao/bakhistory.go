@@ -13,7 +13,7 @@ type BakHistory struct {
 	Host       string    `gorm:"column:host" description:"主机"`
 	DBName     string    `gorm:"column:db_name" description:"库名"`
 	OssStatus  int       `gorm:"column:oss_status"  description:"钉钉发送状态"`
-	DingStatus int       `gorm:"column:bak_status"  description:"OSS保存状态"`
+	DingStatus int       `gorm:"column:ding_status"  description:"OSS保存状态"`
 	BakStatus  int       `gorm:"column:bak_status" description:"备份状态"`
 	Msg        string    `gorm:"column:message" description:"消息"`
 	FileSize   int       `gorm:"column:filesize" description:"文件大小"`
@@ -49,13 +49,13 @@ func (b *BakHistory) FindAllHistory(c *gin.Context, tx *gorm.DB, status string) 
 		}
 		return result, nil
 	case "success":
-		err := tx.WithContext(c).Where("bak_status = ?", 0).Order("id desc").Find(&result).Error
+		err := tx.WithContext(c).Where("bak_status = ?", 1).Order("id desc").Find(&result).Error
 		if err != nil {
 			return nil, err
 		}
 		return result, nil
 	case "fail":
-		err := tx.WithContext(c).Where("bak_status = ?", 1).Order("id desc").Find(&result).Error
+		err := tx.WithContext(c).Where("bak_status = ?", 0).Order("id desc").Find(&result).Error
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func (s *BakHistory) PageList(c *gin.Context, tx *gorm.DB, params *dto.HistoryLi
 	list := []BakHistory{}
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
-	query = query.Table(s.TableName()).Where("bak_status = 0")
+	query = query.Table(s.TableName())
 	if params.Info != "" {
 		query = query.Where("(host like ? or db_name like ?)", "%"+params.Info+"%", "%"+params.Info+"%")
 	}
