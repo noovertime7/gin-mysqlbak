@@ -159,7 +159,6 @@ func (b *BakController) HistoryList(c *gin.Context) {
 	for _, listIterm := range list {
 		outItem := dto.HistoryListOutItem{
 			ID:         listIterm.Id,
-			ClusterIP:  lib.GetStringConf("base.base.cluster_url"),
 			Host:       listIterm.Host,
 			DBName:     listIterm.DBName,
 			DingStatus: listIterm.DingStatus,

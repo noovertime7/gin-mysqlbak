@@ -35,7 +35,6 @@ type HistoryListOutput struct {
 type HistoryListOutItem struct {
 	ID         int    `json:"id"`
 	Host       string `json:"host" form:"host"`
-	ClusterIP  string `json:"cluster_ip"`
 	DBName     string `json:"db_name" form:"db_name"`
 	DingStatus int    `json:"ding_status" form:"ding_status"`
 	OSSStatus  int    `json:"oss_status" form:"oss_status"`

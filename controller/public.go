@@ -7,7 +7,9 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
+	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -17,6 +19,7 @@ func PublicRegister(group *gin.RouterGroup) {
 	pb := &PublicController{}
 	group.GET("/initbak", pb.InitBak)
 	group.GET("/download", pb.DownLoadBakfile)
+	group.GET("/check_file_exists", pb.BakFileExists)
 }
 
 // InitBak 公共接口无需鉴权，用于程序崩溃后，重启会自动启动数据库备份任务
@@ -85,4 +88,28 @@ func (p *PublicController) DownLoadBakfile(ctx *gin.Context) {
 	ctx.Header("Content-Transfer-Encoding", "binary")
 	ctx.Header("Cache-Control", "no-cache")
 	ctx.File(filepath)
+}
+
+func (p *PublicController) BakFileExists(ctx *gin.Context) {
+	params := &dto.Bak{}
+	if err := params.BindValidParm(ctx); err != nil {
+		log.Logger.Error(err)
+		return
+	}
+	tx, _ := lib.GetGormPool("default")
+	bakhistory := &dao.BakHistory{
+		Id: params.ID,
+	}
+	resBakHistory, err := bakhistory.Find(ctx, tx, bakhistory)
+	if err != nil {
+		log.Logger.Error(err)
+		return
+	}
+	filepath := resBakHistory.FileName
+	if ok, _ := public.HasDir(filepath); !ok {
+		middleware.ResponseError(ctx, 20001, errors.New("本地文件不存在"))
+		return
+	}
+	clusterUrl := lib.GetStringConf("base.base.cluster_url")
+	middleware.ResponseSuccess(ctx, clusterUrl+"/public/download")
 }
