@@ -66,12 +66,12 @@ type TaskListOutput struct {
 
 type TaskListOutItem struct {
 	ID          int    `json:"id" form:"id"`
-	Host        string `json:"host" form:"id"`
-	DBName      string `json:"db_name" form:"id"`
-	BackupCycle string `json:"backup_cycle" form:"id"`
-	KeepNumber  int    `json:"keep_number" form:"id"`
+	Host        string `json:"host" form:"host"`
+	DBName      string `json:"db_name" form:"db_name"`
+	BackupCycle string `json:"backup_cycle" form:"backup_cycle"`
+	KeepNumber  int    `json:"keep_number" form:"keep_number"`
 	Status      bool   `json:"status" form:"status"`
-	CreateAt    string `json:"create_at" form:"id"`
+	CreateAt    string `json:"create_at" form:"create_at"`
 }
 
 //删除task

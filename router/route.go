@@ -146,5 +146,16 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	{
 		controller.DashboardRegister(dashRouter)
 	}
+
+	hostRouter := router.Group("/host")
+	hostRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware())
+	{
+		controller.HostRegister(hostRouter)
+	}
 	return router
 }
