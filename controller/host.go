@@ -89,7 +89,7 @@ func (h *HostController) HostUpdate(c *gin.Context) {
 	// 更改主机后进行ping测试
 	hostinput := &dto.HostAddInput{Host: params.Host, User: params.User, Password: params.Password}
 	if err := HostPingCheck(hostinput); err != nil {
-		middleware.ResponseError(c, 1111, errors.New("数据库连接失败，请检查IP地址或端口"))
+		middleware.ResponseError(c, 1111, err)
 		return
 	}
 	tx, err := lib.GetGormPool("default")
