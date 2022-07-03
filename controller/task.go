@@ -1,17 +1,14 @@
 package controller
 
 import (
-	"context"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
-	"github.com/go-xorm/xorm"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
-	"time"
 )
 
 type TaskController struct{}
@@ -32,25 +29,23 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	if err := TaskPingCheck(params); err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 10000, err)
-		return
-	}
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		log.Logger.Panic(err)
 	}
+	//if err := TaskPingCheck(params, tx, c); err != nil {
+	//	log.Logger.Error(err)
+	//	middleware.ResponseError(c, 10000, err)
+	//	return
+	//}
 	//开启事务
 	tx = tx.Begin()
 	taskinfo := &dao.TaskInfo{
-		Host:        params.Host,
-		Password:    params.Password,
-		User:        params.User,
 		DBName:      params.DBName,
 		BackupCycle: params.BackupCycle,
 		KeepNumber:  params.KeepNumber,
 		IsAllDBBak:  params.IsAllDBBak,
+		HostID:      params.HostID,
 		Status:      0,
 		IsDelete:    0,
 	}
@@ -70,7 +65,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 		BucketName: params.BucketName,
 		Directory:  params.Directory,
 	}
-	if err := ossdb.Save(c, tx); err != nil {
+	if err = ossdb.Save(c, tx); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 10002, err)
@@ -136,10 +131,8 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 	tx = tx.Begin()
 	taskinfo := &dao.TaskInfo{
 		Id:          params.ID,
-		Host:        params.Host,
-		User:        params.User,
+		HostID:      params.HostID,
 		DBName:      params.DBName,
-		Password:    params.Password,
 		BackupCycle: params.BackupCycle,
 		KeepNumber:  params.KeepNumber,
 		IsAllDBBak:  params.IsAllDBBak,
@@ -203,9 +196,15 @@ func (t *TaskController) TaskList(c *gin.Context) {
 	for _, listIterm := range list {
 		nexttime, _ := public.Cronexpr(listIterm.BackupCycle)
 		cronstr := nexttime
+		database := &dao.HostDatabase{Id: listIterm.HostID}
+		databseres, err := database.Find(c, tx, database)
+		if err != nil {
+			middleware.ResponseError(c, 10005, err)
+			return
+		}
 		outItem := dto.TaskListOutItem{
 			ID:          listIterm.Id,
-			Host:        listIterm.Host,
+			Host:        databseres.Host,
 			HostID:      listIterm.HostID,
 			DBName:      listIterm.DBName,
 			BackupCycle: cronstr,
@@ -250,18 +249,4 @@ func (s *TaskController) TaskDetail(ctx *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(ctx, taskdetail)
-}
-
-func TaskPingCheck(task *dto.TaskAddInput) error {
-	en, err := xorm.NewEngine("mysql", task.User+":"+task.Password+"@tcp("+task.Host+")/"+task.DBName+"?charset=utf8&parseTime=true")
-	defer en.Close()
-	if err != nil {
-		log.Logger.Errorf("创建数据库连接失败:%s", err.Error())
-		return err
-	}
-	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
-	if err = en.PingContext(ctx); err != nil {
-		return err
-	}
-	return nil
 }

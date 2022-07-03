@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/noovertime7/mysqlbak/pkg/log"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -78,10 +79,11 @@ func (t *Webhook) SendMarkDown(md map[string]string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	_, err = ioutil.ReadAll(resp.Body)
+	dingmsg, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
+	log.Logger.Infof("钉钉发送响应结果:%s", string(dingmsg))
 	return nil
 }
 

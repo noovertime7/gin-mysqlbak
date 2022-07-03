@@ -1,14 +1,17 @@
 package controller
 
 import (
+	"context"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"github.com/go-xorm/xorm"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
+	"time"
 )
 
 type HostController struct{}
@@ -26,6 +29,10 @@ func (h *HostController) HostAdd(c *gin.Context) {
 	if err := params.BindValidParm(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		return
+	}
+	if err := HostPingCheck(params); err != nil {
+		middleware.ResponseError(c, 1111, errors.New("数据库连接失败，请检查IP地址或端口"))
 		return
 	}
 	tx, err := lib.GetGormPool("default")
@@ -77,6 +84,12 @@ func (h *HostController) HostUpdate(c *gin.Context) {
 	params := &dto.HostUpdateInput{}
 	if err := params.BindValidParm(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		return
+	}
+	// 更改主机后进行ping测试
+	hostinput := &dto.HostAddInput{Host: params.Host, User: params.User, Password: params.Password}
+	if err := HostPingCheck(hostinput); err != nil {
+		middleware.ResponseError(c, 1111, errors.New("数据库连接失败，请检查IP地址或端口"))
 		return
 	}
 	tx, err := lib.GetGormPool("default")
@@ -134,4 +147,18 @@ func (t *HostController) HostList(c *gin.Context) {
 		List:  outList,
 	}
 	middleware.ResponseSuccess(c, out)
+}
+
+func HostPingCheck(host *dto.HostAddInput) error {
+	en, err := xorm.NewEngine("mysql", host.User+":"+host.Password+"@tcp("+host.Host+")/mysql?charset=utf8&parseTime=true")
+	defer en.Close()
+	if err != nil {
+		log.Logger.Errorf("创建数据库连接失败:%s", err.Error())
+		return err
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	if err = en.PingContext(ctx); err != nil {
+		return err
+	}
+	return nil
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type HostDatabase struct {
-	Id        int    `gorm:"primary_key" description:"自增主键"`
+	Id        int    `json:"host_id" gorm:"primary_key" description:"自增主键"`
 	Host      string `json:"host" gorm:"column:host" description:"任务id"`
 	User      string `json:"user"  gorm:"column:user" description:"是否发送钉钉消息"`
 	Password  string `json:"password"  gorm:"column:password" description:"accessToken"`

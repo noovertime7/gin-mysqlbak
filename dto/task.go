@@ -7,9 +7,7 @@ import (
 
 // TaskAddInput 新增task
 type TaskAddInput struct {
-	Host            string `form:"host" json:"host" comment:"数据库备份主机地址加端口"   validate:"required" example:"127.0.0.1"`
-	Password        string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
-	User            string `form:"user" json:"user" comment:"用户"   validate:"required" example:"123456"`
+	HostID          int    `json:"host_id" form:"host_id" validate:"required"`
 	DBName          string `form:"db_name" json:"db_name" comment:"库名"   validate:"required" example:"123456"`
 	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
 	KeepNumber      int    `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
@@ -29,9 +27,7 @@ type TaskAddInput struct {
 // TaskUpdateInput 更新任务
 type TaskUpdateInput struct {
 	ID              int    `json:"id" form:"id" validate:"required"`
-	Host            string `form:"host" json:"host" comment:"数据库备份主机地址加端口"   validate:"required" example:"127.0.0.1"`
-	Password        string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
-	User            string `form:"user" json:"user" comment:"用户"   validate:"required" example:"123456"`
+	HostID          int    `json:"host_id" form:"host_id" validate:"required"`
 	DBName          string `form:"db_name" json:"db_name" comment:"库名"   validate:"required" example:"123456"`
 	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
 	KeepNumber      int    `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`

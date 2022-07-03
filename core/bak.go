@@ -45,9 +45,9 @@ var CronJob = make(map[int]*cron.Cron)
 func NewBakController(detail *dao.TaskDetail, afterBakChan chan *BakHandler) (*BakHandler, error) {
 	bakhandler := &BakHandler{
 		TaskID:       detail.Info.Id,
-		Host:         detail.Info.Host,
-		PassWord:     detail.Info.Password,
-		User:         detail.Info.User,
+		Host:         detail.Host.Host,
+		PassWord:     detail.Host.Password,
+		User:         detail.Host.User,
 		DbName:       detail.Info.DBName,
 		BackupCycle:  detail.Info.BackupCycle,
 		KeepNumber:   detail.Info.KeepNumber,
@@ -128,7 +128,9 @@ func (b *BakHandler) Run() {
 		b.BakMsg = fmt.Sprintf("%s", err)
 		b.FileName = "unknown"
 		AfterBak(b)
-		log.Logger.Error("备份失败", err)
+		log.Logger.Error("备份失败,保存备份历史到数据库,停止备份任务,发送消息", err)
+		b.AfterBakChan <- b
+		log.Logger.Debug("BakHandler 发送消息成功")
 		return
 	}
 	b.BakMsg = "success"

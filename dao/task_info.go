@@ -9,10 +9,7 @@ import (
 
 type TaskInfo struct {
 	Id          int       `gorm:"primary_key" description:"自增主键"`
-	Host        string    `json:"host" gorm:"column:host" description:"数据库主机"`
 	HostID      int       `json:"id" gorm:"column:host_id" description:"主机关系id"`
-	Password    string    `json:"password" gorm:"column:password" description:"密码"`
-	User        string    `json:"user"  gorm:"column:user" description:"用户名"`
 	DBName      string    `json:"db_name" gorm:"column:db_name" description:"备份库名"`
 	BackupCycle string    `json:"backup_cycle" gorm:"column:backup_cycle" description:"备份周期"`
 	KeepNumber  int       `json:"keep_number"  gorm:"column:keep_number" description:"数据保留周期"`
