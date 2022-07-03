@@ -132,13 +132,20 @@ func (t *HostController) HostList(c *gin.Context) {
 	}
 	var outList []dto.HostListOutItem
 	for _, listIterm := range list {
+		task := &dao.TaskInfo{}
+		_, taskNum, err := task.PageList(c, tx, &dto.TaskListInput{HostId: listIterm.Id, PageNo: 1, PageSize: 1})
+		if err != nil {
+			log.Logger.Error(err)
+			middleware.ResponseError(c, 10004, err)
+			return
+		}
 		outItem := dto.HostListOutItem{
 			ID:         listIterm.Id,
 			Host:       listIterm.Host,
 			User:       listIterm.User,
 			Password:   listIterm.Password,
 			HostStatus: 0,
-			TaskNum:    10,
+			TaskNum:    taskNum,
 		}
 		outList = append(outList, outItem)
 	}
@@ -156,7 +163,8 @@ func HostPingCheck(host *dto.HostAddInput) error {
 		log.Logger.Errorf("创建数据库连接失败:%s", err.Error())
 		return err
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
 	if err = en.PingContext(ctx); err != nil {
 		return err
 	}
