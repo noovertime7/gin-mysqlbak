@@ -206,6 +206,7 @@ func (t *TaskController) TaskList(c *gin.Context) {
 		outItem := dto.TaskListOutItem{
 			ID:          listIterm.Id,
 			Host:        listIterm.Host,
+			HostID:      listIterm.HostID,
 			DBName:      listIterm.DBName,
 			BackupCycle: cronstr,
 			KeepNumber:  listIterm.KeepNumber,

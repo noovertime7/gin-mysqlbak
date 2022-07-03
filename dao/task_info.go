@@ -10,6 +10,7 @@ import (
 type TaskInfo struct {
 	Id          int       `gorm:"primary_key" description:"自增主键"`
 	Host        string    `json:"host" gorm:"column:host" description:"数据库主机"`
+	HostID      int       `json:"id" gorm:"column:host_id" description:"主机关系id"`
 	Password    string    `json:"password" gorm:"column:password" description:"密码"`
 	User        string    `json:"user"  gorm:"column:user" description:"用户名"`
 	DBName      string    `json:"db_name" gorm:"column:db_name" description:"备份库名"`
@@ -57,7 +58,11 @@ func (s *TaskInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.TaskListInp
 	list := []TaskInfo{}
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
-	query = query.Table(s.TableName()).Where("is_delete=0")
+	if params.HostId > 0 {
+		query = query.Table(s.TableName()).Where("is_delete=0 and host_id = ?", params.HostId)
+	} else {
+		query = query.Table(s.TableName()).Where("is_delete=0")
+	}
 	if params.Info != "" {
 		query = query.Where("(host like ? or db_name like ?)", "%"+params.Info+"%", "%"+params.Info+"%")
 	}
@@ -74,6 +79,11 @@ func (s *TaskInfo) TaskDetail(c *gin.Context, tx *gorm.DB, serch *TaskInfo) (*Ta
 	if err != nil {
 		return nil, err
 	}
+	hostinfo := &HostDatabase{Id: infores.HostID}
+	hostinfores, err := hostinfo.Find(c, tx, hostinfo)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
 	ding := &DingDatabase{TaskID: serch.Id}
 	dingres, err := ding.Find(c, tx, ding)
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -85,6 +95,7 @@ func (s *TaskInfo) TaskDetail(c *gin.Context, tx *gorm.DB, serch *TaskInfo) (*Ta
 		return nil, err
 	}
 	return &TaskDetail{
+		Host: hostinfores,
 		Info: infores,
 		Oss:  ossres,
 		Ding: dingres,

@@ -122,6 +122,8 @@ func (t *HostController) HostList(c *gin.Context) {
 		outItem := dto.HostListOutItem{
 			ID:         listIterm.Id,
 			Host:       listIterm.Host,
+			User:       listIterm.User,
+			Password:   listIterm.Password,
 			HostStatus: 0,
 			TaskNum:    10,
 		}
