@@ -54,16 +54,25 @@ func (s *TaskInfo) FindAllTask(c *gin.Context, tx *gorm.DB, params *dto.HostIDIn
 	return result, nil
 }
 
+func FindAllStatusUpTask(tx *gorm.DB) ([]*TaskInfo, error) {
+	var result []*TaskInfo
+	err := tx.Where("is_delete = 0").Find(&result).Error
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (d *TaskInfo) Updates(c *gin.Context, tx *gorm.DB) error {
 	return tx.WithContext(c).Where("id = ?", d.Id).Updates(d).Error
 }
 
 // UpdatesStatus 只更新单个字段
-func (d *TaskInfo) UpdatesStatus(c *gin.Context, tx *gorm.DB) error {
+func (d *TaskInfo) UpdatesStatus(tx *gorm.DB) error {
 	if d.Id == 0 {
 		return errors.New("TASK_INFO的ID为空,更新失败")
 	}
-	return tx.WithContext(c).Table(d.TableName()).Where("id = ?", d.Id).Updates(map[string]interface{}{
+	return tx.Table(d.TableName()).Where("id = ?", d.Id).Updates(map[string]interface{}{
 		"status": d.Status,
 	}).Error
 }

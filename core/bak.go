@@ -109,7 +109,7 @@ func (b *BakHandler) IsStart(tid int) bool {
 
 func (b *BakHandler) StopBak(tid int) error {
 	if ok := b.IsStart(tid); !ok {
-		return errors.New("当前没有正在运行的备份任务,批量停止失败")
+		return errors.New("任务非运行,停止失败")
 	}
 	log.Logger.Debug("StopBak", CronJob)
 	for id, cronjob := range CronJob {

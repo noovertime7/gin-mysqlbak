@@ -148,7 +148,7 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 		// 修改任务启动状态
 		taskinfo.Status = 1
 		taskinfo.Id = task.Id
-		if err = taskinfo.UpdatesStatus(c, tx); err != nil {
+		if err = taskinfo.UpdatesStatus(tx); err != nil {
 			log.Logger.Error(err)
 			return
 		}
@@ -179,7 +179,7 @@ func (b *BakController) StopBak(c *gin.Context) {
 		return
 	}
 	taskinfo.Status = 0
-	if err = taskinfo.UpdatesStatus(c, tx); err != nil {
+	if err = taskinfo.UpdatesStatus(tx); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
@@ -232,7 +232,7 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 		// 修改任务启动状态为关闭
 		taskinfo.Id = task.Id
 		taskinfo.Status = 0
-		if err = taskinfo.UpdatesStatus(c, tx); err != nil {
+		if err = taskinfo.UpdatesStatus(tx); err != nil {
 			log.Logger.Error(err)
 			middleware.ResponseError(c, 2005, err)
 			return
