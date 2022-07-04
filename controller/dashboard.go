@@ -33,7 +33,7 @@ func (service *DashboardController) PanelGroupData(c *gin.Context) {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
-	list, err := taskinfo.FindStatusUpTask(c, tx)
+	list, err := taskinfo.FindAllTask(c, tx, nil)
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
 		return

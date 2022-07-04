@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/noovertime7/gin-mysqlbak/router"
-	"github.com/noovertime7/gin-mysqlbak/services"
 	"log"
 	"os"
 	"os/signal"
@@ -17,8 +16,6 @@ func main() {
 	}
 	defer lib.Destroy()
 	router.HttpServerRun()
-	// 执行初始化任务操作
-	services.InitBak()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

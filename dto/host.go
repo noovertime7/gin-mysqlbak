@@ -61,3 +61,11 @@ type HostListOutItem struct {
 	HostStatus int    `json:"host_status"`
 	TaskNum    int    `json:"task_num"`
 }
+
+type HostIDInput struct {
+	HostID string `json:"host_id" form:"host_id"`
+}
+
+func (d *HostIDInput) BindValidParm(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
+}

@@ -128,8 +128,10 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	PublicRouter := router.Group("/public")
 	PublicRouter.Use(
+		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
 		middleware.TranslationMiddleware(),
 	)
 	{

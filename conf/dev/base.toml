@@ -20,8 +20,8 @@
         wf_log_path = "./logs/gin-mysqlbak.wf.log"
         rotate_wf_log_path = "./logs/gin-mysqlbak.wf.log.%Y%M%D%H"
     [log.console_writer]        #工作台输出
-        on = true
-        color = true
+        on = false
+        color = false
 
 [swagger]
     title="gin_scaffold swagger API"

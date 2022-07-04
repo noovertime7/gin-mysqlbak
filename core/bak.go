@@ -42,7 +42,11 @@ type BakHandler struct {
 
 var CronJob = make(map[int]*cron.Cron)
 
-func NewBakController(detail *dao.TaskDetail, afterBakChan chan *BakHandler) (*BakHandler, error) {
+//func init() {
+//	CronJob = make(map[int]*cron.Cron, 10)
+//}
+
+func NewBakHandler(detail *dao.TaskDetail, afterBakChan chan *BakHandler) (*BakHandler, error) {
 	bakhandler := &BakHandler{
 		TaskID:       detail.Info.Id,
 		Host:         detail.Host.Host,
@@ -66,9 +70,7 @@ func NewBakController(detail *dao.TaskDetail, afterBakChan chan *BakHandler) (*B
 	if _, ok := CronJob[bakhandler.TaskID]; ok {
 		return nil, errors.New("当前备份任务已启动，切勿重复启动")
 	}
-	jobmap := make(map[int]*cron.Cron)
-	jobmap[bakhandler.TaskID] = c
-	CronJob = jobmap
+	CronJob[bakhandler.TaskID] = c
 	bakhandler.Cron = c
 	log.Logger.Debug("NewBakHandler", CronJob)
 	return bakhandler, nil
@@ -106,6 +108,9 @@ func (b *BakHandler) IsStart(tid int) bool {
 }
 
 func (b *BakHandler) StopBak(tid int) error {
+	if ok := b.IsStart(tid); !ok {
+		return errors.New("当前没有正在运行的备份任务,批量停止失败")
+	}
 	log.Logger.Debug("StopBak", CronJob)
 	for id, cronjob := range CronJob {
 		if id == tid {

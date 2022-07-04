@@ -3,6 +3,7 @@ package dao
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dto"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"time"
 )
@@ -37,9 +38,16 @@ func (s *TaskInfo) Find(c *gin.Context, tx *gorm.DB, search *TaskInfo) (*TaskInf
 	return out, nil
 }
 
-func (s *TaskInfo) FindStatusUpTask(c *gin.Context, tx *gorm.DB) ([]*TaskInfo, error) {
+func (s *TaskInfo) FindAllTask(c *gin.Context, tx *gorm.DB, params *dto.HostIDInput) ([]*TaskInfo, error) {
 	var result []*TaskInfo
-	err := tx.WithContext(c).Where("status = ? AND is_delete = ?", 1, 0).Find(&result).Error
+	if params == nil {
+		err := tx.WithContext(c).Where("is_delete = 0").Find(&result).Error
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+	err := tx.WithContext(c).Where("is_delete = 0 and host_id = ?", params.HostID).Find(&result).Error
 	if err != nil {
 		return nil, err
 	}
@@ -48,6 +56,16 @@ func (s *TaskInfo) FindStatusUpTask(c *gin.Context, tx *gorm.DB) ([]*TaskInfo, e
 
 func (d *TaskInfo) Updates(c *gin.Context, tx *gorm.DB) error {
 	return tx.WithContext(c).Where("id = ?", d.Id).Updates(d).Error
+}
+
+// UpdatesStatus 只更新单个字段
+func (d *TaskInfo) UpdatesStatus(c *gin.Context, tx *gorm.DB) error {
+	if d.Id == 0 {
+		return errors.New("TASK_INFO的ID为空,更新失败")
+	}
+	return tx.WithContext(c).Table(d.TableName()).Where("id = ?", d.Id).Updates(map[string]interface{}{
+		"status": d.Status,
+	}).Error
 }
 
 func (s *TaskInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.TaskListInput) ([]TaskInfo, int, error) {
