@@ -11,6 +11,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
+	"net"
 	"time"
 )
 
@@ -41,7 +42,8 @@ func (h *HostController) HostAdd(c *gin.Context) {
 		middleware.ResponseError(c, 10003, err)
 		return
 	}
-	host := &dao.HostDatabase{Host: params.Host, Password: params.Password, User: params.User}
+	host := &dao.HostDatabase{Host: params.Host, Password: params.Password, User: params.User, HostStatus: 1}
+	go HostPortCheck(host)
 	if err = host.Save(c, tx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 10004, err)
@@ -169,4 +171,20 @@ func HostPingCheck(host *dto.HostAddInput) error {
 		return err
 	}
 	return nil
+}
+
+func HostPortCheck(host *dao.HostDatabase) {
+	for {
+		log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host.Host)
+		timeout := time.Duration(5 * time.Second)
+		_, err := net.DialTimeout("tcp", host.Host, timeout)
+		tx, _ := lib.GetGormPool("default")
+		hostdb := &dao.HostDatabase{Host: host.Host}
+		if err != nil {
+			log.Logger.Warnf("主机端口检测失败:HOST:%v,ERR:%s", host.Host, err.Error())
+			hostdb.HostStatus = 0
+			_ = hostdb.UpdatesStatus(tx)
+		}
+		time.Sleep(10 * time.Minute)
+	}
 }

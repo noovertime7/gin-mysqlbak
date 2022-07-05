@@ -7,11 +7,12 @@ import (
 )
 
 type HostDatabase struct {
-	Id        int    `json:"host_id" gorm:"primary_key" description:"自增主键"`
-	Host      string `json:"host" gorm:"column:host" description:"任务id"`
-	User      string `json:"user"  gorm:"column:user" description:"是否发送钉钉消息"`
-	Password  string `json:"password"  gorm:"column:password" description:"accessToken"`
-	IsDeleted int    `json:"is_deleted" gorm:"column:is_deleted"`
+	Id         int    `json:"host_id" gorm:"primary_key" description:"自增主键"`
+	Host       string `json:"host" gorm:"column:host" description:"任务id"`
+	User       string `json:"user"  gorm:"column:user" description:"是否发送钉钉消息"`
+	Password   string `json:"password"  gorm:"column:password" description:"accessToken"`
+	HostStatus int    `json:"host_status" gorm:"column:host_status"`
+	IsDeleted  int    `json:"is_deleted" gorm:"column:is_deleted"`
 }
 
 func (h *HostDatabase) TableName() string {
@@ -29,6 +30,12 @@ func (s *HostDatabase) Find(c *gin.Context, tx *gorm.DB, search *HostDatabase) (
 		return nil, err
 	}
 	return out, nil
+}
+
+func (d *HostDatabase) UpdatesStatus(tx *gorm.DB) error {
+	return tx.Table(d.TableName()).Where("host = ?", d.Host).Updates(map[string]interface{}{
+		"host_status": d.HostStatus,
+	}).Error
 }
 
 func (s *HostDatabase) PageList(c *gin.Context, tx *gorm.DB, params *dto.HostListInput) ([]HostDatabase, int, error) {

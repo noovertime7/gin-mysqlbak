@@ -10,6 +10,7 @@ import (
 	en_translations "gopkg.in/go-playground/validator.v9/translations/en"
 	zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
 	"reflect"
+	"strings"
 )
 
 //设置Translation
@@ -87,7 +88,23 @@ func TranslationMiddleware() gin.HandlerFunc {
 				t, _ := ut.T("is_valid_bycle", fe.Field())
 				return t
 			})
+			//host_valid
+			//自定义验证方法
+			_ = val.RegisterValidation("host_valid", func(fl validator.FieldLevel) bool {
+				lenth := len(strings.Split(fl.Field().String(), ":"))
+				if lenth != 2 {
+					return false
+				}
+				return true
+			})
+			//自定义验证器
 
+			_ = val.RegisterTranslation("host_valid", trans, func(ut ut.Translator) error {
+				return ut.Add("host_valid", "{0}请添加端口信息,正确格式: 127.0.0.0:3306", true)
+			}, func(ut ut.Translator, fe validator.FieldError) string {
+				t, _ := ut.T("host_valid", fe.Field())
+				return t
+			})
 			break
 		}
 		c.Set(public.TranslatorKey, trans)
