@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/e421083458/golang_common/lib"
+	"github.com/noovertime7/gin-mysqlbak/controller"
 	"github.com/noovertime7/gin-mysqlbak/router"
 	"log"
 	"os"
@@ -15,6 +16,7 @@ func main() {
 		log.Fatal("加载配置文件失败", err)
 	}
 	defer lib.Destroy()
+	go controller.HostPortCheck()
 	router.HttpServerRun()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)

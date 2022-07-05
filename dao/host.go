@@ -38,6 +38,14 @@ func (d *HostDatabase) UpdatesStatus(tx *gorm.DB) error {
 	}).Error
 }
 
+func (d *HostDatabase) FindAllHost(tx *gorm.DB) ([]HostDatabase, error) {
+	var hostlist []HostDatabase
+	if err := tx.Where("is_deleted = 0").Find(&hostlist).Error; err != nil {
+		return nil, err
+	}
+	return hostlist, nil
+}
+
 func (s *HostDatabase) PageList(c *gin.Context, tx *gorm.DB, params *dto.HostListInput) ([]HostDatabase, int, error) {
 	var total int64 = 0
 	var list []HostDatabase

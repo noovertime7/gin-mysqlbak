@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
@@ -9,6 +10,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/ding"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
 	"net"
@@ -43,7 +45,6 @@ func (h *HostController) HostAdd(c *gin.Context) {
 		return
 	}
 	host := &dao.HostDatabase{Host: params.Host, Password: params.Password, User: params.User, HostStatus: 1}
-	go HostPortCheck(host)
 	if err = host.Save(c, tx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 10004, err)
@@ -146,7 +147,7 @@ func (t *HostController) HostList(c *gin.Context) {
 			Host:       listIterm.Host,
 			User:       listIterm.User,
 			Password:   listIterm.Password,
-			HostStatus: 0,
+			HostStatus: listIterm.HostStatus,
 			TaskNum:    taskNum,
 		}
 		outList = append(outList, outItem)
@@ -173,18 +174,56 @@ func HostPingCheck(host *dto.HostAddInput) error {
 	return nil
 }
 
-func HostPortCheck(host *dao.HostDatabase) {
-	for {
-		log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host.Host)
-		timeout := time.Duration(5 * time.Second)
-		_, err := net.DialTimeout("tcp", host.Host, timeout)
-		tx, _ := lib.GetGormPool("default")
-		hostdb := &dao.HostDatabase{Host: host.Host}
-		if err != nil {
-			log.Logger.Warnf("主机端口检测失败:HOST:%v,ERR:%s", host.Host, err.Error())
-			hostdb.HostStatus = 0
-			_ = hostdb.UpdatesStatus(tx)
-		}
-		time.Sleep(10 * time.Minute)
+func HostPortCheck() {
+	tx, _ := lib.GetGormPool("default")
+	hostdb := &dao.HostDatabase{}
+	hostlists, err := hostdb.FindAllHost(tx)
+	if err != nil {
+		log.Logger.Error(err)
+		return
 	}
+	for _, hostinfo := range hostlists {
+		go func(host dao.HostDatabase) {
+			for {
+				log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host.Host)
+				_, err = net.DialTimeout("tcp", host.Host, time.Duration(5*time.Second))
+				if err != nil {
+
+					log.Logger.Warnf("主机端口检测失败:HOST:%v,ERR:%s", host.Host, err.Error())
+					log.Logger.Infof("开始修改数据库在线状态:HOST:%v", host.Host)
+					host.HostStatus = 0
+					_ = host.UpdatesStatus(tx)
+					webhook := ding.Webhook{
+						AtAll:       true,
+						AccessToken: lib.GetStringConf("base.dingMonitor.accessToken"),
+						Secret:      lib.GetStringConf("base.dingMonitor.secret"),
+					}
+					log.Logger.Infof("开始发送钉钉告警消息:HOST:%v", host.Host)
+					err = webhook.SendTextMessage(fmt.Sprintf("主机端口检测失败,请检查！:HOST:%v,ERR:%s", host.Host, err.Error()))
+					if err != nil {
+						log.Logger.Error("钉钉消息发送失败", err)
+					}
+					time.Sleep(10 * time.Minute)
+					continue
+				}
+				log.Logger.Infof("主机存活端口检测成功:HOST:%v", host.Host)
+				host.HostStatus = 1
+				_ = host.UpdatesStatus(tx)
+				time.Sleep(10 * time.Second)
+			}
+		}(hostinfo)
+	}
+
+	//	log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host.Host)
+	//timeout := time.Duration(5 * time.Second)
+	//_, err := net.DialTimeout("tcp", host.Host, timeout)
+	//
+	//hostdb := &dao.HostDatabase{Host: host.Host}
+	//if err != nil {
+	//	log.Logger.Warnf("主机端口检测失败:HOST:%v,ERR:%s", host.Host, err.Error())
+	//	hostdb.HostStatus = 0
+	//	_ = hostdb.UpdatesStatus(tx)
+	//}
+	//log.Logger.Infof("主机存活端口检测成功:HOST:%v", host.Host)
+	//time.Sleep(10 * time.Minute)
 }
