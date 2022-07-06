@@ -19,6 +19,8 @@ import (
 
 type HostController struct{}
 
+var HostOnlineMap map[int]string
+
 func HostRegister(group *gin.RouterGroup) {
 	host := &HostController{}
 	group.POST("/hostadd", host.HostAdd)
@@ -75,6 +77,9 @@ func (s *HostController) HostDelete(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 30003, errors.New("主机不存在,请检查id是否正确"))
 		return
 	}
+	//从在线列表中删除主机
+	delete(HostOnlineMap, hostinfo.Id)
+	//删除标记修改为1
 	hostinfo.IsDeleted = 1
 	if err = hostinfo.Save(ctx, tx); err != nil {
 		middleware.ResponseError(ctx, 30004, err)
@@ -175,55 +180,47 @@ func HostPingCheck(host *dto.HostAddInput) error {
 }
 
 func HostPortCheck() {
+	HostOnlineMap = make(map[int]string)
 	tx, _ := lib.GetGormPool("default")
 	hostdb := &dao.HostDatabase{}
-	hostlists, err := hostdb.FindAllHost(tx)
+	for {
+		hostlists, err := hostdb.FindAllHost(tx)
+		if err != nil {
+			log.Logger.Error(err)
+			return
+		}
+		for _, host := range hostlists {
+			HostOnlineMap[host.Id] = host.Host
+		}
+		for _, host := range HostOnlineMap {
+			HostPortCheckHandler(host)
+		}
+	}
+}
+
+func HostPortCheckHandler(host string) {
+	tx, _ := lib.GetGormPool("default")
+	hostdb := &dao.HostDatabase{Host: host}
+	log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host)
+	_, err := net.DialTimeout("tcp", host, 5*time.Second)
 	if err != nil {
-		log.Logger.Error(err)
-		return
+		log.Logger.Warnf("主机端口检测失败:HOST:%v,ERR:%s", host, err.Error())
+		log.Logger.Infof("开始修改数据库在线状态:HOST:%v", host)
+		hostdb.HostStatus = 0
+		_ = hostdb.UpdatesStatus(tx)
+		webhook := ding.Webhook{
+			AtAll:       true,
+			AccessToken: lib.GetStringConf("base.dingMonitor.accessToken"),
+			Secret:      lib.GetStringConf("base.dingMonitor.secret"),
+		}
+		err = webhook.SendTextMessage(fmt.Sprintf("主机端口检测失败,请检查！:HOST:%v,ERR:%s", host, err.Error()))
+		if err != nil {
+			log.Logger.Error("钉钉消息发送失败", err)
+		}
+		time.Sleep(10 * time.Minute)
 	}
-	for _, hostinfo := range hostlists {
-		go func(host dao.HostDatabase) {
-			for {
-				log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host.Host)
-				_, err = net.DialTimeout("tcp", host.Host, time.Duration(5*time.Second))
-				if err != nil {
-
-					log.Logger.Warnf("主机端口检测失败:HOST:%v,ERR:%s", host.Host, err.Error())
-					log.Logger.Infof("开始修改数据库在线状态:HOST:%v", host.Host)
-					host.HostStatus = 0
-					_ = host.UpdatesStatus(tx)
-					webhook := ding.Webhook{
-						AtAll:       true,
-						AccessToken: lib.GetStringConf("base.dingMonitor.accessToken"),
-						Secret:      lib.GetStringConf("base.dingMonitor.secret"),
-					}
-					log.Logger.Infof("开始发送钉钉告警消息:HOST:%v", host.Host)
-					err = webhook.SendTextMessage(fmt.Sprintf("主机端口检测失败,请检查！:HOST:%v,ERR:%s", host.Host, err.Error()))
-					if err != nil {
-						log.Logger.Error("钉钉消息发送失败", err)
-					}
-					time.Sleep(10 * time.Minute)
-					continue
-				}
-				log.Logger.Infof("主机存活端口检测成功:HOST:%v", host.Host)
-				host.HostStatus = 1
-				_ = host.UpdatesStatus(tx)
-				time.Sleep(10 * time.Second)
-			}
-		}(hostinfo)
-	}
-
-	//	log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host.Host)
-	//timeout := time.Duration(5 * time.Second)
-	//_, err := net.DialTimeout("tcp", host.Host, timeout)
-	//
-	//hostdb := &dao.HostDatabase{Host: host.Host}
-	//if err != nil {
-	//	log.Logger.Warnf("主机端口检测失败:HOST:%v,ERR:%s", host.Host, err.Error())
-	//	hostdb.HostStatus = 0
-	//	_ = hostdb.UpdatesStatus(tx)
-	//}
-	//log.Logger.Infof("主机存活端口检测成功:HOST:%v", host.Host)
-	//time.Sleep(10 * time.Minute)
+	log.Logger.Infof("主机存活端口检测成功:HOST:%v", host)
+	hostdb.HostStatus = 1
+	_ = hostdb.UpdatesStatus(tx)
+	time.Sleep(30 * time.Second)
 }
