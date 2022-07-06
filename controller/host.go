@@ -189,12 +189,15 @@ func HostPortCheck() {
 			log.Logger.Error(err)
 			return
 		}
+		//添加host信息到onlinemap中
 		for _, host := range hostlists {
 			HostOnlineMap[host.Id] = host.Host
 		}
 		for _, host := range HostOnlineMap {
+			//30秒运行一次监测任务
 			HostPortCheckHandler(host)
 		}
+		time.Sleep(1 * time.Minute)
 	}
 }
 
@@ -216,11 +219,12 @@ func HostPortCheckHandler(host string) {
 		err = webhook.SendTextMessage(fmt.Sprintf("主机端口检测失败,请检查！:HOST:%v,ERR:%s", host, err.Error()))
 		if err != nil {
 			log.Logger.Error("钉钉消息发送失败", err)
+			return
 		}
-		time.Sleep(10 * time.Minute)
+		log.Logger.Warnf("主机端口检测失败,发送钉钉告警，修改在线状态完成:HOST:%v,ERR:%s", host)
+		return
 	}
 	log.Logger.Infof("主机存活端口检测成功:HOST:%v", host)
 	hostdb.HostStatus = 1
 	_ = hostdb.UpdatesStatus(tx)
-	time.Sleep(30 * time.Second)
 }
