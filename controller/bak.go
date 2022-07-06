@@ -22,7 +22,9 @@ func BakRegister(group *gin.RouterGroup) {
 	bak := &BakController{}
 	group.GET("/start", bak.StartBak)
 	group.GET("/start_bak_all", bak.StartBakAll)
+	group.GET("/start_bak_all_byhost", bak.StartBakAllByHost)
 	group.GET("/stop", bak.StopBak)
+	group.GET("/stop_bak_all_byhost", bak.StopBakAllByHost)
 	group.GET("/stop_bak_all", bak.StopBakAll)
 	group.GET("/findallhistory", bak.FindAllHistory)
 	group.GET("/historylist", bak.HistoryList)
@@ -103,6 +105,58 @@ func (b *BakController) StartBak(c *gin.Context) {
 }
 
 func (bak *BakController) StartBakAll(c *gin.Context) {
+	var b BakController
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	taskinfo := &dao.TaskInfo{}
+	result, err := taskinfo.FindAllTask(c, tx, nil)
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	if len(result) == 0 {
+		log.Logger.Info("当前主机备份任务为空")
+		middleware.ResponseError(c, 2003, errors.New("当前主机备份任务为空"))
+		return
+	}
+	b.AfterBakChan = make(chan *core.BakHandler, 10)
+	go b.ListenAndSave(c, tx, b.AfterBakChan)
+	for _, task := range result {
+		if task.Status == 1 {
+			log.Logger.Infof("TASK_ID:%d,HOSTID:%d,%s数据库任务已经开启,返回", task.Id, task.HostID, task.DBName)
+			break
+		}
+		taskdetail, err := taskinfo.TaskDetail(c, tx, task)
+		if err != nil {
+			log.Logger.Error(err)
+			return
+		}
+		bakhandler, err := core.NewBakHandler(taskdetail, b.AfterBakChan)
+		if err != nil {
+			log.Logger.Error(err)
+			return
+		}
+		if err = bakhandler.StartBak(); err != nil {
+			log.Logger.Error(err)
+			return
+		}
+		// 修改任务启动状态
+		taskinfo.Status = 1
+		taskinfo.Id = task.Id
+		if err = taskinfo.UpdatesStatus(tx); err != nil {
+			log.Logger.Error(err)
+			return
+		}
+	}
+	middleware.ResponseSuccess(c, "批量启动任务成功")
+}
+
+func (bak *BakController) StartBakAllByHost(c *gin.Context) {
 	params := &dto.HostIDInput{}
 	if err := params.BindValidParm(c); err != nil {
 		log.Logger.Error(err)
@@ -193,6 +247,49 @@ func (b *BakController) StopBak(c *gin.Context) {
 }
 
 func (bak *BakController) StopBakAll(c *gin.Context) {
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	taskinfo := &dao.TaskInfo{}
+	result, err := taskinfo.FindAllTask(c, tx, nil)
+	if err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	if len(result) == 0 {
+		log.Logger.Info("当前主机备份任务为空")
+		middleware.ResponseError(c, 2003, errors.New("当前主机备份任务为空"))
+		return
+	}
+	for _, task := range result {
+		if task.Status != 1 {
+			log.Logger.Infof("TASK_ID:%d,HOSTID:%d,%s数据库任务已经关闭,返回", task.Id, task.HostID, task.DBName)
+			break
+		}
+		bakhandler := &core.BakHandler{DbName: task.DBName}
+		err = bakhandler.StopBak(task.Id)
+		if err != nil {
+			log.Logger.Warning(err)
+			middleware.ResponseError(c, 2004, err)
+			return
+		}
+		// 修改任务启动状态为关闭
+		taskinfo.Id = task.Id
+		taskinfo.Status = 0
+		if err = taskinfo.UpdatesStatus(tx); err != nil {
+			log.Logger.Error(err)
+			middleware.ResponseError(c, 2005, err)
+			return
+		}
+	}
+	middleware.ResponseSuccess(c, "批量停止任务成功")
+}
+
+func (bak *BakController) StopBakAllByHost(c *gin.Context) {
 	params := &dto.HostIDInput{}
 	if err := params.BindValidParm(c); err != nil {
 		log.Logger.Error(err)
