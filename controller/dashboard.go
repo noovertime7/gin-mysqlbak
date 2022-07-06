@@ -30,20 +30,26 @@ func (service *DashboardController) PanelGroupData(c *gin.Context) {
 	histry := &dao.BakHistory{}
 	_, histryNum, err := histry.PageList(c, tx, &dto.HistoryListInput{PageNo: 1, PageSize: 1})
 	if err != nil {
-		middleware.ResponseError(c, 2002, err)
+		middleware.ResponseError(c, 2003, err)
+		return
+	}
+	hostdb := &dao.HostDatabase{}
+	_, hostNum, err := hostdb.PageList(c, tx, &dto.HostListInput{PageNo: 1, PageSize: 1})
+	if err != nil {
+		middleware.ResponseError(c, 2004, err)
 		return
 	}
 	list, err := taskinfo.FindAllTask(c, tx, nil)
 	if err != nil {
-		middleware.ResponseError(c, 2002, err)
+		middleware.ResponseError(c, 2005, err)
 		return
 	}
 	runningNum := len(list)
 	out := dto.PanelGroupDataOutPut{
+		HostNum:       hostNum,
 		TaskNum:       taskNum,
 		HistoryNum:    histryNum,
 		RunningProNum: runningNum,
-		StopProNum:    0,
 	}
 	middleware.ResponseSuccess(c, out)
 }
