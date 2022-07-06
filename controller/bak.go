@@ -119,6 +119,7 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
+	log.Logger.Debug("StartBakAll 任务查询结果", result)
 	if len(result) == 0 {
 		log.Logger.Info("当前主机备份任务为空")
 		middleware.ResponseError(c, 2003, errors.New("当前主机备份任务为空"))
@@ -129,7 +130,7 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 	for _, task := range result {
 		if task.Status == 1 {
 			log.Logger.Infof("TASK_ID:%d,HOSTID:%d,%s数据库任务已经开启,返回", task.Id, task.HostID, task.DBName)
-			break
+			continue
 		}
 		taskdetail, err := taskinfo.TaskDetail(c, tx, task)
 		if err != nil {
@@ -141,6 +142,7 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 			log.Logger.Error(err)
 			return
 		}
+		log.Logger.Infof("StartBakAll开启备份任务TASK:%s", task.DBName)
 		if err = bakhandler.StartBak(); err != nil {
 			log.Logger.Error(err)
 			return
@@ -185,6 +187,11 @@ func (bak *BakController) StartBakAllByHost(c *gin.Context) {
 	b.AfterBakChan = make(chan *core.BakHandler, 10)
 	go b.ListenAndSave(c, tx, b.AfterBakChan)
 	for _, task := range result {
+		if task.Status == 1 {
+			log.Logger.Infof("TASK_ID:%d,HOSTID:%d,%s数据库任务已经打开,返回", task.Id, task.HostID, task.DBName)
+			continue
+		}
+
 		taskdetail, err := taskinfo.TaskDetail(c, tx, task)
 		if err != nil {
 			log.Logger.Error(err)
@@ -266,9 +273,9 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 		return
 	}
 	for _, task := range result {
-		if task.Status != 1 {
+		if task.Status == 0 {
 			log.Logger.Infof("TASK_ID:%d,HOSTID:%d,%s数据库任务已经关闭,返回", task.Id, task.HostID, task.DBName)
-			break
+			continue
 		}
 		bakhandler := &core.BakHandler{DbName: task.DBName}
 		err = bakhandler.StopBak(task.Id)
@@ -315,9 +322,9 @@ func (bak *BakController) StopBakAllByHost(c *gin.Context) {
 		return
 	}
 	for _, task := range result {
-		if task.Status != 1 {
+		if task.Status == 0 {
 			log.Logger.Infof("TASK_ID:%d,HOSTID:%d,%s数据库任务已经关闭,返回", task.Id, task.HostID, task.DBName)
-			break
+			continue
 		}
 		bakhandler := &core.BakHandler{DbName: task.DBName}
 		err = bakhandler.StopBak(task.Id)
