@@ -56,7 +56,7 @@ func (s *TaskInfo) FindAllTask(c *gin.Context, tx *gorm.DB, params *dto.HostIDIn
 
 func FindAllStatusUpTask(tx *gorm.DB) ([]*TaskInfo, error) {
 	var result []*TaskInfo
-	err := tx.Where("is_delete = 0").Find(&result).Error
+	err := tx.Where("is_delete = 0 and status = 1 ").Find(&result).Error
 	if err != nil {
 		return nil, err
 	}
