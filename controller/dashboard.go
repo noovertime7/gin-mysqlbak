@@ -6,6 +6,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
+	"github.com/pkg/errors"
 )
 
 type DashboardController struct{}
@@ -13,7 +14,10 @@ type DashboardController struct{}
 func DashboardRegister(group *gin.RouterGroup) {
 	dashboard := &DashboardController{}
 	group.GET("/panel_group_data", dashboard.PanelGroupData)
+	group.GET("/pie_chart_data", dashboard.PieChartData)
 }
+
+var HostNameMap = make(map[int]string)
 
 func (service *DashboardController) PanelGroupData(c *gin.Context) {
 	tx, err := lib.GetGormPool("default")
@@ -50,6 +54,45 @@ func (service *DashboardController) PanelGroupData(c *gin.Context) {
 		TaskNum:       taskNum,
 		HistoryNum:    histryNum,
 		RunningProNum: runningNum,
+	}
+	middleware.ResponseSuccess(c, out)
+}
+
+func (service *DashboardController) PieChartData(c *gin.Context) {
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	hostdb := &dao.HostDatabase{}
+	hosts, err := hostdb.FindAllHost(tx)
+	if err != nil {
+		middleware.ResponseError(c, 2005, err)
+		return
+	}
+	for _, host := range hosts {
+		HostNameMap[host.Id] = host.Host
+	}
+
+	taskInfo := &dao.TaskInfo{}
+	list, err := taskInfo.GroupByHost(c, tx)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	legend := []string{}
+	for index, item := range list {
+		name, ok := HostNameMap[item.HostID]
+		if !ok {
+			middleware.ResponseError(c, 2003, errors.New("host not found"))
+			return
+		}
+		list[index].Name = name
+		legend = append(legend, name)
+	}
+	out := &dto.DashServiceStatOutput{
+		Legend: legend,
+		Data:   list,
 	}
 	middleware.ResponseSuccess(c, out)
 }

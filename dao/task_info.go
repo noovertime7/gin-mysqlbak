@@ -126,3 +126,12 @@ func (s *TaskInfo) TaskDetail(c *gin.Context, tx *gorm.DB, serch *TaskInfo) (*Ta
 		Ding: dingres,
 	}, nil
 }
+
+func (t *TaskInfo) GroupByHost(c *gin.Context, tx *gorm.DB) ([]dto.DashServiceStatItemOutput, error) {
+	var list []dto.DashServiceStatItemOutput
+	query := tx.Table(t.TableName())
+	if err := query.Where("is_delete=0").Select("host_id, count(*) as value").Group("host_id").Scan(&list).Error; err != nil {
+		return nil, err
+	}
+	return list, nil
+}
