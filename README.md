@@ -60,43 +60,120 @@ kubectl apply -f gin-mysqlbak-server-deploy.yaml  ## 创建后端服务
 ## 二、文件分层
 
 ```
-├── README.md
-├── conf            配置文件夹
+├── bakfile   ## 备份文件存放位置
+├── cmd       ## 二进制启动文件
+│   └── gin-mysqlbak
+├── conf     ## 配置文件存放位置
 │   └── dev
 │       ├── base.toml
-│       ├── mysql_map.toml
-│       └── redis_map.toml
-├── controller      控制器
-│   └── demo.go
-├── dao             DB数据层
-│   └── demo.go
-├── docs            swagger文件层
-├── dto             输入输出结构层
-│   └── demo.go
+│       └── mysql_map.toml
+├── controller  ## controller层
+│   ├── admin.go
+│   ├── admin_login.go
+│   ├── bak.go
+│   ├── dashboard.go
+│   ├── host.go
+│   ├── public.go
+│   └── task.go
+├── core   ## 核心备份功能
+│   └── bak.go
+├── dao   ## 数据库层
+│   ├── admin_login.go
+│   ├── bakhistory.go
+│   ├── ding.go
+│   ├── host.go
+│   ├── oss.go
+│   ├── task.go
+│   └── task_info.go
+├── Dockerfile
+├── docs  ## 文档
+│   ├── docs.go
+│   ├── swagger.json
+│   └── swagger.yaml
+├── dto    ## 模型层
+│   ├── admin.go
+│   ├── admin_login.go
+│   ├── bak.go
+│   ├── dashboard.go
+│   ├── host.go
+│   └── task.go
 ├── go.mod
 ├── go.sum
-├── main.go         入口文件
-├── middleware      中间件层
-│   ├── panic.go
+├── img
+│   ├── bakhistory.gif
+│   ├── dashboard.gif
+│   ├── hostlist.gif
+│   ├── hosttask.gif
+│   └── task.gif
+├── kubernetes
+│   ├── conf
+│   │   ├── mysqlbak-base-conf.yaml
+│   │   ├── mysqlbak-mysql-conf.yaml
+│   │   └── mysqlbak-web-nginx-default.yaml
+│   ├── gin-mysqlbak-server-deploy.yaml
+│   └── gin-mysqlbak-web-deploy.yaml
+├── logs
+│   ├── gin-mysqlbak.inf.log
+│   └── gin-mysqlbak.wf.log
+├── main.go
+├── middleware
+│   ├── ip_auth.go
+│   ├── recovery.go
+│   ├── request_log.go
 │   ├── response.go
-│   ├── token_auth.go
+│   ├── session_auth.go
 │   └── translation.go
-├── public          公共文件
+├── public
+│   ├── alioss
+│   │   └── alioss.go
+│   ├── const.go
+│   ├── ding
+│   │   └── ding.go
 │   ├── log.go
-│   ├── mysql.go
-│   └── validate.go
-└── router          路由层
+│   ├── params.go
+│   └── util.go
+├── README.md
+├── router
 │   ├── httpserver.go
 │   └── route.go
-└── services        逻辑处理层
+├── services
+│   └── stopAllTask.go
+├── sql
+│   └── gin-mysqlbak.sql
+└── test
 ```
 层次划分
 控制层 --> 逻辑处理层 --> DB数据层
 
+## 三、操作及页面演示
+
+- 首页大盘展示
+
+ ![dashboard.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/dashboard.gif?raw=true)    
+
+- 备份主机操作演示
+
+![hostlist.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/hostlist.gif?raw=true) 
+
+- 备份主机添加备份任务操作演示
+
+![hosttask.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/hosttask.gif?raw=true) 
+
+- 任务列表操作展示
+
+ ![task.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/task.gif?raw=true) 
+
+- 备份历史记录操作展示
+
+ ![bakhistory.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/bakhistory.gif?raw=true) 
+
+
+
+## 四、其他
+
 ### log / redis / mysql / http.client 常用方法
 
 参考文档：https://github.com/e421083458/golang_common
-
 
 ### swagger文档生成
 
