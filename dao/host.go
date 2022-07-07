@@ -52,12 +52,12 @@ func (s *HostDatabase) PageList(c *gin.Context, tx *gorm.DB, params *dto.HostLis
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
 	query = query.Table(s.TableName()).Where("is_deleted=0")
+	query.Find(&list).Count(&total)
 	if params.Info != "" {
 		query = query.Where("(host like ? )", "%"+params.Info+"%")
 	}
 	if err := query.Limit(params.PageSize).Offset(offset).Order("id desc").Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
 	}
-	query.Limit(params.PageSize).Offset(offset).Find(&list).Count(&total)
 	return list, int(total), nil
 }

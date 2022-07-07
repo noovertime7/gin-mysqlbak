@@ -70,6 +70,7 @@ func (s *BakHistory) PageList(c *gin.Context, tx *gorm.DB, params *dto.HistoryLi
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
 	query = query.Table(s.TableName())
+	query.Find(&list).Count(&total)
 	if params.Info != "" {
 		query = query.Where("(host like ? or db_name like ?)", "%"+params.Info+"%", "%"+params.Info+"%")
 	}
@@ -82,6 +83,5 @@ func (s *BakHistory) PageList(c *gin.Context, tx *gorm.DB, params *dto.HistoryLi
 			return nil, 0, err
 		}
 	}
-	query.Limit(params.PageSize).Offset(offset).Find(&list).Count(&total)
 	return list, int(total), nil
 }

@@ -82,6 +82,7 @@ func (s *TaskInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.TaskListInp
 	list := []TaskInfo{}
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
+	query.Find(&list).Count(&total)
 	if params.HostId > 0 {
 		query = query.Table(s.TableName()).Where("is_delete=0 and host_id = ?", params.HostId)
 	} else {
@@ -93,7 +94,7 @@ func (s *TaskInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.TaskListInp
 	if err := query.Limit(params.PageSize).Offset(offset).Order("id desc").Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
 	}
-	query.Limit(params.PageSize).Offset(offset).Find(&list).Count(&total)
+
 	return list, int(total), nil
 }
 
