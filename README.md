@@ -2,9 +2,13 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [gin_scaffold](#gin_scaffold)
-    - [现在开始](#%E7%8E%B0%E5%9C%A8%E5%BC%80%E5%A7%8B)
-    - [文件分层](#%E6%96%87%E4%BB%B6%E5%88%86%E5%B1%82)
+- [gin-mysqlbak](#gin-mysqlbak)
+  - [一、现在开始](#%E4%B8%80%E7%8E%B0%E5%9C%A8%E5%BC%80%E5%A7%8B)
+    - [1.1、二进制编译运行](#11%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%BC%96%E8%AF%91%E8%BF%90%E8%A1%8C)
+    - [1.2 Kubernetes环境部署](#12-kubernetes%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2)
+  - [二、文件分层](#%E4%BA%8C%E6%96%87%E4%BB%B6%E5%88%86%E5%B1%82)
+  - [三、操作及页面演示](#%E4%B8%89%E6%93%8D%E4%BD%9C%E5%8F%8A%E9%A1%B5%E9%9D%A2%E6%BC%94%E7%A4%BA)
+  - [四、其他](#%E5%9B%9B%E5%85%B6%E4%BB%96)
     - [log / redis / mysql / http.client 常用方法](#log--redis--mysql--httpclient-%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95)
     - [swagger文档生成](#swagger%E6%96%87%E6%A1%A3%E7%94%9F%E6%88%90)
 
