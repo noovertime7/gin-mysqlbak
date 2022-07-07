@@ -24,6 +24,8 @@ gin-mysqlbak:一款简单高效的Mysql数据库备份平台！
 项目地址：https://github.com/noovertime7/gin-mysqlbak
 ## 一、现在开始
 
+**注意: 安装开始前，请先创建gin-mysqlbak数据库，刷入sql文件初始化数据库，sql文件在项目sql文件夹下**
+
 ### 1.1、二进制编译运行
 
 - 开始前请确保机器已安装go编译环境
@@ -46,85 +48,16 @@ go run main.go
 ```
 ### 1.2 Kubernetes环境部署
 
-- 开始前请准备状态良好的k8s集群
+- 开始前请准备状态良好的k8s集群,**请根据实际环境修改conf文件夹下的配置文件**
 - 创建mysqlbak命名空间部署后端服务
 
 ```
-kubectl create ns mysqlbak
+kubectl create ns mysqlbak  ## 创建命名空间
+cd gin-mysqlbak/kubernetes && kubectl apply -f ./conf  ## 创建configmap配置文件
+kubectl apply -f gin-mysqlbak-server-deploy.yaml  ## 创建后端服务
 ```
 
-- 创建configmap文件用于替换容器中的配置文件,**文件内容请根据实际修改**
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysqlbak-base-conf
-  namespace: mysqlbak
-data:
-  base.toml: |
-    [base]
-        debug_mode="debug"
-        time_location="Asia/Chongqing"
-        cluster_url="http://yunxue521.top:32081"  # 外网访问地址
-    
-    [http]
-        addr = ":8880"                       # 监听地址, default ":8700"
-        read_timeout = 10                   # 读取超时时长
-        write_timeout = 10                  # 写入超时时长
-        max_header_bytes = 20               # 最大的header大小，二进制位长度
-    
-    [log]
-        log_level = "trace"         #日志打印最低级别
-        [log.file_writer]           #文件写入配置
-            on = true
-            log_path = "./logs/gin-mysqlbak.inf.log"
-            rotate_log_path = "./logs/gin-mysqlbak.inf.log.%Y%M%D%H"
-            wf_log_path = "./logs/gin-mysqlbak.wf.log"
-            rotate_wf_log_path = "./logs/gin-mysqlbak.wf.log.%Y%M%D%H"
-        [log.console_writer]        #工作台输出
-            on = false
-            color = false
-    
-    [swagger]
-        title="gin_scaffold swagger API"
-        desc="This is a sample server celler server."
-        host="127.0.0.1:8880"
-        base_path=""
-    
-    [redis]
-        host="127.0.0.1:6379"
-        password="123456"
-        max_active = 100
-        max_idle = 100
-        down_grade = false
-    [dingMonitor]   # 用于钉钉推送主机报警
-        accessToken = "77f579efbefeefc316b55d3caea1ba1963db2f1319aa7520cbfd9626de07fffc"
-        secret = "SEC72586e3f7ff6db4b2ad24eac905f308a9ddb0b1b9809af31e5623a14abb42fff"
-```
-
-- 创建数据库配置文件
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysqlbak-mysql-conf
-  namespace: mysqlbak
-data:
-  mysql_map.toml: |
-    [list]
-        [list.default]
-            driver_name = "mysql"
-            data_source_name = "root:123456@tcp(127.0.0.1:3306)/gin-mysqlbak?charset=utf8&parseTime=true&loc=Asia%2FChongqing"
-            max_open_conn = 20
-            max_idle_conn = 10
-            max_conn_life_time = 100
-```
-
-
-
-### 文件分层
+## 二、文件分层
 
 ```
 ├── README.md
