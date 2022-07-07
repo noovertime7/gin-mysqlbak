@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gin-mysqlbak-server
+  namespace: mysqlbak
+spec:
+  selector:
+    matchLabels:
+      app: gin-mysqlbak-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gin-mysqlbak-server
+    spec:
+      containers:
+      - name: gin-mysqlbak-server
+        imagePullPolicy: IfNotPresent
+        image: chenteng/gin-mysqlbak-server:1.1.2
+        volumeMounts:
+        - name: baseconf
+          mountPath: /app/conf/dev/base.toml
+          subPath: base.toml
+        - name: mysqlconf
+          mountPath: /app/conf/dev/mysql_map.toml
+          subPath: mysql_map.toml
+        - name: mysqlbak-data  
+          mountPath: /app/bakfile
+          subPath: mysql-data
+      volumes:
+      - name: mysqlbak-data 
+        hostPath:
+          path: /data/gin-mysqlbak  
+      - name: baseconf
+        configMap:
+          name: mysqlbak-base-conf
+      - name: mysqlconf
+        configMap:
+          name: mysqlbak-mysql-conf		  		  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gin-mysqlbak-server
+  namespace: mysqlbak
+  labels:
+    app: gin-mysqlbak-server
+spec:
+  type: NodePort
+  ports:
+  - targetPort: 8880
+    port: 8880
+    nodePort: 32081
+  selector:
+     app: gin-mysqlbak-server

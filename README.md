@@ -10,109 +10,122 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# gin_scaffold
-Gin best practices, gin development scaffolding, too late to explain, get on the bus.
+# gin-mysqlbak
 
-使用gin构建了企业级脚手架，代码简洁易读，可快速进行高效web开发。
-主要功能有：
+gin-mysqlbak:一款简单高效的Mysql数据库备份平台！
+
 1. 请求链路日志打印，涵盖mysql/redis/request
-2. 支持多语言错误信息提示及自定义错误提示。
-3. 支持了多配置环境
-4. 封装了 log/redis/mysql/http.client 常用方法
-5. 支持swagger文档生成
+2. 支持备份文件直接下载到本地，一键还原至原数据库。
+3. 支持对接OSS对象存储存储备份文件
+4. 支持主机健康检查，主机离线通过钉钉发送告警
+5. 支持钉钉推送备份状态
+6. 支持swagger文档生成
 
-项目地址：https://github.com/e421083458/gin_scaffold
-### 现在开始
+项目地址：https://github.com/noovertime7/gin-mysqlbak
+## 一、现在开始
+
+### 1.1、二进制编译运行
+
+- 开始前请确保机器已安装go编译环境
+
 - 安装软件依赖
 go mod使用请查阅：
 
 https://blog.csdn.net/e421083458/article/details/89762113
-```
-git clone git@github.com:e421083458/gin_scaffold.git
-cd gin_scaffold
+```shell
+git clone https://github.com/noovertime7/gin-mysqlbak.git
+cd gin-mysqlbak
 go mod tidy
 ```
-- 确保正确配置了 conf/mysql_map.toml、conf/redis_map.toml：
+- 确保正确配置了 conf/mysql_map.toml、conf/base.toml
 
-- 运行脚本
+- 运行入口main.go (默认监听8880端口)
 
-```
+```shell
 go run main.go
-
-➜  gin_scaffold git:(master) ✗ go run main.go
-------------------------------------------------------------------------
-[INFO]  config=./conf/dev/
-[INFO]  start loading resources.
-[INFO]  success loading resources.
-------------------------------------------------------------------------
-[GIN-debug] [WARNING] Now Gin requires Go 1.6 or later and Go 1.7 will be required soon.
-
-[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
-
-[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
- - using env:	export GIN_MODE=release
- - using code:	gin.SetMode(gin.ReleaseMode)
-
-[GIN-debug] GET    /demo/index               --> github.com/e421083458/gin_scaffold/controller.(*Demo).Index-fm (6 handlers)
-[GIN-debug] GET    /demo/bind                --> github.com/e421083458/gin_scaffold/controller.(*Demo).Bind-fm (6 handlers)
-[GIN-debug] GET    /demo/dao                 --> github.com/e421083458/gin_scaffold/controller.(*Demo).Dao-fm (6 handlers)
-[GIN-debug] GET    /demo/redis               --> github.com/e421083458/gin_scaffold/controller.(*Demo).Redis-fm (6 handlers)
- [INFO] HttpServerRun::8880
 ```
-- 测试mysql与请求链路
+### 1.2 Kubernetes环境部署
 
-创建测试表：
-```
-CREATE TABLE `area` (
- `id` bigint(20) NOT NULL AUTO_INCREMENT,
- `area_name` varchar(255) NOT NULL,
- `city_id` int(11) NOT NULL,
- `user_id` int(11) NOT NULL,
- `update_at` datetime NOT NULL,
- `create_at` datetime NOT NULL,
- `delete_at` datetime NOT NULL,
- PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='area';
-INSERT INTO `area` (`id`, `area_name`, `city_id`, `user_id`, `update_at`, `create_at`, `delete_at`) VALUES (NULL, 'area_name', '1', '2', '2019-06-15 00:00:00', '2019-06-15 00:00:00', '2019-06-15 00:00:00');
-```
+- 开始前请准备状态良好的k8s集群
+- 创建mysqlbak命名空间部署后端服务
 
 ```
-curl 'http://127.0.0.1:8880/demo/dao?id=1'
-{
-    "errno": 0,
-    "errmsg": "",
-    "data": "[{\"id\":1,\"area_name\":\"area_name\",\"city_id\":1,\"user_id\":2,\"update_at\":\"2019-06-15T00:00:00+08:00\",\"create_at\":\"2019-06-15T00:00:00+08:00\",\"delete_at\":\"2019-06-15T00:00:00+08:00\"}]",
-    "trace_id": "c0a8fe445d05b9eeee780f9f5a8581b0"
-}
-
-查看链路日志（确认是不是一次请求查询，都带有相同trace_id）：
-tail -f gin_scaffold.inf.log
-
-[INFO][2019-06-16T11:39:26.802][log.go:58] _com_request_in||method=GET||from=127.0.0.1||traceid=c0a8fe445d05b9eeee780f9f5a8581b0||cspanid=||uri=/demo/dao?id=1||args=map[]||body=||spanid=9dad47aa57e9d186
-[INFO][2019-06-16T11:39:26.802][log.go:58] _com_mysql_success||affected_row=1||traceid=c0a8fe445d05b9ee07b80f9f66cb39b0||spanid=9dad47aa1408d2ac||source=/Users/niuyufu/go/src/github.com/e421083458/gin_scaffold/dao/demo.go:24||proc_time=0.000000000||sql=SELECT * FROM `area`  WHERE (id = '1')||level=sql||current_time=2019-06-16 11:39:26||cspanid=
-[INFO][2019-06-16T11:39:26.802][log.go:58] _com_request_out||method=GET||args=map[]||proc_time=0.025019164||traceid=c0a8fe445d05b9eeee780f9f5a8581b0||spanid=9dad47aa57e9d186||uri=/demo/dao?id=1||from=127.0.0.1||response={\"errno\":0,\"errmsg\":\"\",\"data\":\"[{\\\"id\\\":1,\\\"area_name\\\":\\\"area_name\\\",\\\"city_id\\\":1,\\\"user_id\\\":2,\\\"update_at\\\":\\\"2019-06-15T00:00:00+08:00\\\",\\\"create_at\\\":\\\"2019-06-15T00:00:00+08:00\\\",\\\"delete_at\\\":\\\"2019-06-15T00:00:00+08:00\\\"}]\",\"trace_id\":\"c0a8fe445d05b9eeee780f9f5a8581b0\"}||cspanid=
+kubectl create ns mysqlbak
 ```
-- 测试参数绑定与多语言验证
 
-```
-curl 'http://127.0.0.1:8880/demo/bind?name=name&locale=zh'
-{
-    "errno": 500,
-    "errmsg": "年龄为必填字段,密码为必填字段",
-    "data": "",
-    "trace_id": "c0a8fe445d05badae8c00f9fb62158b0"
-}
+- 创建configmap文件用于替换容器中的配置文件,**文件内容请根据实际修改**
 
-curl 'http://127.0.0.1:8880/demo/bind?name=name&locale=en'
-{
-    "errno": 500,
-    "errmsg": "Age is a required field,Passwd is a required field",
-    "data": "",
-    "trace_id": "c0a8fe445d05bb4cd3b00f9f3a768bb0"
-}
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysqlbak-base-conf
+  namespace: mysqlbak
+data:
+  base.toml: |
+    [base]
+        debug_mode="debug"
+        time_location="Asia/Chongqing"
+        cluster_url="http://yunxue521.top:32081"  # 外网访问地址
+    
+    [http]
+        addr = ":8880"                       # 监听地址, default ":8700"
+        read_timeout = 10                   # 读取超时时长
+        write_timeout = 10                  # 写入超时时长
+        max_header_bytes = 20               # 最大的header大小，二进制位长度
+    
+    [log]
+        log_level = "trace"         #日志打印最低级别
+        [log.file_writer]           #文件写入配置
+            on = true
+            log_path = "./logs/gin-mysqlbak.inf.log"
+            rotate_log_path = "./logs/gin-mysqlbak.inf.log.%Y%M%D%H"
+            wf_log_path = "./logs/gin-mysqlbak.wf.log"
+            rotate_wf_log_path = "./logs/gin-mysqlbak.wf.log.%Y%M%D%H"
+        [log.console_writer]        #工作台输出
+            on = false
+            color = false
+    
+    [swagger]
+        title="gin_scaffold swagger API"
+        desc="This is a sample server celler server."
+        host="127.0.0.1:8880"
+        base_path=""
+    
+    [redis]
+        host="127.0.0.1:6379"
+        password="123456"
+        max_active = 100
+        max_idle = 100
+        down_grade = false
+    [dingMonitor]   # 用于钉钉推送主机报警
+        accessToken = "77f579efbefeefc316b55d3caea1ba1963db2f1319aa7520cbfd9626de07fffc"
+        secret = "SEC72586e3f7ff6db4b2ad24eac905f308a9ddb0b1b9809af31e5623a14abb42fff"
 ```
+
+- 创建数据库配置文件
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysqlbak-mysql-conf
+  namespace: mysqlbak
+data:
+  mysql_map.toml: |
+    [list]
+        [list.default]
+            driver_name = "mysql"
+            data_source_name = "root:123456@tcp(127.0.0.1:3306)/gin-mysqlbak?charset=utf8&parseTime=true&loc=Asia%2FChongqing"
+            max_open_conn = 20
+            max_idle_conn = 10
+            max_conn_life_time = 100
+```
+
+
 
 ### 文件分层
+
 ```
 ├── README.md
 ├── conf            配置文件夹
@@ -146,6 +159,7 @@ curl 'http://127.0.0.1:8880/demo/bind?name=name&locale=en'
 ```
 层次划分
 控制层 --> 逻辑处理层 --> DB数据层
+
 ### log / redis / mysql / http.client 常用方法
 
 参考文档：https://github.com/e421083458/golang_common
