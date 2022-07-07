@@ -63,7 +63,7 @@ type HostListOutItem struct {
 }
 
 type HostIDInput struct {
-	HostID string `json:"host_id" form:"host_id"`
+	HostID int `json:"host_id" form:"host_id"`
 }
 
 func (d *HostIDInput) BindValidParm(ctx *gin.Context) error {

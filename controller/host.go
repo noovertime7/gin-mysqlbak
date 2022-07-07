@@ -141,7 +141,7 @@ func (t *HostController) HostList(c *gin.Context) {
 	var outList []dto.HostListOutItem
 	for _, listIterm := range list {
 		task := &dao.TaskInfo{}
-		_, taskNum, err := task.PageList(c, tx, &dto.TaskListInput{HostId: listIterm.Id, PageNo: 1, PageSize: 1})
+		taskinfos, err := task.FindAllTask(c, tx, &dto.HostIDInput{HostID: listIterm.Id})
 		if err != nil {
 			log.Logger.Error(err)
 			middleware.ResponseError(c, 10004, err)
@@ -153,7 +153,7 @@ func (t *HostController) HostList(c *gin.Context) {
 			User:       listIterm.User,
 			Password:   listIterm.Password,
 			HostStatus: listIterm.HostStatus,
-			TaskNum:    taskNum,
+			TaskNum:    len(taskinfos),
 		}
 		outList = append(outList, outItem)
 	}
