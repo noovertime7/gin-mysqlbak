@@ -89,7 +89,7 @@ func (s *TaskInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.TaskListInp
 		query = query.Table(s.TableName()).Where("is_delete=0")
 	}
 	if params.Info != "" {
-		query = query.Where("(host like ? or db_name like ?)", "%"+params.Info+"%", "%"+params.Info+"%")
+		query = query.Where("( db_name like ?)", "%"+params.Info+"%")
 	}
 	if err := query.Limit(params.PageSize).Offset(offset).Order("id desc").Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
