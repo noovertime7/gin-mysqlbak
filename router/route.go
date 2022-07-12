@@ -156,5 +156,15 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	{
 		controller.HostRegister(hostRouter)
 	}
+
+	AgentRouter := router.Group("/agent")
+	AgentRouter.Use(
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.TranslationMiddleware())
+	{
+		controller.AgentRegister(AgentRouter)
+	}
+
 	return router
 }
