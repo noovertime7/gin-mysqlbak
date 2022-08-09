@@ -7,6 +7,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/alioss"
 	"github.com/noovertime7/gin-mysqlbak/public/ding"
+	"github.com/noovertime7/gin-mysqlbak/public/minio"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
@@ -126,6 +127,7 @@ func (b *BakHandler) StopBak(tid int) error {
 
 func (b *BakHandler) Run() {
 	log.Logger.Info("BakHandler 开始备份数据库")
+	b.BeforBak()
 	err := b.Engine.DumpAllToFile(b.FileName)
 	if err != nil {
 		if err := b.RunMysqlDump(); err != nil {
@@ -189,7 +191,7 @@ func AfterBak(b *BakHandler) {
 		markcontent := map[string]string{
 			"title": b.Host + b.DbName + "备份状态",
 			"text": fmt.Sprintf(
-				"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](https://img.alicdn.com/tfs/TB1NwmBEL9TBuNjy1zbXXXpepXa-2400-1218.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName),
+				"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](http://web.ts-it.cn/img/index/section_4_img.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName),
 		}
 		webhook := ding.Webhook{AtAll: true, Secret: b.DingConfig.DingSecret, AccessToken: b.DingConfig.DingAccessToken}
 		log.Logger.Infof("%s:%s开始发送钉钉消息", b.Host, b.DbName)
@@ -204,20 +206,32 @@ func AfterBak(b *BakHandler) {
 	}
 	//判断是否启动OSS保存
 	if b.OssConfig.IsOssSave == 1 {
-		if b.OssConfig.OssType == 0 {
-			FileName := b.FileName
-			Endpoint := b.OssConfig.Endpoint
-			Accesskey := b.OssConfig.OssAccess
-			Secretkey := b.OssConfig.OssSecret
-			BucketName := b.OssConfig.BucketName
-			Directory := b.OssConfig.Directory
+		FileName := b.FileName
+		Endpoint := b.OssConfig.Endpoint
+		Accesskey := b.OssConfig.OssAccess
+		Secretkey := b.OssConfig.OssSecret
+		BucketName := b.OssConfig.BucketName
+		Directory := b.OssConfig.Directory
+		switch b.OssConfig.OssType {
+		case 0:
+			log.Logger.Debug("OSSType为0保存至minio中")
 			log.Logger.Infof("%s:%s开始保存至阿里云对象存储OSS", b.Host, b.DbName)
 			if err := alioss.AliOssUploadFile(FileName, Endpoint, Accesskey, Secretkey, BucketName, Directory); err != nil {
-				log.Logger.Errorf("%s:%s保存阿里云对象存储OSS失败:", b.Host, b.DbName)
+				log.Logger.Errorf("%s:%s保存阿里云对象存储OSS失败:%v", b.Host, b.DbName, err.Error())
 				b.OssStatus = 0
 				return
 			}
 			log.Logger.Infof("%s:%s阿里云对象存储OSS上传成功", b.Host, b.DbName)
+			b.OssStatus = 1
+		case 1:
+			log.Logger.Debug("OSSType为1保存至minio中")
+			client := minio.NewClient(Endpoint, Accesskey, Secretkey, BucketName, Directory, b.FileName)
+			if err := client.UploadFile(); err != nil {
+				log.Logger.Errorf("%s:%s保存Minio存储失败:%v", b.Host, b.DbName, err.Error())
+				b.OssStatus = 0
+				return
+			}
+			log.Logger.Infof("%s:%s保存Minio对象存储上传成功", b.Host, b.DbName)
 			b.OssStatus = 1
 		}
 	}
