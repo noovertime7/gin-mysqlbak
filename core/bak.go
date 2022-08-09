@@ -185,25 +185,6 @@ func (b *BakHandler) RunMysqlDump() error {
 }
 
 func AfterBak(b *BakHandler) {
-	//判断是否启动钉钉提醒
-	if b.DingConfig.IsDingSend == 1 {
-		baktime := time.Now().Format("2006年01月02日15:04:01")
-		markcontent := map[string]string{
-			"title": b.Host + b.DbName + "备份状态",
-			"text": fmt.Sprintf(
-				"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](http://web.ts-it.cn/img/index/section_4_img.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName),
-		}
-		webhook := ding.Webhook{AtAll: true, Secret: b.DingConfig.DingSecret, AccessToken: b.DingConfig.DingAccessToken}
-		log.Logger.Infof("%s:%s开始发送钉钉消息", b.Host, b.DbName)
-		if err := webhook.SendMarkDown(markcontent); err != nil {
-			b.DingStatus = 0
-			log.Logger.Error("钉钉消息发送失败", err)
-			return
-		}
-		// 钉钉消息发送成功，更新状态
-		b.DingStatus = 1
-		log.Logger.Infof("%s:%s发送钉钉消息成功", b.Host, b.DbName)
-	}
 	//判断是否启动OSS保存
 	if b.OssConfig.IsOssSave == 1 {
 		FileName := b.FileName
@@ -234,5 +215,24 @@ func AfterBak(b *BakHandler) {
 			log.Logger.Infof("%s:%s保存Minio对象存储上传成功", b.Host, b.DbName)
 			b.OssStatus = 1
 		}
+	}
+	//判断是否启动钉钉提醒
+	if b.DingConfig.IsDingSend == 1 {
+		baktime := time.Now().Format("2006年01月02日15:04:01")
+		markcontent := map[string]string{
+			"title": b.Host + b.DbName + "备份状态",
+			"text": fmt.Sprintf(
+				"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](http://web.ts-it.cn/img/index/section_4_img.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName),
+		}
+		webhook := ding.Webhook{AtAll: true, Secret: b.DingConfig.DingSecret, AccessToken: b.DingConfig.DingAccessToken}
+		log.Logger.Infof("%s:%s开始发送钉钉消息", b.Host, b.DbName)
+		if err := webhook.SendMarkDown(markcontent); err != nil {
+			b.DingStatus = 0
+			log.Logger.Error("钉钉消息发送失败", err)
+			return
+		}
+		// 钉钉消息发送成功，更新状态
+		b.DingStatus = 1
+		log.Logger.Infof("%s:%s发送钉钉消息成功", b.Host, b.DbName)
 	}
 }

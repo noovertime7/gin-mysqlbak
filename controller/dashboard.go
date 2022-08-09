@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/core"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
@@ -43,12 +44,12 @@ func (service *DashboardController) PanelGroupData(c *gin.Context) {
 		middleware.ResponseError(c, 2004, err)
 		return
 	}
-	list, err := taskinfo.FindAllTask(c, tx, nil)
+	_, err = taskinfo.FindAllTask(c, tx, nil)
 	if err != nil {
 		middleware.ResponseError(c, 2005, err)
 		return
 	}
-	runningNum := len(list)
+	runningNum := len(core.CronJob)
 	out := dto.PanelGroupDataOutPut{
 		HostNum:       hostNum,
 		TaskNum:       taskNum,
