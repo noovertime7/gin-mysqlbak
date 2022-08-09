@@ -9,6 +9,7 @@ import (
 type HostAddInput struct {
 	Host     string `form:"host" json:"host" comment:"数据库备份主机地址加端口"   validate:"required,host_valid" example:"127.0.0.1"`
 	User     string `form:"username" json:"username" comment:"用户"   validate:"required" example:"123456"`
+	Content  string `form:"content" json:"content" comment:"备注"   validate:"" example:"123456"`
 	Password string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
 }
 
@@ -30,6 +31,7 @@ type HostUpdateInput struct {
 	ID       int    `json:"id" form:"id" validate:"required"`
 	Host     string `form:"host" json:"host" comment:"数据库备份主机地址加端口"   validate:"required,host_valid" example:"127.0.0.1"`
 	User     string `form:"username" json:"username" comment:"用户"   validate:"required" example:"123456"`
+	Content  string `form:"content" json:"content" comment:"备注"   validate:"" example:"123456"`
 	Password string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
 }
 
@@ -59,6 +61,7 @@ type HostListOutItem struct {
 	User       string `json:"username" comment:"用户"`
 	Password   string `json:"password" comment:"数据库密码"`
 	HostStatus int    `json:"host_status"`
+	Content    string `json:"content"`
 	TaskNum    int    `json:"task_num"`
 }
 

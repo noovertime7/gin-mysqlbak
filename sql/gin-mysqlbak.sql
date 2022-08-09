@@ -36,7 +36,7 @@ CREATE TABLE `t_admin`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
-INSERT INTO `gin-mysqlbak`.t_admin (id, user_name, salt, password, update_at, create_at, is_delete) VALUES (1, 'admin', 'admin', '2823d896e9822c0833d41d4904f0c00756d718570fce49b9a379a62c804689d3', '2020-04-10 16:42:05', '2022-06-15 20:55:55', 0);
+INSERT INTO `gin-mysqlbak`.t_admin(id, user_name, salt, password, update_at, create_at, is_delete) VALUES (1, 'admin', 'admin', '2823d896e9822c0833d41d4904f0c00756d718570fce49b9a379a62c804689d3', '2020-04-10 16:42:05', '2022-06-15 20:55:55', 0);
 
 
 -- ----------------------------

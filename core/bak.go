@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -127,13 +128,28 @@ func (b *BakHandler) Run() {
 	log.Logger.Info("BakHandler 开始备份数据库")
 	err := b.Engine.DumpAllToFile(b.FileName)
 	if err != nil {
-		b.BakStatus = 0
-		b.OssStatus = 2
+		if err := b.RunMysqlDump(); err != nil {
+			b.BakStatus = 0
+			b.OssStatus = 2
+			b.DingStatus = 2
+			b.BakMsg = fmt.Sprintf("%s", err)
+			b.FileName = "unknown"
+			AfterBak(b)
+			log.Logger.Error("备份失败,保存备份历史到数据库,停止备份任务,发送消息", err)
+			b.AfterBakChan <- b
+			log.Logger.Debug("BakHandler 发送消息成功")
+			return
+		}
+		b.BakMsg = "success"
+		b.BakStatus = 1
+		b.FileSize = public.GetFileSize(b.FileName)
+		//首先判定钉钉 oss都操作成功，状态改为1
 		b.DingStatus = 2
-		b.BakMsg = fmt.Sprintf("%s", err)
-		b.FileName = "unknown"
+		b.OssStatus = 2
+		//判断是否启动钉钉提醒
 		AfterBak(b)
-		log.Logger.Error("备份失败,保存备份历史到数据库,停止备份任务,发送消息", err)
+		//发送对象到channel
+		log.Logger.Info("备份数据库成功,保存备份历史到数据库,发送消息")
 		b.AfterBakChan <- b
 		log.Logger.Debug("BakHandler 发送消息成功")
 		return
@@ -150,6 +166,20 @@ func (b *BakHandler) Run() {
 	log.Logger.Info("备份数据库成功,保存备份历史到数据库,发送消息")
 	b.AfterBakChan <- b
 	log.Logger.Debug("BakHandler 发送消息成功")
+}
+
+func (b *BakHandler) RunMysqlDump() error {
+	log.Logger.Warning("使用xorm备份失败，尝试使用mysqldump进行备份")
+	iphost, port := strings.Split(b.Host, ":")[0], strings.Split(b.Host, ":")[1]
+	command := fmt.Sprintf("mysqldump -u%v -p%v -P%v -h%v  %v >  %v", b.User, b.PassWord, port, iphost, b.DbName, b.FileName)
+	cmd := exec.Command("sh", "-c", command)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Logger.Error("mysqldump执行失败:", command, " with error: ", err.Error())
+		return err
+	}
+	log.Logger.Infof("mysqldump执行成功:%v:%v", b.Host, b.DbName)
+	return nil
 }
 
 func AfterBak(b *BakHandler) {

@@ -46,7 +46,7 @@ func (h *HostController) HostAdd(c *gin.Context) {
 		middleware.ResponseError(c, 10003, err)
 		return
 	}
-	host := &dao.HostDatabase{Host: params.Host, Password: params.Password, User: params.User, HostStatus: 1}
+	host := &dao.HostDatabase{Host: params.Host, Password: params.Password, User: params.User, HostStatus: 1, Content: params.Content}
 	if err = host.Save(c, tx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 10004, err)
@@ -95,7 +95,7 @@ func (h *HostController) HostUpdate(c *gin.Context) {
 		return
 	}
 	// 更改主机后进行ping测试
-	hostinput := &dto.HostAddInput{Host: params.Host, User: params.User, Password: params.Password}
+	hostinput := &dto.HostAddInput{Host: params.Host, User: params.User, Password: params.Password, Content: params.Content}
 	if err := HostPingCheck(hostinput); err != nil {
 		middleware.ResponseError(c, 1111, err)
 		return
@@ -110,6 +110,7 @@ func (h *HostController) HostUpdate(c *gin.Context) {
 		Host:     params.Host,
 		User:     params.User,
 		Password: params.Password,
+		Content:  params.Content,
 	}
 	if err = host.Save(c, tx); err != nil {
 		middleware.ResponseError(c, 30003, err)
@@ -153,6 +154,7 @@ func (t *HostController) HostList(c *gin.Context) {
 			User:       listIterm.User,
 			Password:   listIterm.Password,
 			HostStatus: listIterm.HostStatus,
+			Content:    listIterm.Content,
 			TaskNum:    len(taskinfos),
 		}
 		outList = append(outList, outItem)
