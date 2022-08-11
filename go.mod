@@ -25,6 +25,7 @@ require (
 	github.com/swaggo/swag v1.8.2
 	golang.org/x/tools v0.1.11 // indirect
 	gopkg.in/go-playground/validator.v9 v9.29.0
+	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/gorm v1.22.4
 )
 

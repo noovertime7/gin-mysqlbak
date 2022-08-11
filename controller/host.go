@@ -6,6 +6,8 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
+	"github.com/noovertime7/gin-mysqlbak/conf"
+	"github.com/noovertime7/gin-mysqlbak/core"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
@@ -213,15 +215,30 @@ func HostPortCheckHandler(host string) {
 		log.Logger.Infof("开始修改数据库在线状态:HOST:%v", host)
 		hostdb.HostStatus = 0
 		_ = hostdb.UpdatesStatus(tx)
-		webhook := ding.Webhook{
-			AtAll:       true,
-			AccessToken: lib.GetStringConf("base.dingMonitor.accessToken"),
-			Secret:      lib.GetStringConf("base.dingMonitor.secret"),
-		}
-		err = webhook.SendTextMessage(fmt.Sprintf("主机端口检测失败,请检查！:HOST:%v,ERR:%s", host, err.Error()))
-		if err != nil {
-			log.Logger.Error("钉钉消息发送失败", err)
-			return
+		//根据是否开启钉钉代理，选择调用
+		if conf.GetBoolConf("dingProxyAgent", "enable") {
+			log.Logger.Infof("主机失联告警：使用钉钉代理发送告警信息")
+			dingSender := core.NewDingSender(
+				conf.GetStringConf("HostLostAlarms", "accessToken"),
+				conf.GetStringConf("HostLostAlarms", "secret"),
+				fmt.Sprintf("主机端口检测失败,请检查！:HOST:%v,ERR:%s", host, err.Error()))
+			data, err := dingSender.SendMessage()
+			if err != nil {
+				log.Logger.Error("钉钉消息发送失败", err, data)
+				return
+			}
+		} else {
+			log.Logger.Infof("主机失联告警：使用自身能力发送告警信息")
+			webhook := ding.Webhook{
+				AtAll:       true,
+				AccessToken: conf.GetStringConf("HostLostAlarms", "accessToken"),
+				Secret:      conf.GetStringConf("HostLostAlarms", "secret"),
+			}
+			err = webhook.SendTextMessage(fmt.Sprintf("主机端口检测失败,请检查！:HOST:%v,ERR:%s", host, err.Error()))
+			if err != nil {
+				log.Logger.Error("钉钉消息发送失败", err)
+				return
+			}
 		}
 		log.Logger.Warnf("主机端口检测失败,发送钉钉告警，修改在线状态完成:HOST:%v,ERR:%s", host)
 		return

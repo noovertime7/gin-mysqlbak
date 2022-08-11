@@ -58,10 +58,11 @@ func (t *Webhook) SendTextMessage(s string, at ...string) error {
 		return err
 	}
 	defer resp.Body.Close()
-	_, err = ioutil.ReadAll(resp.Body)
+	dingmsg, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
+	log.Logger.Infof("钉钉发送响应结果:%s", string(dingmsg))
 	return nil
 }
 

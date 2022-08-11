@@ -2,8 +2,9 @@ package router
 
 import (
 	"context"
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/conf"
+	"github.com/noovertime7/gin-mysqlbak/controller"
 	"github.com/noovertime7/gin-mysqlbak/services"
 	"log"
 	"net/http"
@@ -15,21 +16,25 @@ var (
 )
 
 func HttpServerRun() {
-	gin.SetMode(lib.ConfBase.DebugMode)
+	gin.SetMode(conf.GetStringConf("base", "debug_mode"))
 	r := InitRouter()
 	HttpSrvHandler = &http.Server{
-		Addr:           lib.GetStringConf("base.http.addr"),
+		Addr:           conf.GetStringConf("http", "addr"),
 		Handler:        r,
-		ReadTimeout:    time.Duration(lib.GetIntConf("base.http.read_timeout")) * time.Second,
-		WriteTimeout:   time.Duration(lib.GetIntConf("base.http.write_timeout")) * time.Second,
-		MaxHeaderBytes: 1 << uint(lib.GetIntConf("base.http.max_header_bytes")),
+		ReadTimeout:    time.Duration(conf.GetIntConf("http", "read_timeout")) * time.Second,
+		WriteTimeout:   time.Duration(conf.GetIntConf("http", "write_timeout")) * time.Second,
+		MaxHeaderBytes: 1 << uint(conf.GetIntConf("http", "max_header_bytes")),
 	}
 	go func() {
-		log.Printf(" [INFO] HttpServerRun:%s\n", lib.GetStringConf("base.http.addr"))
+		log.Printf(" [INFO] HttpServerRun:%s\n", conf.GetStringConf("http", "addr"))
 		if err := HttpSrvHandler.ListenAndServe(); err != nil {
-			log.Fatalf(" [ERROR] HttpServerRun:%s err:%v\n", lib.GetStringConf("base.http.addr"), err)
+			log.Fatalf(" [ERROR] HttpServerRun:%s err:%v\n", conf.GetStringConf("http", "addr"), err)
 		}
 	}()
+	//如果主机丢失开关打开，才会开启主机检测功能
+	if conf.GetBoolConf("HostLostAlarms", "enable") {
+		go controller.HostPortCheck()
+	}
 }
 
 func HttpServerStop() {

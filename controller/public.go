@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
@@ -64,6 +65,6 @@ func (p *PublicController) BakFileExists(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 20001, errors.New("本地文件不存在"))
 		return
 	}
-	clusterUrl := lib.GetStringConf("base.base.cluster_url")
+	clusterUrl := conf.GetStringConf("base", "download_url")
 	middleware.ResponseSuccess(ctx, clusterUrl+"/public/download")
 }

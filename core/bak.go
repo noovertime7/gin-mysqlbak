@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/go-xorm/xorm"
+	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/alioss"
@@ -219,17 +220,30 @@ func AfterBak(b *BakHandler) {
 	//判断是否启动钉钉提醒
 	if b.DingConfig.IsDingSend == 1 {
 		baktime := time.Now().Format("2006年01月02日15:04:01")
-		markcontent := map[string]string{
-			"title": b.Host + b.DbName + "备份状态",
-			"text": fmt.Sprintf(
-				"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](http://web.ts-it.cn/img/index/section_4_img.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName),
-		}
-		webhook := ding.Webhook{AtAll: true, Secret: b.DingConfig.DingSecret, AccessToken: b.DingConfig.DingAccessToken}
-		log.Logger.Infof("%s:%s开始发送钉钉消息", b.Host, b.DbName)
-		if err := webhook.SendMarkDown(markcontent); err != nil {
-			b.DingStatus = 0
-			log.Logger.Error("钉钉消息发送失败", err)
-			return
+		if conf.GetBoolConf("dingProxyAgent", "enable") {
+			log.Logger.Infof("%s:%s调用钉钉代理发送钉钉消息", b.Host, b.DbName)
+			msg := fmt.Sprintf("\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](http://web.ts-it.cn/img/index/section_4_img.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName)
+			dingSender := NewDingSender(b.DingConfig.DingAccessToken, b.DingConfig.DingSecret, msg)
+			data, err := dingSender.SendMarkdown()
+			if err != nil {
+				b.DingStatus = 0
+				log.Logger.Error("钉钉消息发送失败", err)
+				return
+			}
+			log.Logger.Debug("钉钉发送响应结果:", data)
+		} else {
+			log.Logger.Infof("%s:%s使用自身能力发送钉钉消息", b.Host, b.DbName)
+			markContent := map[string]string{
+				"title": b.Host + b.DbName + "备份状态",
+				"text": fmt.Sprintf(
+					"\n- 备份时间:%v\n- 备份状态:%s\n- OSS上传状态:%s\n- 备份文件目录:%s\n![screenshot](http://web.ts-it.cn/img/index/section_4_img.png)\n", baktime, b.BakMsg, public.StatusConversion(b.OssStatus), b.FileName),
+			}
+			webhook := ding.Webhook{AtAll: true, Secret: b.DingConfig.DingSecret, AccessToken: b.DingConfig.DingAccessToken}
+			if err := webhook.SendMarkDown(markContent); err != nil {
+				b.DingStatus = 0
+				log.Logger.Error("钉钉消息发送失败", err.Error())
+				return
+			}
 		}
 		// 钉钉消息发送成功，更新状态
 		b.DingStatus = 1

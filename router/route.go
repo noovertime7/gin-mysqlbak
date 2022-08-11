@@ -2,9 +2,9 @@ package router
 
 import (
 	"github.com/e421083458/gin_scaffold/docs"
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/controller"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/swaggo/files"
@@ -59,11 +59,11 @@ import (
 
 func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	// programatically set swagger info
-	docs.SwaggerInfo.Title = lib.GetStringConf("base.swagger.title")
-	docs.SwaggerInfo.Description = lib.GetStringConf("base.swagger.desc")
+	docs.SwaggerInfo.Title = conf.GetStringConf("swagger", "title")
+	docs.SwaggerInfo.Description = conf.GetStringConf("swagger", "desc")
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = lib.GetStringConf("base.swagger.host")
-	docs.SwaggerInfo.BasePath = lib.GetStringConf("base.swagger.base_path")
+	docs.SwaggerInfo.Host = conf.GetStringConf("swagger", "host")
+	docs.SwaggerInfo.BasePath = conf.GetStringConf("swagger", "base_path")
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	router := gin.Default()
@@ -76,7 +76,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	adminLoginRouter := router.Group("/admin_login")
-	store, err := sessions.NewRedisStore(10, "tcp", lib.GetStringConf("base.redis.host"), lib.GetStringConf("base.redis.password"), []byte("store"))
+	store, err := sessions.NewRedisStore(10, "tcp", conf.GetStringConf("redis", "host"), conf.GetStringConf("redis", "password"), []byte("store"))
 	if err != nil {
 		log.Fatalln("new redis err", err)
 	}
