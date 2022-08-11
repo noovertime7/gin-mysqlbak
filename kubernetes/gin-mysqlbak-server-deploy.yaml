@@ -16,7 +16,7 @@ spec:
       containers:
       - name: gin-mysqlbak-server
         imagePullPolicy: IfNotPresent
-        image: chenteng/gin-mysqlbak-server:1.1.2
+        image: chenteng/gin-mysqlbak-server:1.1.7-SP1
         volumeMounts:
         - name: baseconf
           mountPath: /app/conf/dev/base.toml
