@@ -4,7 +4,6 @@ go 1.14
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
-	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/e421083458/gin_scaffold v0.0.0-20211226015300-616fc31c0400
 	github.com/e421083458/golang_common v1.2.1
 	github.com/gin-gonic/contrib v0.0.0-20190526021735-7fb7810ed2a0
@@ -14,8 +13,10 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-xorm/xorm v0.7.9
+	github.com/golang/protobuf v1.5.2
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/micro/go-micro/v2 v2.9.1
 	github.com/minio/minio-go/v7 v7.0.34
 	github.com/noovertime7/mysqlbak v0.0.0-20220612083217-fdb12cd90242
 	github.com/pkg/errors v0.9.1
@@ -24,9 +25,12 @@ require (
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.8.2
 	golang.org/x/tools v0.1.11 // indirect
+	google.golang.org/protobuf v1.28.0
 	gopkg.in/go-playground/validator.v9 v9.29.0
-	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/ini.v1 v1.67.0
 	gorm.io/gorm v1.22.4
 )
 
 replace github.com/gin-contrib/sse v0.1.0 => github.com/e421083458/sse v0.1.1
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0

@@ -1,0 +1,64 @@
+syntax = "proto3";
+package go.micro.service.backupAgent;
+option go_package="./;Host";
+
+
+service Host {
+  rpc AddHost(HostAddInput) returns (HostOneMessage) {}
+  rpc DeleteHost(HostDeleteInput) returns (HostOneMessage) {}
+  rpc UpdateHost(HostUpdateInput) returns (HostOneMessage) {}
+  rpc GetHostList(HostListInput) returns (HostListOutPut) {}
+}
+
+
+message HostAddInput{
+  string Host =2 ;
+  string UserName =3 ;
+  string Password =4 ;
+  string Content =5 ;
+}
+
+
+
+message HostDeleteInput {
+  int32 ID =1 ;
+}
+
+message HostUpdateInput{
+  int32 ID =1 ;
+  string Host =2 ;
+  string UserName =3 ;
+  string Password =4 ;
+  string Content =5 ;
+}
+
+
+message HostOneMessage {
+  string Message  =1;
+  bool OK =2;
+}
+
+
+message HostListInput {
+  string Info =1 ;
+  int32 PageNo =2;
+  int32 PageSize =3 ;
+}
+
+message HostListOutPut {
+  int32 Total  =1 ;
+  repeated ListItem listItem =2 ;
+}
+
+message ListItem {
+  int32 ID =3 ;
+  string Host =4 ;
+  string UserName =5 ;
+  string Password =6 ;
+  int32 HostStatus =7 ;
+  string Content =8 ;
+  int32  TaskNum =9;
+}
+
+
+

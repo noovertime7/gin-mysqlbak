@@ -9,7 +9,7 @@ import (
 	"runtime/debug"
 )
 
-// RecoveryMiddleware捕获所有panic，并且返回错误信息
+// RecoveryMiddleware RecoveryMiddleware捕获所有panic，并且返回错误信息
 func RecoveryMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

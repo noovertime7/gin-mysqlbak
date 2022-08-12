@@ -4,6 +4,7 @@ import (
 	"github.com/e421083458/gin_scaffold/docs"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentcontroller"
 	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/controller"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
@@ -157,13 +158,25 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		controller.HostRegister(hostRouter)
 	}
 
+	//Agent相关路由
 	AgentRouter := router.Group("/agent")
 	AgentRouter.Use(
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware())
 	{
-		controller.AgentRegister(AgentRouter)
+		agentcontroller.AgentRegister(AgentRouter)
+	}
+
+	AgentHostRouter := router.Group("/agent")
+	AgentHostRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware())
+	{
+		agentcontroller.AgentHostRegister(AgentHostRouter)
 	}
 
 	return router
