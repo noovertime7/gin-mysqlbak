@@ -3,6 +3,7 @@ module github.com/noovertime7/gin-mysqlbak
 go 1.14
 
 require (
+	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/e421083458/gin_scaffold v0.0.0-20211226015300-616fc31c0400
 	github.com/e421083458/golang_common v1.2.1
@@ -17,13 +18,18 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/micro/go-micro/v2 v2.9.1
+	github.com/micro/go-plugins/wrapper/breaker/hystrix/v2 v2.9.1
+	github.com/micro/go-plugins/wrapper/trace/opentracing/v2 v2.9.1
 	github.com/minio/minio-go/v7 v7.0.34
 	github.com/noovertime7/mysqlbak v0.0.0-20220612083217-fdb12cd90242
+	github.com/opentracing/opentracing-go v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.8.2
+	github.com/uber/jaeger-client-go v2.30.0+incompatible
+	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	golang.org/x/tools v0.1.11 // indirect
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/go-playground/validator.v9 v9.29.0
