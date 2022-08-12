@@ -20,7 +20,8 @@ func (d *HostAddInput) BindValidParm(ctx *gin.Context) error {
 
 // HostDeleteInput  删除
 type HostDeleteInput struct {
-	ID int `json:"id" form:"id" validate:"required"`
+	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"123456"`
+	ID          int    `json:"id" form:"id" validate:"required"`
 }
 
 func (d *HostDeleteInput) BindValidParm(ctx *gin.Context) error {
