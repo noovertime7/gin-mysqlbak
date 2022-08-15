@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
-	"github.com/noovertime7/gin-mysqlbak/agent/proto"
+	"github.com/noovertime7/gin-mysqlbak/agent/proto/host"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
@@ -26,8 +26,8 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	hostService := pkg.GetMicroService(params.ServiceName).(proto.HostService)
-	data, err := hostService.AddHost(c, &proto.HostAddInput{
+	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
+	data, err := hostService.AddHost(c, &host.HostAddInput{
 		Host:     params.Host,
 		UserName: params.User,
 		Password: params.Password,
@@ -48,8 +48,8 @@ func (a *AgentHostController) DeleteHost(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	hostService := pkg.GetMicroService(params.ServiceName).(proto.HostService)
-	data, err := hostService.DeleteHost(c, &proto.HostDeleteInput{
+	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
+	data, err := hostService.DeleteHost(c, &host.HostDeleteInput{
 		ID: int32(params.ID),
 	})
 	if err != nil || !data.OK {
@@ -67,8 +67,8 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	hostService := pkg.GetMicroService(params.ServiceName).(proto.HostService)
-	data, err := hostService.UpdateHost(c, &proto.HostUpdateInput{
+	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
+	data, err := hostService.UpdateHost(c, &host.HostUpdateInput{
 		ID:       int32(params.ID),
 		Host:     params.Host,
 		UserName: params.User,
@@ -90,8 +90,8 @@ func (a *AgentHostController) HostList(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	hostService := pkg.GetMicroService(params.ServiceName).(proto.HostService)
-	out, err := hostService.GetHostList(c, &proto.HostListInput{
+	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
+	out, err := hostService.GetHostList(c, &host.HostListInput{
 		Info:     params.Info,
 		PageNo:   int32(params.PageNo),
 		PageSize: int32(params.PageSize),

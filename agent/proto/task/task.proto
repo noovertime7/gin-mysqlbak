@@ -1,0 +1,120 @@
+syntax = "proto3";
+package go.micro.service.backupAgent;
+option go_package="./;Task";
+
+
+service Task {
+  rpc TaskAdd(TaskAddInput) returns (TaskOneMessage) {}
+  rpc TaskDelete(TaskIDInput) returns (TaskOneMessage) {}
+  rpc TaskUpdate(TaskUpdateInput) returns (TaskOneMessage) {}
+  rpc TaskList(TaskListInput) returns (TaskListOutPut) {}
+  rpc TaskDetail(TaskIDInput) returns (TaskDetailOutPut) {}
+}
+
+message TaskOneMessage {
+  // @inject_tag: json:"message" form:"message" uri:"message"
+  string Message  =1;
+  // @inject_tag: json:"content" form:"content" uri:"content"
+  bool OK =2;
+}
+
+
+message TaskAddInput {
+  int64 HostID = 1;
+  string DBName =2;
+  string ServiceName = 16;
+  string BackupCycle =3;
+  int64 KeepNumber =4 ;
+  int64 IsAllDBBak =5;
+  int64 IsDingSend=6;
+  string DingAccessToken =7;
+  string DingSecret=8;
+  int64 OssType=9;
+  int64 IsOssSave=10;
+  string Endpoint=11;
+  string OssAccess=12;
+  string OssSecret=13;
+  string BucketName=14;
+  string Directory=15;
+}
+
+
+message TaskIDInput {
+  int64 ID = 1;
+}
+
+message TaskUpdateInput {
+  int64 ID = 17;
+  int64 HostID = 1;
+  string DBName =2;
+  string ServiceName = 16;
+  string BackupCycle =3;
+  int64 KeepNumber =4 ;
+  int64 IsAllDBBak =5;
+  int64 IsDingSend=6;
+  string DingAccessToken =7;
+  string DingSecret=8;
+  int64 OssType=9;
+  int64 IsOssSave=10;
+  string Endpoint=11;
+  string OssAccess=12;
+  string OssSecret=13;
+  string BucketName=14;
+  string Directory=15;
+}
+
+message TaskListInput {
+  // @inject_tag: json:"info" form:"info" uri:"info"
+  string Info =1 ;
+  // @inject_tag: json:"page_no" form:"page_no" uri:"page_no"
+  int64 PageNo =2;
+  // @inject_tag: json:"page_size" form:"page_size" uri:"page_size"
+  int64 PageSize =3 ;
+}
+
+message TaskListOutPut {
+  int64 Total =1;
+  repeated TaskListItem taskListItem =2 ;
+}
+
+message TaskListItem {
+  int64 ID = 1;
+  int64 HostID = 2;
+  string Host = 3;
+  string DBName =4;
+  string ServiceName = 5;
+  string BackupCycle =6;
+  int64 KeepNumber =7 ;
+  int64 Status =8;
+  string CreateAt =9;
+}
+
+message TaskDetailOutPut {
+    HostInfo hostInfo =1;
+    DingInfo dingInfo =2;
+    OssInfo ossInfo =3;
+}
+
+
+message HostInfo {
+  string Host =1  ;
+  string Content =2 ;
+  int64 HostStatus =3 ;
+}
+
+message DingInfo {
+  int64 IsDingSend = 1;
+  string DingAccessToken =2;
+  string  DingSecret =3 ;
+}
+
+
+message OssInfo {
+  int64 IsOssSave =1;
+  int64 OssType =2;
+  string Endpoint =3;
+  string OssAccess =4 ;
+  string OssSecret =5;
+  string BucketName =6;
+   string Directory  =7;
+}

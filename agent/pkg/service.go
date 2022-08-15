@@ -13,7 +13,8 @@ import (
 	"github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg/trace"
-	"github.com/noovertime7/gin-mysqlbak/agent/proto"
+	"github.com/noovertime7/gin-mysqlbak/agent/proto/host"
+	"github.com/noovertime7/gin-mysqlbak/agent/proto/task"
 	"log"
 )
 
@@ -57,7 +58,7 @@ func NewHystrixWrapper(c client.Client) client.Client {
 	return &hystrixWrapper{Client: c}
 }
 
-func GetMicroService(serviceName string) interface{} {
+func GetHostService(serviceName string) interface{} {
 	// 配置jaeger连接
 	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
 	if err != nil {
@@ -72,7 +73,25 @@ func GetMicroService(serviceName string) interface{} {
 			opentracing.NewClientWrapper(jaegerTracer)),
 	)
 	s.Init()
-	return proto.NewHostService(fmt.Sprintf("%s", serviceName), s.Client())
+	return host.NewHostService(fmt.Sprintf("%s", serviceName), s.Client())
+}
+
+func GetTaskService(serviceName string) interface{} {
+	// 配置jaeger连接
+	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer closer.Close()
+	// 配置jaeger连接
+	s = micro.NewService(
+		micro.Registry(reg),
+		micro.WrapClient(
+			NewHystrixWrapper,
+			opentracing.NewClientWrapper(jaegerTracer)),
+	)
+	s.Init()
+	return task.NewTaskService(fmt.Sprintf("%s", serviceName), s.Client())
 }
 
 func GetServiceList() agentdto.AgentOutPut {

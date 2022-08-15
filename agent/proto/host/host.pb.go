@@ -4,7 +4,7 @@
 // 	protoc        v3.13.0
 // source: agent/proto/host.proto
 
-package proto
+package host
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

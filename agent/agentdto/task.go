@@ -7,16 +7,17 @@ import (
 
 // TaskAddInput 新增task
 type TaskAddInput struct {
-	HostID          int    `json:"host_id" form:"host_id" validate:"required"`
+	ServiceName     string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
+	HostID          int64  `json:"host_id" form:"host_id" validate:"required"`
 	DBName          string `form:"db_name" json:"db_name" comment:"库名"   validate:"required" example:"123456"`
 	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
-	KeepNumber      int    `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
-	IsAllDBBak      int    `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
-	IsDingSend      int    `json:"is_ding_send"`
+	KeepNumber      int64  `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
+	IsAllDBBak      int64  `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
+	IsDingSend      int64  `json:"is_ding_send"`
 	DingAccessToken string `json:"ding_access_token"`
 	DingSecret      string `json:"ding_secret"`
-	OssType         int    `json:"oss_type" validate:"" `
-	IsOssSave       int    `json:"is_oss_save" validate:"" `
+	OssType         int64  `json:"oss_type" validate:"" `
+	IsOssSave       int64  `json:"is_oss_save" validate:"" `
 	Endpoint        string `json:"endpoint" validate:"" `
 	OssAccess       string `json:"oss_access" validate:"" `
 	OssSecret       string `json:"oss_secret" validate:"" `
@@ -26,17 +27,18 @@ type TaskAddInput struct {
 
 // TaskUpdateInput 更新任务
 type TaskUpdateInput struct {
-	ID              int    `json:"id" form:"id" validate:"required"`
-	HostID          int    `json:"host_id" form:"host_id" validate:"required"`
+	ServiceName     string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
+	ID              int64  `json:"id" form:"id" validate:"required"`
+	HostID          int64  `json:"host_id" form:"host_id" validate:"required"`
 	DBName          string `form:"db_name" json:"db_name" comment:"库名"   validate:"required" example:"123456"`
 	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
-	KeepNumber      int    `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
-	IsAllDBBak      int    `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
-	IsDingSend      int    `json:"is_ding_send"`
+	KeepNumber      int64  `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
+	IsAllDBBak      int64  `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
+	IsDingSend      int64  `json:"is_ding_send"`
 	DingAccessToken string `json:"ding_access_token"`
 	DingSecret      string `json:"ding_secret"`
-	OssType         int    `json:"oss_type" validate:"" `
-	IsOssSave       int    `json:"is_oss_save" validate:"" `
+	OssType         int64  `json:"oss_type" validate:"" `
+	IsOssSave       int64  `json:"is_oss_save" validate:"" `
 	Endpoint        string `json:"endpoint" validate:"" `
 	OssAccess       string `json:"oss_access" validate:"" `
 	OssSecret       string `json:"oss_secret" validate:"" `
@@ -50,31 +52,33 @@ func (d *TaskUpdateInput) BindValidParm(ctx *gin.Context) error {
 
 // TaskListInput 通过page pagesize 查询服务信息
 type TaskListInput struct {
-	HostId   int    `json:"host_id" form:"host_id" validate:""`
-	Info     string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
-	PageNo   int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
-	PageSize int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
+	HostId      int64  `json:"host_id" form:"host_id" validate:""`
+	Info        string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
+	PageNo      int64  `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
+	PageSize    int64  `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
 type TaskListOutput struct {
-	Total int               `form:"total" json:"total" comment:"总数"   validate:"" example:""`
+	Total int64             `form:"total" json:"total" comment:"总数"   validate:"" example:""`
 	List  []TaskListOutItem `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
 }
 
 type TaskListOutItem struct {
-	ID          int    `json:"id" form:"id"`
+	ID          int64  `json:"id" form:"id"`
 	Host        string `json:"host" form:"host"`
-	HostID      int    `json:"host_id" form:"host_id"`
+	HostID      int64  `json:"host_id" form:"host_id"`
 	DBName      string `json:"db_name" form:"db_name"`
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle"`
-	KeepNumber  int    `json:"keep_number" form:"keep_number"`
+	KeepNumber  int64  `json:"keep_number" form:"keep_number"`
 	Status      bool   `json:"status" form:"status"`
 	CreateAt    string `json:"create_at" form:"create_at"`
 }
 
-//删除task
+// TaskDeleteInput 删除task
 type TaskDeleteInput struct {
-	ID int `json:"id" form:"id" validate:"required"`
+	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
+	ID          int64  `json:"id" form:"id" validate:"required"`
 }
 
 func (d *TaskDeleteInput) BindValidParm(ctx *gin.Context) error {

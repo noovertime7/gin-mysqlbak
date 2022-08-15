@@ -161,22 +161,15 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	//Agent相关路由
 	AgentRouter := router.Group("/agent")
 	AgentRouter.Use(
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.TranslationMiddleware())
-	{
-		agentcontroller.AgentRegister(AgentRouter)
-	}
-
-	AgentHostRouter := router.Group("/agent")
-	AgentHostRouter.Use(
 		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.SessionAuthMiddleware(),
 		middleware.TranslationMiddleware())
 	{
-		agentcontroller.AgentHostRegister(AgentHostRouter)
+		agentcontroller.AgentRegister(AgentRouter)
+		agentcontroller.AgentTaskRegister(AgentRouter)
+		agentcontroller.AgentHostRegister(AgentRouter)
 	}
 
 	return router
