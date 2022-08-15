@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
+	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/e421083458/gin_scaffold v0.0.0-20211226015300-616fc31c0400
 	github.com/e421083458/golang_common v1.2.1
@@ -18,7 +19,6 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/micro/go-micro/v2 v2.9.1
-	github.com/micro/go-plugins/wrapper/breaker/hystrix/v2 v2.9.1
 	github.com/micro/go-plugins/wrapper/trace/opentracing/v2 v2.9.1
 	github.com/minio/minio-go/v7 v7.0.34
 	github.com/noovertime7/mysqlbak v0.0.0-20220612083217-fdb12cd90242
