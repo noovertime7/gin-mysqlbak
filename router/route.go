@@ -170,6 +170,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		agentcontroller.AgentRegister(AgentRouter)
 		agentcontroller.AgentTaskRegister(AgentRouter)
 		agentcontroller.AgentHostRegister(AgentRouter)
+		agentcontroller.BakHistoryRegister(AgentRouter)
 	}
 
 	return router

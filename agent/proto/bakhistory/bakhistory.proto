@@ -1,0 +1,49 @@
+syntax = "proto3";
+package go.micro.service.backupAgent;
+option go_package="./;History";
+
+
+service History {
+  rpc GetHistoryList(HistoryListInput) returns (HistoryListOutput) {}
+  rpc DeleteHistory(HistoryIDInput) returns (HistoryOneMessage) {}
+}
+
+
+message HistoryListInput {
+  // @inject_tag: json:"info" form:"info" uri:"info"
+  string Info =1 ;
+  // @inject_tag: json:"page_no" form:"page_no" uri:"page_no"
+  int64 PageNo =2;
+  // @inject_tag: json:"page_size" form:"page_size" uri:"page_size"
+  int64 PageSize =3 ;
+  string Sort =4;
+}
+
+
+message HistoryIDInput{
+  int64 ID = 1;
+}
+
+message HistoryOneMessage {
+  // @inject_tag: json:"message" form:"message" uri:"message"
+  string Message  =1;
+  // @inject_tag: json:"content" form:"content" uri:"content"
+  bool OK =2;
+}
+
+message HistoryListOutput {
+  int64 Total =1;
+  repeated HistoryListOutItem historyListOutItem =2 ;
+}
+
+message HistoryListOutItem {
+  int64 ID =1 ;
+  string Host =2;
+  string DBName =3;
+  int64 DingStatus =4;
+  int64  OSSStatus =5;
+  string Message =6;
+  string FileSize =7;
+  string FileName =8;
+  string BakTime=9;
+}

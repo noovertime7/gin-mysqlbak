@@ -13,6 +13,7 @@ import (
 	"github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg/trace"
+	"github.com/noovertime7/gin-mysqlbak/agent/proto/bakhistory"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/host"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/task"
 	"log"
@@ -92,6 +93,24 @@ func GetTaskService(serviceName string) interface{} {
 	)
 	s.Init()
 	return task.NewTaskService(fmt.Sprintf("%s", serviceName), s.Client())
+}
+
+func GetHistoryService(serviceName string) interface{} {
+	// 配置jaeger连接
+	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer closer.Close()
+	// 配置jaeger连接
+	s = micro.NewService(
+		micro.Registry(reg),
+		micro.WrapClient(
+			NewHystrixWrapper,
+			opentracing.NewClientWrapper(jaegerTracer)),
+	)
+	s.Init()
+	return bakhistory.NewHistoryService(fmt.Sprintf("%s", serviceName), s.Client())
 }
 
 func GetServiceList() agentdto.AgentOutPut {
