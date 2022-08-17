@@ -1,6 +1,7 @@
 package agentcontroller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
@@ -69,15 +70,17 @@ func (a *AgentTaskController) TaskList(ctx *gin.Context) {
 		Info:     params.Info,
 		PageNo:   params.PageNo,
 		PageSize: params.PageSize,
+		HostID:   params.HostId,
 	}
 	data, err := taskService.TaskList(ctx, taskListInput)
 	if err != nil {
-		log.Logger.Error("agent查询主机列表失败", err)
+		log.Logger.Error("agent查询任务列表失败", err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
 	middleware.ResponseSuccess(ctx, data)
-	log.Logger.Info("agent查询主机列表成功")
+	fmt.Println(data)
+	log.Logger.Info("agent查询任务列表成功")
 }
 
 func (a *AgentTaskController) TaskDetail(ctx *gin.Context) {
@@ -125,6 +128,7 @@ func (a *AgentTaskController) TaskUpdate(ctx *gin.Context) {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
+	fmt.Println("params", params)
 	taskService := pkg.GetTaskService(params.ServiceName).(task.TaskService)
 	taskUpdateInput := &task.TaskUpdateInput{
 		ID:              params.ID,
@@ -145,6 +149,7 @@ func (a *AgentTaskController) TaskUpdate(ctx *gin.Context) {
 		BucketName:      params.BucketName,
 		Directory:       params.Directory,
 	}
+	fmt.Println(taskUpdateInput)
 	data, err := taskService.TaskUpdate(ctx, taskUpdateInput)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent更新主机失败", err)

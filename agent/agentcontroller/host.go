@@ -1,13 +1,16 @@
 package agentcontroller
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
+	"github.com/go-xorm/xorm"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/host"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
+	"time"
 )
 
 type AgentHostController struct{}
@@ -24,6 +27,12 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 	params := &agentdto.HostAddInput{}
 	if err := params.BindValidParm(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		return
+	}
+	//进行主机检测避免添加无用信息
+	if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
+		log.Logger.Error("agent添加主机检测失败", err)
+		middleware.ResponseError(c, 20001, err)
 		return
 	}
 	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
@@ -67,6 +76,12 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
+	//进行主机检测避免添加无用信息
+	if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
+		log.Logger.Error("agent添加主机检测失败", err)
+		middleware.ResponseError(c, 20001, err)
+		return
+	}
 	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
 	data, err := hostService.UpdateHost(c, &host.HostUpdateInput{
 		ID:       int32(params.ID),
@@ -101,4 +116,19 @@ func (a *AgentHostController) HostList(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, out)
+}
+
+func HostPingCheck(User, Password, Host string) error {
+	en, err := xorm.NewEngine("mysql", User+":"+Password+"@tcp("+Host+")/mysql?charset=utf8&parseTime=true")
+	defer en.Close()
+	if err != nil {
+		log.Logger.Errorf("创建数据库连接失败:%s", err.Error())
+		return err
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err = en.PingContext(ctx); err != nil {
+		return err
+	}
+	return nil
 }

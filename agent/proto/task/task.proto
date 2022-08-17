@@ -64,6 +64,7 @@ message TaskUpdateInput {
 }
 
 message TaskListInput {
+  int64 HostID =4;
   // @inject_tag: json:"info" form:"info" uri:"info"
   string Info =1 ;
   // @inject_tag: json:"page_no" form:"page_no" uri:"page_no"
@@ -93,6 +94,7 @@ message TaskDetailOutPut {
     HostInfo hostInfo =1;
     DingInfo dingInfo =2;
     OssInfo ossInfo =3;
+    TaskInfo taskInfo =4;
 }
 
 
@@ -100,6 +102,18 @@ message HostInfo {
   string Host =1  ;
   string Content =2 ;
   int64 HostStatus =3 ;
+}
+
+
+message TaskInfo {
+  int64 TaskID = 1;
+  int64 HostID = 2;
+  string DBName =4;
+  string ServiceName = 5;
+  string BackupCycle =6;
+  int64 KeepNumber =7 ;
+  int64 Status =8;
+  string CreateAt =9;
 }
 
 message DingInfo {

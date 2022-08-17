@@ -13,16 +13,16 @@ type TaskAddInput struct {
 	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
 	KeepNumber      int64  `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
 	IsAllDBBak      int64  `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
-	IsDingSend      int64  `json:"is_ding_send"`
-	DingAccessToken string `json:"ding_access_token"`
-	DingSecret      string `json:"ding_secret"`
-	OssType         int64  `json:"oss_type" validate:"" `
-	IsOssSave       int64  `json:"is_oss_save" validate:"" `
-	Endpoint        string `json:"endpoint" validate:"" `
-	OssAccess       string `json:"oss_access" validate:"" `
-	OssSecret       string `json:"oss_secret" validate:"" `
-	BucketName      string `json:"bucket_name" validate:"" `
-	Directory       string `json:"directory" validate:"" `
+	IsDingSend      int64  `json:"is_ding_send" form:"is_ding_send"`
+	DingAccessToken string `json:"ding_access_token" form:"ding_access_token"`
+	DingSecret      string `json:"ding_secret" form:"ding_secret"`
+	OssType         int64  `json:"oss_type" validate:""  form:"oss_type"`
+	IsOssSave       int64  `json:"is_oss_save" validate:""  form:"is_oss_save"`
+	Endpoint        string `json:"endpoint" validate:""  form:"endpoint"`
+	OssAccess       string `json:"oss_access" validate:""  form:"oss_access"`
+	OssSecret       string `json:"oss_secret" validate:""  form:"oss_secret"`
+	BucketName      string `json:"bucket_name" validate:""  form:"bucket_name"`
+	Directory       string `json:"directory" validate:"" form:"directory"`
 }
 
 // TaskUpdateInput 更新任务
@@ -34,16 +34,16 @@ type TaskUpdateInput struct {
 	BackupCycle     string `form:"backup_cycle" json:"backup_cycle" comment:"数据库备份时间"   validate:"required,is_valid_bycle" example:"123456"`
 	KeepNumber      int64  `form:"keep_number" json:"keep_number" comment:"保留周期"   validate:"required" example:"123456"`
 	IsAllDBBak      int64  `form:"is_all_dbBak" json:"is_all_dbBak" comment:"是否全库备份 0开启 1关闭"  example:"123456"`
-	IsDingSend      int64  `json:"is_ding_send"`
-	DingAccessToken string `json:"ding_access_token"`
-	DingSecret      string `json:"ding_secret"`
-	OssType         int64  `json:"oss_type" validate:"" `
-	IsOssSave       int64  `json:"is_oss_save" validate:"" `
-	Endpoint        string `json:"endpoint" validate:"" `
-	OssAccess       string `json:"oss_access" validate:"" `
-	OssSecret       string `json:"oss_secret" validate:"" `
-	BucketName      string `json:"bucket_name" validate:"" `
-	Directory       string `json:"directory" validate:"" `
+	IsDingSend      int64  `json:"is_ding_send" form:"is_ding_send"`
+	DingAccessToken string `json:"ding_access_token" form:"ding_access_token"`
+	DingSecret      string `json:"ding_secret" form:"ding_secret"`
+	OssType         int64  `json:"oss_type" validate:""  form:"oss_type"`
+	IsOssSave       int64  `json:"is_oss_save" validate:"" form:"is_oss_save"`
+	Endpoint        string `json:"endpoint" validate:""  form:"endpoint"`
+	OssAccess       string `json:"oss_access" validate:""  form:"oss_access"`
+	OssSecret       string `json:"oss_secret" validate:""  form:"oss_secret"`
+	BucketName      string `json:"bucket_name" validate:""  form:"bucket_name"`
+	Directory       string `json:"directory" validate:"" form:"directory" `
 }
 
 func (d *TaskUpdateInput) BindValidParm(ctx *gin.Context) error {

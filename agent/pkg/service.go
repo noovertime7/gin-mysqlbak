@@ -7,7 +7,6 @@ import (
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/metadata"
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/micro/go-micro/v2/registry/etcd"
 	"github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
@@ -31,8 +30,7 @@ type hystrixWrapper struct {
 
 // Call 熔断器的使用，超过1秒熔断
 func (h *hystrixWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
-	md, _ := metadata.FromContext(ctx)
-	fmt.Printf("[Log Wrapper] ctx: %v service: %s method: %s\n", md, req.Service(), req.Endpoint())
+	//md, _ := metadata.FromContext(ctx)
 	name := req.Service() + "." + req.Endpoint()
 	config := hystrix.CommandConfig{
 		//超时时间
