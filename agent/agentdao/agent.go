@@ -61,7 +61,7 @@ func (s *AgentDB) PageList(c *gin.Context, tx *gorm.DB, params *agentdto.AgentLi
 	var list []AgentDB
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
-	query = query.Table(s.TableName()).Where("is_delete=0")
+	query = query.Table(s.TableName()).Where("is_deleted=0")
 	if params.Info != "" {
 		query = query.Where("( service_name like ?)", "%"+params.Info+"%")
 	}

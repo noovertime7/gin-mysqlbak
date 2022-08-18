@@ -10,7 +10,6 @@ import (
 	"github.com/micro/go-micro/v2/registry"
 	"github.com/micro/go-micro/v2/registry/etcd"
 	"github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
-	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg/trace"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/bak"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/bakhistory"
@@ -170,20 +169,20 @@ func GetBakService(serviceName string) interface{} {
 	return bak.NewBakService(fmt.Sprintf("%s", serviceName), s.Client())
 }
 
-func GetServiceList() agentdto.AgentOutPut {
-	services, _ := reg.ListServices()
-	var AgentOutPutItems []agentdto.AgentOutPutItem
-	for _, s := range services {
-		nodes := s.Nodes
-		for _, node := range nodes {
-			item := agentdto.AgentOutPutItem{
-				Name:      s.Name,
-				Address:   node.Address,
-				ServiceID: node.Id,
-			}
-			AgentOutPutItems = append(AgentOutPutItems, item)
-		}
-	}
-	total := len(AgentOutPutItems)
-	return agentdto.AgentOutPut{Total: total, AgentOutPutItem: AgentOutPutItems}
-}
+//func GetServiceList() agentdto.AgentOutPut {
+//	services, _ := reg.ListServices()
+//	var AgentOutPutItems []agentdto.AgentOutPutItem
+//	for _, s := range services {
+//		nodes := s.Nodes
+//		for _, node := range nodes {
+//			item := agentdto.AgentOutPutItem{
+//				Name:      s.Name,
+//				Address:   node.Address,
+//				ServiceID: node.Id,
+//			}
+//			AgentOutPutItems = append(AgentOutPutItems, item)
+//		}
+//	}
+//	total := len(AgentOutPutItems)
+//	return agentdto.AgentOutPut{Total: total, AgentOutPutItem: AgentOutPutItems}
+//}

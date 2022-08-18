@@ -134,6 +134,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.TranslationMiddleware())
 	{
 		controller.PublicRegister(PublicRouter)
+		agentcontroller.AgentRegister(PublicRouter)
 	}
 
 	dashRouter := router.Group("/dashboard")
@@ -167,12 +168,11 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.SessionAuthMiddleware(),
 		middleware.TranslationMiddleware())
 	{
-		agentcontroller.AgentRegister(AgentRouter)
 		agentcontroller.AgentTaskRegister(AgentRouter)
 		agentcontroller.AgentHostRegister(AgentRouter)
 		agentcontroller.BakHistoryRegister(AgentRouter)
 		agentcontroller.BakRegister(AgentRouter)
-		agentcontroller.DashBoardRegister(AgentRouter)
+		//agentcontroller.DashBoardRegister(AgentRouter)
 	}
 
 	return router

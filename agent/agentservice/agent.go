@@ -1,6 +1,7 @@
 package agentservice
 
 import (
+	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdao"
@@ -24,8 +25,10 @@ func (a *AgentService) Register(ctx *gin.Context, agentInfo *agentdto.AgentRegis
 	if err != nil {
 		return err
 	}
-	agent, err := agentDb.Find(ctx, tx, agentDb)
+	agent, err := agentDb.Find(ctx, tx, &agentdao.AgentDB{ServiceName: agentInfo.ServiceName, IsDeleted: 0})
 	if agent.Id != 0 {
+		agentDb.Id = agent.Id
+		agentDb.CreateAt = agent.CreateAt
 		return agentDb.Update(ctx, tx)
 	}
 	return agentDb.Save(ctx, tx)
@@ -41,6 +44,7 @@ func (a *AgentService) DeRegister(ctx *gin.Context, serviceName string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(agent, agentDb)
 	agent.AgentStatus = 0
 	return agent.UpdateStatus(ctx, tx)
 }

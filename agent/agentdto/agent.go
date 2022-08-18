@@ -23,7 +23,7 @@ type AgentRegisterInput struct {
 }
 
 type AgentDeRegisterInput struct {
-	ServiceName string `json:"service_name"`
+	ServiceName string `json:"service_name" form:"service_name"`
 }
 
 type AgentListInput struct {
