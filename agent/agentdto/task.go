@@ -53,7 +53,7 @@ func (d *TaskUpdateInput) BindValidParm(ctx *gin.Context) error {
 // TaskListInput 通过page pagesize 查询服务信息
 type TaskListInput struct {
 	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
-	HostId      int64  `json:"host_id" form:"host_id" validate:""`
+	HostId      int64  `json:"host_id" form:"host_id" validate:"required"`
 	Info        string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
 	PageNo      int64  `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
 	PageSize    int64  `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`

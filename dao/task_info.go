@@ -94,7 +94,6 @@ func (s *TaskInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.TaskListInp
 	if err := query.Limit(params.PageSize).Offset(offset).Order("id desc").Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
 	}
-
 	return list, int(total), nil
 }
 

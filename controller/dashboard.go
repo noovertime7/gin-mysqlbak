@@ -81,7 +81,7 @@ func (service *DashboardController) PieChartData(c *gin.Context) {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
-	legend := []string{}
+	var legend []string
 	for index, item := range list {
 		name, ok := HostNameMap[item.HostID]
 		if !ok {

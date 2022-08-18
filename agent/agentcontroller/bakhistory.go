@@ -2,6 +2,7 @@ package agentcontroller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/micro/go-micro/v2/client"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/bakhistory"
@@ -25,6 +26,9 @@ func (b *BakHistoryController) HistoryList(ctx *gin.Context) {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{"127.0.0.1:39800"}
+	}
 	historyService := pkg.GetHistoryService(params.ServiceName).(bakhistory.HistoryService)
 	historyListInput := &bakhistory.HistoryListInput{
 		Info:     params.Info,
@@ -32,7 +36,7 @@ func (b *BakHistoryController) HistoryList(ctx *gin.Context) {
 		PageSize: params.PageSize,
 		Sort:     params.Sort,
 	}
-	data, err := historyService.GetHistoryList(ctx, historyListInput)
+	data, err := historyService.GetHistoryList(ctx, historyListInput, ops)
 	if err != nil {
 		log.Logger.Error("agent获取历史记录列表失败", err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)

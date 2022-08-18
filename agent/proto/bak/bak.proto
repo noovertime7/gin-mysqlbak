@@ -1,0 +1,39 @@
+syntax = "proto3";
+package go.micro.service.backupAgent;
+option go_package="./;Bak";
+
+service BakService {
+  rpc StartBak(StartBakInput) returns (BakOneMessage) {}
+  rpc StopBak(StopBakInput) returns (BakOneMessage) {}
+  rpc StartBakByHost(StartBakByHostInput) returns (BakOneMessage) {}
+  rpc StopBakByHost(StopBakByHostInput) returns (BakOneMessage) {}
+}
+
+message StartBakInput {
+  int64 TaskID =1;
+  string ServiceName =2;
+}
+
+message StartBakByHostInput {
+  int64 HostID =1;
+  string ServiceName =2;
+}
+
+
+message StopBakInput {
+  int64 TaskID =1;
+  string ServiceName =2;
+}
+
+message StopBakByHostInput {
+  int64 HostID =1;
+  string ServiceName =2;
+}
+
+
+message BakOneMessage {
+  // @inject_tag: json:"message" form:"message" uri:"message"
+  string Message  =1;
+  // @inject_tag: json:"content" form:"content" uri:"content"
+  bool OK =2;
+}

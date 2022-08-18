@@ -12,52 +12,77 @@ service Host {
 
 
 message HostAddInput{
+  // @inject_tag: json:"host" form:"host" uri:"host"
   string Host =2 ;
+  // @inject_tag: json:"username" form:"username" uri:"username"
   string UserName =3 ;
+  // @inject_tag: json:"password" form:"password" uri:"password"
   string Password =4 ;
+  // @inject_tag: json:"content" form:"content" uri:"content"
   string Content =5 ;
 }
 
 
 
 message HostDeleteInput {
-  int32 ID =1 ;
+  // @inject_tag: json:"id" form:"id" uri:"id"
+  int64 ID =1 ;
 }
 
 message HostUpdateInput{
-  int32 ID =1 ;
+  // @inject_tag: json:"id" form:"id" uri:"id"
+  int64 ID =1 ;
+  // @inject_tag: json:"host" form:"host" uri:"host"
   string Host =2 ;
+  // @inject_tag: json:"username" form:"username" uri:"username"
   string UserName =3 ;
+  // @inject_tag: json:"password" form:"password" uri:"password"
   string Password =4 ;
+  // @inject_tag: json:"content" form:"content" uri:"content"
   string Content =5 ;
 }
 
+message ListItem {
+  // @inject_tag: json:"id" form:"info" uri:"info"
+  int64 ID =3 ;
+  // @inject_tag: json:"host" form:"host" uri:"host"
+  string Host =4 ;
+  // @inject_tag: json:"username" form:"username" uri:"username"
+  string UserName =5 ;
+  // @inject_tag: json:"password" form:"password" uri:"password"
+  string Password =6 ;
+  // @inject_tag: json:"host_status" form:"host_status" uri:"host_status"
+  int64 HostStatus =7 ;
+  // @inject_tag: json:"content" form:"content" uri:"content"
+  string Content =8 ;
+  // @inject_tag: json:"task_num" form:"task_num" uri:"task_num"
+  int64  TaskNum =9;
+}
+
+
 
 message HostOneMessage {
+  // @inject_tag: json:"message" form:"message" uri:"message"
   string Message  =1;
+  // @inject_tag: json:"content" form:"content" uri:"content"
   bool OK =2;
 }
 
 
 message HostListInput {
+  // @inject_tag: json:"info" form:"info" uri:"info"
   string Info =1 ;
-  int32 PageNo =2;
-  int32 PageSize =3 ;
+  // @inject_tag: json:"page_no" form:"page_no" uri:"page_no"
+  int64 PageNo =2;
+  // @inject_tag: json:"page_size" form:"page_size" uri:"page_size"
+  int64 PageSize =3 ;
 }
 
 message HostListOutPut {
-  int32 Total  =1 ;
+  // @inject_tag: json:"total" form:"total" uri:"total"
+  int64 Total  =1 ;
+  // @inject_tag: json:"list_item" form:"list_item" uri:"list_item"
   repeated ListItem listItem =2 ;
-}
-
-message ListItem {
-  int32 ID =3 ;
-  string Host =4 ;
-  string UserName =5 ;
-  string Password =6 ;
-  int32 HostStatus =7 ;
-  string Content =8 ;
-  int32  TaskNum =9;
 }
 
 

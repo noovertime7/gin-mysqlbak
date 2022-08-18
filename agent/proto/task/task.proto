@@ -86,7 +86,7 @@ message TaskListItem {
   string ServiceName = 5;
   string BackupCycle =6;
   int64 KeepNumber =7 ;
-  int64 Status =8;
+  bool Status =8;
   string CreateAt =9;
 }
 

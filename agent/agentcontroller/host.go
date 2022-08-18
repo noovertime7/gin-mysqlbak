@@ -29,12 +29,12 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	//进行主机检测避免添加无用信息
-	if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
-		log.Logger.Error("agent添加主机检测失败", err)
-		middleware.ResponseError(c, 20001, err)
-		return
-	}
+	////进行主机检测避免添加无用信息
+	//if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
+	//	log.Logger.Error("agent添加主机检测失败", err)
+	//	middleware.ResponseError(c, 20001, err)
+	//	return
+	//}
 	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
 	data, err := hostService.AddHost(c, &host.HostAddInput{
 		Host:     params.Host,
@@ -59,7 +59,7 @@ func (a *AgentHostController) DeleteHost(c *gin.Context) {
 	}
 	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
 	data, err := hostService.DeleteHost(c, &host.HostDeleteInput{
-		ID: int32(params.ID),
+		ID: int64(params.ID),
 	})
 	if err != nil || !data.OK {
 		log.Logger.Error("agent删除主机失败", err)
@@ -76,15 +76,15 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	//进行主机检测避免添加无用信息
-	if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
-		log.Logger.Error("agent添加主机检测失败", err)
-		middleware.ResponseError(c, 20001, err)
-		return
-	}
+	////进行主机检测避免添加无用信息
+	//if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
+	//	log.Logger.Error("agent添加主机检测失败", err)
+	//	middleware.ResponseError(c, 20001, err)
+	//	return
+	//}
 	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
 	data, err := hostService.UpdateHost(c, &host.HostUpdateInput{
-		ID:       int32(params.ID),
+		ID:       int64(params.ID),
 		Host:     params.Host,
 		UserName: params.User,
 		Password: params.Password,
@@ -108,8 +108,8 @@ func (a *AgentHostController) HostList(c *gin.Context) {
 	hostService := pkg.GetHostService(params.ServiceName).(host.HostService)
 	out, err := hostService.GetHostList(c, &host.HostListInput{
 		Info:     params.Info,
-		PageNo:   int32(params.PageNo),
-		PageSize: int32(params.PageSize),
+		PageNo:   int64(params.PageNo),
+		PageSize: int64(params.PageSize),
 	})
 	if err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
