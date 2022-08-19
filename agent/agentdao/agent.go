@@ -1,6 +1,7 @@
 package agentdao
 
 import (
+	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
@@ -23,7 +24,7 @@ func (a *AgentDB) TableName() string {
 	return "t_agent"
 }
 
-func (a *AgentDB) Find(c *gin.Context, tx *gorm.DB, search *AgentDB) (*AgentDB, error) {
+func (a *AgentDB) Find(c context.Context, tx *gorm.DB, search *AgentDB) (*AgentDB, error) {
 	out := &AgentDB{}
 	err := tx.WithContext(c).Where(search).Find(out).Error
 	if err != nil {

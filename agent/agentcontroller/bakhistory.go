@@ -26,10 +26,16 @@ func (b *BakHistoryController) HistoryList(ctx *gin.Context) {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{"127.0.0.1:39800"}
+
+	historyService, addr, err := pkg.GetHistoryService(params.ServiceName)
+	if err != nil {
+		log.Logger.Error("获取Agent地址失败", err)
+		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		return
 	}
-	historyService := pkg.GetHistoryService(params.ServiceName).(bakhistory.HistoryService)
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
 	historyListInput := &bakhistory.HistoryListInput{
 		Info:     params.Info,
 		PageNo:   params.PageNo,
@@ -52,8 +58,17 @@ func (b *BakHistoryController) DeleteHistory(ctx *gin.Context) {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
-	historyService := pkg.GetHistoryService(params.ServiceName).(bakhistory.HistoryService)
-	data, err := historyService.DeleteHistory(ctx, &bakhistory.HistoryIDInput{ID: params.ID})
+	historyService, addr, err := pkg.GetHistoryService(params.ServiceName)
+	if err != nil {
+		log.Logger.Error("获取Agent地址失败", err)
+		middleware.ResponseError(ctx, 30001, err)
+		return
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+
+	data, err := historyService.DeleteHistory(ctx, &bakhistory.HistoryIDInput{ID: params.ID}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("删除失败", err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)

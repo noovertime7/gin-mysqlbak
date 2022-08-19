@@ -1,6 +1,7 @@
 package agentservice
 
 import (
+	"context"
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
@@ -65,6 +66,9 @@ func (a *AgentService) GetAgentList(ctx *gin.Context, agentInfo *agentdto.AgentL
 			ServiceName: agent.ServiceName,
 			Address:     agent.Address,
 			Content:     agent.Content,
+			LastTime:    agent.LastTime.Format("2006年01月02日15:04:01"),
+			AgentStatus: agent.AgentStatus,
+			CreateAt:    agent.CreateAt.Format("2006年01月02日15:04:01"),
 		}
 		agentOutitems = append(agentOutitems, tempAgent)
 	}
@@ -73,4 +77,17 @@ func (a *AgentService) GetAgentList(ctx *gin.Context, agentInfo *agentdto.AgentL
 		AgentOutPutItem: agentOutitems,
 	}
 	return out, nil
+}
+
+func (a *AgentService) GetServiceAddr(ctx context.Context, serviceName string) (string, error) {
+	agentDb := &agentdao.AgentDB{ServiceName: serviceName}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		return "unknown", err
+	}
+	agent, err := agentDb.Find(ctx, tx, agentDb)
+	if err != nil {
+		return "unknown", err
+	}
+	return agent.Address, nil
 }

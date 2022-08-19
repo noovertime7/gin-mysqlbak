@@ -22,7 +22,7 @@ func main() {
 	service := micro.NewService()
 	service.Init()
 	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{"59.206.48.146:39800"}
+		options.Address = []string{"127.0.0.1:30000"}
 	}
 	h := bakhistory.NewHistoryService("test5.local", service.Client())
 	historyListInput := &bakhistory.HistoryListInput{

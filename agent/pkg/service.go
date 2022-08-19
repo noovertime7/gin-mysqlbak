@@ -2,14 +2,10 @@ package pkg
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/afex/hystrix-go/hystrix"
 	"github.com/micro/go-micro/v2"
-	"github.com/micro/go-micro/v2/client"
-	"github.com/micro/go-micro/v2/registry"
-	"github.com/micro/go-micro/v2/registry/etcd"
 	"github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg/trace"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/bak"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/bakhistory"
@@ -20,153 +16,123 @@ import (
 )
 
 var s micro.Service
-var reg = etcd.NewRegistry(registry.Addrs(conf.GetStringConf("etcd", "addr")))
 
 var JaegerAddr = conf.GetStringConf("jaeger", "addr")
 
 // log wrapper logs every time a request is made
-type hystrixWrapper struct {
-	client.Client
-}
+
+var AgentService *agentservice.AgentService
 
 // Call 熔断器的使用，超过1秒熔断
-func (h *hystrixWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
-	//md, _ := metadata.FromContext(ctx)
-	name := req.Service() + "." + req.Endpoint()
-	config := hystrix.CommandConfig{
-		//超时时间
-		Timeout: 2000,
-		//请求阈值，有20个请求才会进行错误计算
-		RequestVolumeThreshold: 5,
-		//过多长时间熔断器，再次开启
-		SleepWindow: 5000,
-		//错误百分比
-		ErrorPercentThreshold: 20,
+
+func GetHostService(serviceName string) (host.HostService, string, error) {
+	//配置jaeger连接
+	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
+	if err != nil {
+		log.Fatal(err)
 	}
-	hystrix.ConfigureCommand(name, config)
-	return hystrix.Do(name, func() error {
-		return h.Client.Call(ctx, req, rsp)
-	}, func(err error) error {
-		if err != nil {
-			return errors.New("请求Agent服务超时")
-		}
-		return nil
-	})
-}
-
-func NewHystrixWrapper(c client.Client) client.Client {
-	return &hystrixWrapper{Client: c}
-}
-
-func GetHostService(serviceName string) interface{} {
-	// 配置jaeger连接
-	//jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer closer.Close()
-	// 配置jaeger连接
+	defer closer.Close()
+	addr, err := AgentService.GetServiceAddr(context.Background(), serviceName)
+	if err != nil {
+		return nil, "", err
+	}
 	if conf.GetBoolConf("jaeger", "enable") {
 		s = micro.NewService()
-		//	micro.WrapClient(
-		//		NewHystrixWrapper,
-		//		opentracing.NewClientWrapper(jaegerTracer)),
-		//)
-		s.Init()
-		return host.NewHostService(fmt.Sprintf("%s", serviceName), s.Client())
-	}
-	s = micro.NewService(
-		micro.Registry(reg),
 		micro.WrapClient(
-			NewHystrixWrapper,
-		))
+			opentracing.NewClientWrapper(jaegerTracer))
+		s.Init()
+		service := host.NewHostService(fmt.Sprintf("%s", serviceName), s.Client())
+		return service, addr, nil
+	}
+	s = micro.NewService()
 	s.Init()
-	return host.NewHostService(fmt.Sprintf("%s", serviceName), s.Client())
+	service := host.NewHostService(fmt.Sprintf("%s", serviceName), s.Client())
+	return service, addr, nil
 }
 
-func GetTaskService(serviceName string) interface{} {
+func GetTaskService(serviceName string) (task.TaskService, string, error) {
 	// 配置jaeger连接
 	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer closer.Close()
-	// 配置jaeger连接
+	// 获取服务地址
+	addr, err := AgentService.GetServiceAddr(context.Background(), serviceName)
+	if err != nil {
+		return nil, "", err
+	}
 	if conf.GetBoolConf("jaeger", "enable") {
 		s = micro.NewService(
-			micro.Registry(reg),
 			micro.WrapClient(
-				NewHystrixWrapper,
 				opentracing.NewClientWrapper(jaegerTracer)),
 		)
 		s.Init()
-		return task.NewTaskService(fmt.Sprintf("%s", serviceName), s.Client())
+		service := task.NewTaskService(fmt.Sprintf("%s", serviceName), s.Client())
+		return service, addr, nil
 	}
-	s = micro.NewService(
-		micro.Registry(reg),
-		micro.WrapClient(
-			NewHystrixWrapper,
-		))
+	s = micro.NewService()
 	s.Init()
-	return task.NewTaskService(fmt.Sprintf("%s", serviceName), s.Client())
+	service := task.NewTaskService(fmt.Sprintf("%s", serviceName), s.Client())
+	return service, addr, nil
 }
 
-func GetHistoryService(serviceName string) interface{} {
-	service := micro.NewService()
-	service.Init()
-	return bakhistory.NewHistoryService(serviceName, service.Client())
-	//// 配置jaeger连接
-	//jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer closer.Close()
-	//// 配置jaeger连接
-	//if conf.GetBoolConf("jaeger", "enable") {
-	//	s = micro.NewService(
-	//		micro.WrapClient(
-	//			NewHystrixWrapper,
-	//			opentracing.NewClientWrapper(jaegerTracer)),
-	//	)
-	//	s.Init()
-	//	return bakhistory.NewHistoryService(fmt.Sprintf("%s", serviceName), s.Client())
-	//}
-	//s = micro.NewService(
-	//	micro.Registry(reg),
-	//	micro.Address("127.0.0.1:39800"),
-	//	micro.WrapClient(
-	//		NewHystrixWrapper,
-	//	))
-	//s.Init()
-	//fmt.Println(s.Client().Options().CallOptions.Address)
-	//return bakhistory.NewHistoryService(fmt.Sprintf("%s", serviceName), s.Client())
-}
-
-func GetBakService(serviceName string) interface{} {
+func GetHistoryService(serviceName string) (bakhistory.HistoryService, string, error) {
 	// 配置jaeger连接
 	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer closer.Close()
+	addr, err := AgentService.GetServiceAddr(context.Background(), serviceName)
+	if err != nil {
+		return nil, "", err
+	}
+	// 配置jaeger连接
+	if conf.GetBoolConf("jaeger", "enable") {
+		s := micro.NewService(
+			micro.WrapClient(
+				opentracing.NewClientWrapper(jaegerTracer),
+			))
+
+		s.Init()
+		ser := bakhistory.NewHistoryService(serviceName, s.Client())
+		return ser, addr, nil
+	}
+	s := micro.NewService(
+		micro.WrapClient(
+			opentracing.NewClientWrapper(jaegerTracer),
+		))
+	s.Init()
+	ser := bakhistory.NewHistoryService(serviceName, s.Client())
+	return ser, addr, nil
+}
+
+func GetBakService(serviceName string) (bak.BakService, string, error) {
+	// 配置jaeger连接
+	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer closer.Close()
+	addr, err := AgentService.GetServiceAddr(context.Background(), serviceName)
+	if err != nil {
+		return nil, "", err
+	}
 	// 配置jaeger连接
 	if conf.GetBoolConf("jaeger", "enable") {
 		s = micro.NewService(
-			micro.Registry(reg),
 			micro.WrapClient(
-				NewHystrixWrapper,
 				opentracing.NewClientWrapper(jaegerTracer)),
 		)
 		s.Init()
-		return bak.NewBakService(fmt.Sprintf("%s", serviceName), s.Client())
+		ser := bak.NewBakService(fmt.Sprintf("%s", serviceName), s.Client())
+		return ser, addr, nil
 	}
-	s = micro.NewService(
-		micro.Registry(reg),
-		micro.WrapClient(
-			NewHystrixWrapper,
-		))
+	s = micro.NewService()
 	s.Init()
-	return bak.NewBakService(fmt.Sprintf("%s", serviceName), s.Client())
+	ser := bak.NewBakService(fmt.Sprintf("%s", serviceName), s.Client())
+	return ser, addr, nil
 }
 
 //func GetServiceList() agentdto.AgentOutPut {
