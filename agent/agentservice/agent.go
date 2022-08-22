@@ -2,7 +2,6 @@ package agentservice
 
 import (
 	"context"
-	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdao"
@@ -18,6 +17,8 @@ func (a *AgentService) Register(ctx *gin.Context, agentInfo *agentdto.AgentRegis
 		Content:     agentInfo.Content,
 		Address:     agentInfo.Address,
 		AgentStatus: 1,
+		TaskNum:     agentInfo.TaskNum,
+		FinishNum:   agentInfo.FinishNum,
 		LastTime:    time.Now(),
 		CreateAt:    time.Now(),
 		IsDeleted:   0,
@@ -45,7 +46,6 @@ func (a *AgentService) DeRegister(ctx *gin.Context, serviceName string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(agent, agentDb)
 	agent.AgentStatus = 0
 	return agent.UpdateStatus(ctx, tx)
 }
@@ -67,6 +67,8 @@ func (a *AgentService) GetAgentList(ctx *gin.Context, agentInfo *agentdto.AgentL
 			Address:     agent.Address,
 			Content:     agent.Content,
 			LastTime:    agent.LastTime.Format("2006年01月02日15:04:01"),
+			TaskNum:     agent.TaskNum,
+			FinishNum:   agent.FinishNum,
 			AgentStatus: agent.AgentStatus,
 			CreateAt:    agent.CreateAt.Format("2006年01月02日15:04:01"),
 		}

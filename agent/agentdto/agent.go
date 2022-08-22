@@ -16,6 +16,8 @@ type AgentOutPutItem struct {
 	Content     string `json:"content"`
 	AgentStatus int    `json:"agent_status"`
 	LastTime    string `json:"last_time"`
+	TaskNum     int    `json:"task_num"`
+	FinishNum   int    `json:"finish_num"`
 	CreateAt    string `json:"create_at"`
 }
 
@@ -23,6 +25,8 @@ type AgentRegisterInput struct {
 	ServiceName string `json:"service_name"`
 	Address     string `json:"address"`
 	Content     string `json:"content"`
+	TaskNum     int    `json:"task_num"`
+	FinishNum   int    `json:"finish_num"`
 }
 type AgentDeRegisterInput struct {
 	ServiceName string `json:"service_name" form:"service_name"`

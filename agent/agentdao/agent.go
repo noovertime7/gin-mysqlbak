@@ -15,6 +15,8 @@ type AgentDB struct {
 	Content     string    `json:"content"  gorm:"column:content"`
 	Address     string    `json:"address"  gorm:"column:address"`
 	AgentStatus int       `json:"agent_status"  gorm:"column:agent_status"`
+	TaskNum     int       `json:"task_num" gorm:"column:task_num"`
+	FinishNum   int       `json:"finish_num" gorm:"column:finish_num"`
 	LastTime    time.Time `json:"last_time"  gorm:"column:last_time"`
 	CreateAt    time.Time `json:"create_at"  gorm:"column:create_at"`
 	IsDeleted   int       `json:"is_deleted"  gorm:"column:is_deleted"`
@@ -34,6 +36,7 @@ func (a *AgentDB) Find(c context.Context, tx *gorm.DB, search *AgentDB) (*AgentD
 }
 
 func (a *AgentDB) Save(c *gin.Context, tx *gorm.DB) error {
+
 	return tx.WithContext(c).Save(a).Error
 }
 
@@ -43,6 +46,8 @@ func (a *AgentDB) Update(c *gin.Context, tx *gorm.DB) error {
 		"content":      a.Content,
 		"address":      a.Address,
 		"agent_status": a.AgentStatus,
+		"finish_num":   a.FinishNum,
+		"task_num":     a.TaskNum,
 		"last_time":    time.Now(),
 		"is_deleted":   a.IsDeleted,
 	}).Error
