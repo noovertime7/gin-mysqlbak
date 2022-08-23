@@ -7,8 +7,8 @@
     - [1.1、二进制编译运行](#11%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%BC%96%E8%AF%91%E8%BF%90%E8%A1%8C)
     - [1.2 Kubernetes环境部署](#12-kubernetes%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2)
   - [二、架构](#%E4%BA%8C%E6%9E%B6%E6%9E%84)
-  - [单机版本](#%E5%8D%95%E6%9C%BA%E7%89%88%E6%9C%AC)
-  - [集群版本](#%E9%9B%86%E7%BE%A4%E7%89%88%E6%9C%AC)
+    - [单机版本](#%E5%8D%95%E6%9C%BA%E7%89%88%E6%9C%AC)
+    - [集群版本](#%E9%9B%86%E7%BE%A4%E7%89%88%E6%9C%AC)
   - [三、操作及页面演示](#%E4%B8%89%E6%93%8D%E4%BD%9C%E5%8F%8A%E9%A1%B5%E9%9D%A2%E6%BC%94%E7%A4%BA)
     - [单机版本操作演示](#%E5%8D%95%E6%9C%BA%E7%89%88%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%BC%94%E7%A4%BA)
     - [集群版本备份功能演示](#%E9%9B%86%E7%BE%A4%E7%89%88%E6%9C%AC%E5%A4%87%E4%BB%BD%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA)
@@ -67,7 +67,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
 ## 二、架构
 
-## 单机版本
+### 单机版本
 
 实现原理：
 
@@ -75,7 +75,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
  ![aloneserver.jpg](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/aloneserver.jpg?raw=true) 
 
-## 集群版本
+### 集群版本
 
 实现原理：
 
