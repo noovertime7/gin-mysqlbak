@@ -6,24 +6,27 @@
   - [一、现在开始](#%E4%B8%80%E7%8E%B0%E5%9C%A8%E5%BC%80%E5%A7%8B)
     - [1.1、二进制编译运行](#11%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%BC%96%E8%AF%91%E8%BF%90%E8%A1%8C)
     - [1.2 Kubernetes环境部署](#12-kubernetes%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2)
-  - [二、文件分层](#%E4%BA%8C%E6%96%87%E4%BB%B6%E5%88%86%E5%B1%82)
+  - [二、架构](#%E4%BA%8C%E6%9E%B6%E6%9E%84)
+  - [单机版本](#%E5%8D%95%E6%9C%BA%E7%89%88%E6%9C%AC)
+  - [集群版本](#%E9%9B%86%E7%BE%A4%E7%89%88%E6%9C%AC)
   - [三、操作及页面演示](#%E4%B8%89%E6%93%8D%E4%BD%9C%E5%8F%8A%E9%A1%B5%E9%9D%A2%E6%BC%94%E7%A4%BA)
+    - [单机版本操作演示](#%E5%8D%95%E6%9C%BA%E7%89%88%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%BC%94%E7%A4%BA)
+    - [集群版本备份功能演示](#%E9%9B%86%E7%BE%A4%E7%89%88%E6%9C%AC%E5%A4%87%E4%BB%BD%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA)
   - [四、其他](#%E5%9B%9B%E5%85%B6%E4%BB%96)
     - [log / redis / mysql / http.client 常用方法](#log--redis--mysql--httpclient-%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95)
-    - [swagger文档生成](#swagger%E6%96%87%E6%A1%A3%E7%94%9F%E6%88%90)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # gin-mysqlbak
 
-gin-mysqlbak:一款简单高效的Mysql数据库备份平台！
+gin-mysqlbak:一款简单高效、支持多集群统一备份的Mysql数据库备份平台！
 
-1. 请求链路日志打印，涵盖mysql/redis/request
-2. 支持备份文件直接下载到本地，一键还原至原数据库。
-3. 支持对接OSS对象存储存储备份文件
+1. 请求链路日志打印，涵盖mysql/redis/request，集群版本支持jaeger链路追踪
+2. 支持备份文件直接下载到本地，可一键还原至原数据库。
+3. 支持对接S3协议对象存储存储备份文件，现已支持minio、阿里oss
 4. 支持主机健康检查，主机离线通过钉钉发送告警
-5. 支持钉钉推送备份状态
-6. 支持swagger文档生成
+5. 支持钉钉推送备份状态，成功失败早知道
+6. 通过部署agent完成异地多节点备份，备份任务统一管理，备份数据集中存储
 
 项目地址：https://github.com/noovertime7/gin-mysqlbak
 ## 一、现在开始
@@ -59,97 +62,32 @@ go run main.go
 kubectl create ns mysqlbak  ## 创建命名空间
 cd gin-mysqlbak/kubernetes && kubectl apply -f ./conf  ## 创建configmap配置文件
 kubectl apply -f gin-mysqlbak-server-deploy.yaml  ## 创建后端服务
+kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 ```
 
-## 二、文件分层
+## 二、架构
 
-```
-├── bakfile   ## 备份文件存放位置
-├── cmd       ## 二进制启动文件
-│   └── gin-mysqlbak
-├── conf     ## 配置文件存放位置
-│   └── dev
-│       ├── base.toml
-│       └── mysql_map.toml
-├── controller  ## controller层
-│   ├── admin.go
-│   ├── admin_login.go
-│   ├── bak.go
-│   ├── dashboard.go
-│   ├── host.go
-│   ├── public.go
-│   └── task.go
-├── core   ## 核心备份功能
-│   └── bak.go
-├── dao   ## 数据库层
-│   ├── admin_login.go
-│   ├── bakhistory.go
-│   ├── ding.go
-│   ├── host.go
-│   ├── oss.go
-│   ├── task.go
-│   └── task_info.go
-├── Dockerfile
-├── docs  ## 文档
-│   ├── docs.go
-│   ├── swagger.json
-│   └── swagger.yaml
-├── dto    ## 模型层
-│   ├── admin.go
-│   ├── admin_login.go
-│   ├── bak.go
-│   ├── dashboard.go
-│   ├── host.go
-│   └── task.go
-├── go.mod
-├── go.sum
-├── img
-│   ├── bakhistory.gif
-│   ├── dashboard.gif
-│   ├── hostlist.gif
-│   ├── hosttask.gif
-│   └── task.gif
-├── kubernetes
-│   ├── conf
-│   │   ├── mysqlbak-base-conf.yaml
-│   │   ├── mysqlbak-mysql-conf.yaml
-│   │   └── mysqlbak-web-nginx-default.yaml
-│   ├── gin-mysqlbak-server-deploy.yaml
-│   └── gin-mysqlbak-web-deploy.yaml
-├── logs
-│   ├── gin-mysqlbak.inf.log
-│   └── gin-mysqlbak.wf.log
-├── main.go
-├── middleware
-│   ├── ip_auth.go
-│   ├── recovery.go
-│   ├── request_log.go
-│   ├── response.go
-│   ├── session_auth.go
-│   └── translation.go
-├── public
-│   ├── alioss
-│   │   └── alioss.go
-│   ├── const.go
-│   ├── ding
-│   │   └── ding.go
-│   ├── log.go
-│   ├── params.go
-│   └── util.go
-├── README.md
-├── router
-│   ├── httpserver.go
-│   └── route.go
-├── services
-│   └── stopAllTask.go
-├── sql
-│   └── gin-mysqlbak.sql
-└── test
-```
-层次划分
-控制层 --> 逻辑处理层 --> DB数据层
+## 单机版本
+
+实现原理：
+
+单机版本比较简单，使用server端备份能力进行备份，使用cron表达式创建备份任务，两种备份方式，xorm备份失败后，使用mysqldump进行备份，确保备份任务能百分百成功
+
+
+
+## 集群版本
+
+实现原理：
+
+原先的server端作为微服务网关，各个agent通过服务端接口进行服务的注册发现，上报agent信息，server端通过不通的服务名调用agent，agent完成数据备份与存储
+
+
+
+
 
 ## 三、操作及页面演示
+
+### 单机版本操作演示
 
 - 首页大盘展示
 
@@ -171,6 +109,10 @@ kubectl apply -f gin-mysqlbak-server-deploy.yaml  ## 创建后端服务
 
  ![bakhistory.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/bakhistory.gif?raw=true) 
 
+### 集群版本备份功能演示
+
+
+
 
 
 ## 四、其他
@@ -178,34 +120,3 @@ kubectl apply -f gin-mysqlbak-server-deploy.yaml  ## 创建后端服务
 ### log / redis / mysql / http.client 常用方法
 
 参考文档：https://github.com/e421083458/golang_common
-
-### swagger文档生成
-
-https://github.com/swaggo/swag/releases
-
-- 下载对应操作系统的执行文件到$GOPATH/bin下面
-
-如下：
-```
-➜  gin_scaffold git:(master) ✗ ll -r $GOPATH/bin
-total 434168
--rwxr-xr-x  1 niuyufu  staff    13M  4  3 17:38 swag
-```
-
-- 设置接口文档参考： `controller/demo.go` 的 Bind方法的注释设置
-
-```
-// ListPage godoc
-// @Summary 测试数据绑定
-// @Description 测试数据绑定
-// @Tags 用户
-// @ID /demo/bind
-// @Accept  json
-// @Produce  json
-// @Param polygon body dto.DemoInput true "body"
-// @Success 200 {object} middleware.Response{data=dto.DemoInput} "success"
-// @Router /demo/bind [post]
-```
-
-- 生成接口文档：`swag init`
-- 然后启动服务器：`go run main.go`，浏览地址: http://127.0.0.1:8880/swagger/index.html
