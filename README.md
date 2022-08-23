@@ -112,9 +112,21 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
 ### 集群版本备份功能演示
 
+- 集群列表
 
+ ![cluster_servicelist.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/cluster_servicelist.gif?raw=true) 
 
+- 集群主机列表
 
+ ![cluster_host.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/cluster_host.gif?raw=true) 
+
+- 集群任务列表
+
+ ![cluster_tasklist.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/cluster_tasklist.gif?raw=true) 
+
+- 集群历史记录列表
+
+ ![cluster_history.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/cluster_history.gif?raw=true) 
 
 ## 四、其他
 
