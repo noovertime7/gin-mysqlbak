@@ -73,7 +73,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
 单机版本比较简单，使用server端备份能力进行备份，使用cron表达式创建备份任务，两种备份方式，xorm备份失败后，使用mysqldump进行备份，确保备份任务能百分百成功
 
-
+ ![aloneserver.jpg](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/aloneserver.jpg?raw=true) 
 
 ## 集群版本
 
@@ -81,7 +81,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
 原先的server端作为微服务网关，各个agent通过服务端接口进行服务的注册发现，上报agent信息，server端通过不通的服务名调用agent，agent完成数据备份与存储
 
-
+ ![cluster.jpg](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/cluster.jpg?raw=true) 
 
 
 
