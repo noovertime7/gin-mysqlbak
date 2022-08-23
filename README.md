@@ -54,7 +54,38 @@ go mod tidy
 ```shell
 go run main.go
 ```
-### 1.2 Kubernetes环境部署
+### 1.2 Docker部署
+
+#### 1.2.1 后端服务部署
+
+首先请在root目录下准备好三个配置文件，base.toml不用改 ,配置文件实例在项目conf文件夹下
+
+```docker
+docker run -itd --name gin-mysql-server \
+-p 8880:8880 \
+-v /root/config.ini:/app/conf/config.ini \
+-v /root/base.toml:/app/conf/dev/base.toml \ 
+-v /root/mysql_map.toml:/app/conf/dev/mysql_map.toml \
+harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-server:2.0.3-SP3
+```
+
+#### 1.2.2 前端服务部署
+
+首先请在root目录下准备好前端配置文件
+
+```docker
+docker run -itd --name gin-mysql-web -p 8881:80 -v /root/default.conf:/etc/nginx/conf.d/default.conf  harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-web:2.0.2-SP3
+```
+
+#### 1.2.3 agent部署
+
+首先请在root目录下准备好agent配置文件，agent配置文件在agent仓库下的/domain/config/config.ini
+
+```docker
+docker run -itd --name gin-mysql-agent -v /root/config.ini:/app/domain/config/config.ini harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-agent:2.0.2-SP5
+```
+
+### 1.3 Kubernetes环境部署
 
 - 开始前请准备状态良好的k8s集群,**请根据实际环境修改conf文件夹下的配置文件**
 - 创建mysqlbak命名空间部署后端服务
@@ -68,7 +99,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
 ## 二、架构
 
-### 单机版本
+### 2.1、单机版本
 
 实现原理：
 
@@ -76,7 +107,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
  ![aloneserver.jpg](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/aloneserver.jpg?raw=true) 
 
-### 集群版本
+### 2.2、集群版本
 
 实现原理：
 
@@ -88,7 +119,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
 ## 三、操作及页面演示
 
-### 单机版本操作演示
+### 3.1、单机版本操作演示
 
 - 首页大盘展示
 
@@ -110,7 +141,7 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
  ![bakhistory.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/bakhistory.gif?raw=true) 
 
-### 集群版本备份功能演示
+### 3.2、集群版本备份功能演示
 
 - 集群列表
 
