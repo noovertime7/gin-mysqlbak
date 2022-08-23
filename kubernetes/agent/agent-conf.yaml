@@ -1,0 +1,36 @@
+apiVersion: v1
+data:
+  config.ini: >
+    [base]
+    serviceName = 公司环境
+    version = 1.0
+    addr = ":39010"                       # 监听地址
+    content = "公司环境"
+    photoUrl = "https://lmg.jj20.com/up/allimg/tp09/210F2130512J47-0-lp.jpg"
+    [register]
+    registerAddr = "10.20.110.60:39010"  ## 注册地址，用于服务端调用,向server上报自己的地址
+    registrationCycle = 10 ## 注册周期,单位分钟
+    content = "公司环境"  ## 备注
+    registerUrl = http://10.20.110.51:19008/prod-api/public/register ## server前端地址，用于向服务发起注册
+    deregisterUrl = http://10.20.110.51:19008/prod-api/public/deregister ##server前端地址，用于向服务发起注册
+    [mysql]
+    autoInit = true  ## 是否自动初始化sql,首次安装请打开，需要手动创建数据库
+    host = mysql.video
+    port = 3306
+    user = root
+    password = tsit@123
+    dbname = backup-agent
+    [dingProxyAgent]
+    enable = false  ## 用于外网环境下发送钉钉消息
+    addr = 172.20.96.56:39999
+    title = "公司环境"
+    content = "公司环境"
+    [jaeger]
+    enable = false
+    addr = 10.20.110.51:6831
+kind: ConfigMap
+metadata:
+  name: mysqlbak-agent-conf
+  namespace: mysqlbak
+  resourceVersion: '92033238'
+

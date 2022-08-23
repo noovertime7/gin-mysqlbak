@@ -1,56 +1,86 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gin-mysqlbak-server
   namespace: mysqlbak
+  resourceVersion: '92029093'
 spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: gin-mysqlbak-server
-  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
+      creationTimestamp: null
       labels:
         app: gin-mysqlbak-server
     spec:
       containers:
-      - name: gin-mysqlbak-server
-        imagePullPolicy: IfNotPresent
-        image: chenteng/gin-mysqlbak-server:1.1.7-SP1
-        volumeMounts:
-        - name: baseconf
-          mountPath: /app/conf/dev/base.toml
-          subPath: base.toml
-        - name: mysqlconf
-          mountPath: /app/conf/dev/mysql_map.toml
-          subPath: mysql_map.toml
-        - name: mysqlbak-data  
-          mountPath: /app/bakfile
-          subPath: mysql-data
+        - image: 'harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-server:2.0.3-SP3'
+          imagePullPolicy: IfNotPresent
+          name: gin-mysqlbak-server
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /app/conf/dev/base.toml
+              name: baseconf
+              subPath: base.toml
+            - mountPath: /app/conf/dev/mysql_map.toml
+              name: mysqlconf
+              subPath: mysql_map.toml
+            - mountPath: /app/conf/config.ini
+              name: iniconf
+              subPath: config.ini
+            - mountPath: /app/bakfile
+              name: mysqlbak-data
+              subPath: mysql-data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
       volumes:
-      - name: mysqlbak-data 
-        hostPath:
-          path: /data/gin-mysqlbak  
-          type: DirectoryOrCreate
-      - name: baseconf
-        configMap:
-          name: mysqlbak-base-conf
-      - name: mysqlconf
-        configMap:
-          name: mysqlbak-mysql-conf		  		  
+        - hostPath:
+            path: /data/gin-mysqlbak
+            type: DirectoryOrCreate
+          name: mysqlbak-data
+        - configMap:
+            defaultMode: 420
+            name: mysqlbak-base-conf
+          name: baseconf
+        - configMap:
+            defaultMode: 420
+            name: mysqlbak-mysql-conf
+          name: mysqlconf
+        - configMap:
+            defaultMode: 420
+            name: mysqlbak-ini-conf
+          name: iniconf
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: gin-mysqlbak-server
-  namespace: mysqlbak
   labels:
     app: gin-mysqlbak-server
+  name: gin-mysqlbak-server
+  namespace: mysqlbak
 spec:
-  type: NodePort
+  externalTrafficPolicy: Cluster
+  ipFamilyPolicy: SingleStack
   ports:
-  - targetPort: 8880
-    port: 8880
-    nodePort: 32081
+    - nodePort: 19009   ## server端地址
+      port: 8880
+      protocol: TCP
+      targetPort: 8880
   selector:
-     app: gin-mysqlbak-server
+    app: gin-mysqlbak-server
+  sessionAffinity: None
+  type: NodePort

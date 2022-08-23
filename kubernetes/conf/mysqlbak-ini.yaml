@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+data:
+  config.ini: >
+    [base]
+    debug_mode="debug"
+    time_location="Asia/Chongqing"
+    download_url="http://10.20.110.51:19009"   ## 用于下载备份文件使用，需要与server端svc开放的地址端口相同
+    [http]
+    addr = ":8880"                       # 监听地址, default ":8700"
+    read_timeout = 10                   # 读取超时时长
+    write_timeout = 10                  # 写入超时时长
+    max_header_bytes = 20               # 最大的header大小，二进制位长度
+    [redis]
+    host="redis.middleware:6379"   ## redis地址
+    password="xxxx"   ## redis密码,没有填空
+    max_active = 100
+    max_idle = 100
+    down_grade = false
+    [HostLostAlarms]
+    enable = true  ## 是否启动主机检测 
+    accessToken = "77f579efbefeefc316b55d3caea1ba1963db2f1319aa7520cbfd9626de073fdc"  ## 主机检测钉钉报警配置
+    secret = "SEC72586e3f7ff6db4b2ad24eac905f308a9ddb0b1b9809af31e5623a14abb424b2"
+    [dingProxyAgent]
+    enable = true    ## 用于无外网环境下发送钉钉消息
+    addr = 172.20.96.56:39999
+    title = "公司测试环境备份平台"
+    content = "公司测试环境备份平台"
+    [swagger]
+    title="gin-mysqlbak swagger API"
+    desc="This is a sample server celler server."
+    host="127.0.0.1:8880"
+    base_path=""
+    [jaeger]
+    enable = false
+    addr = 127.0.0.1:6831
+kind: ConfigMap
+metadata:
+  annotations: {}
+  name: mysqlbak-ini-conf
+  namespace: mysqlbak
+  resourceVersion: '90333492'
+
