@@ -29,6 +29,7 @@ gin-mysqlbak:一款简单高效、支持多集群统一备份的Mysql数据库�
 6. 通过部署agent完成异地多节点备份，备份任务统一管理，备份数据集中存储
 
 项目地址：https://github.com/noovertime7/gin-mysqlbak
+前端地址: https://github.com/noovertime7/gin-mysql-web
 ## 一、现在开始
 
 **注意: 安装开始前，请先创建gin-mysqlbak数据库，刷入sql文件初始化数据库，sql文件在项目sql文件夹下**
