@@ -30,6 +30,7 @@ gin-mysqlbak:一款简单高效、支持多集群统一备份的Mysql数据库�
 
 项目地址：https://github.com/noovertime7/gin-mysqlbak
 前端地址: https://github.com/noovertime7/gin-mysql-web
+agent地址: https://github.com/noovertime7/gin-mysqlbak-agent
 ## 一、现在开始
 
 **注意: 安装开始前，请先创建gin-mysqlbak数据库，刷入sql文件初始化数据库，sql文件在项目sql文件夹下**
@@ -47,7 +48,7 @@ git clone https://github.com/noovertime7/gin-mysqlbak.git
 cd gin-mysqlbak
 go mod tidy
 ```
-- 确保正确配置了 conf/mysql_map.toml、conf/base.toml
+- 确保正确配置了 conf/mysql_map.toml、conf/config.ini
 
 - 运行入口main.go (默认监听8880端口)
 
