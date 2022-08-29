@@ -1,0 +1,28 @@
+syntax = "proto3";
+package go.micro.service.backupAgent;
+option go_package="./;EsBak";
+
+
+
+service EsBakService {
+  rpc Start(StartEsBakInput) returns (EsBakOneMessage) {}
+  rpc Stop(StopEsBakInput) returns (EsBakOneMessage) {}
+}
+
+
+message StartEsBakInput {
+  int64 TaskID = 1;
+}
+
+message StopEsBakInput {
+  int64 TaskID = 1;
+}
+
+message EsBakOneMessage {
+  string Message  =1;
+  bool OK =2;
+}
+
+
+
+

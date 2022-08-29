@@ -174,6 +174,19 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		agentcontroller.BakRegister(AgentRouter)
 		agentcontroller.DashBoardRegister(AgentRouter)
 	}
+	//es备份相关路由
+	EsRouter := router.Group("/agent/es")
+	EsRouter.Use(
+		sessions.Sessions("mysession", store),
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.SessionAuthMiddleware(),
+		middleware.TranslationMiddleware(),
+	)
+	{
+		agentcontroller.EsTaskRegister(EsRouter)
+		agentcontroller.EsBakRegister(EsRouter)
+	}
 
 	return router
 }
