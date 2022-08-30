@@ -7,6 +7,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/mysqlbak/pkg/log"
+	"time"
 )
 
 type AgentController struct {
@@ -49,7 +50,10 @@ func (a *AgentController) Register(ctx *gin.Context) {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
+	listenChan := make(chan struct{})
+	go ListenRegister(ctx, params.ServiceName, listenChan)
 	middleware.ResponseSuccess(ctx, "注册成功")
+	listenChan <- struct{}{}
 }
 
 func (a *AgentController) DeRegister(ctx *gin.Context) {
@@ -65,4 +69,25 @@ func (a *AgentController) DeRegister(ctx *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(ctx, "注销成功")
+}
+
+func ListenRegister(ctx *gin.Context, serviceName string, ListenChan chan struct{}) {
+	log.Logger.Infof("开始监听%s注册状态", serviceName)
+	defer close(ListenChan)
+	for {
+		select {
+		case <-ListenChan:
+			log.Logger.Infof("收到注册消息,重置计时器,服务名:%s", serviceName)
+		//	半小时内未收到注册消息，择认为这个服务离线了
+		case <-time.After(time.Minute * 30):
+			log.Logger.Warnf("%s注册超时", serviceName)
+			//更改状态
+			if err := AgentService.DeRegister(ctx, serviceName); err != nil {
+				log.Logger.Error("监听器注销服务失败", err)
+				return
+			}
+			log.Logger.Infof("监听器注销服务%s成功", serviceName)
+			return
+		}
+	}
 }
