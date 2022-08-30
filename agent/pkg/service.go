@@ -166,6 +166,33 @@ func GetESBakService(serviceName string) (esbak.EsBakService, string, error) {
 	return ser, addr, nil
 }
 
+func GetESHistoryService(serviceName string) (esbak.EsHistoryService, string, error) {
+	// 配置jaeger连接
+	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer closer.Close()
+	addr, err := AgentService.GetServiceAddr(context.Background(), serviceName)
+	if err != nil {
+		return nil, "", err
+	}
+	// 配置jaeger连接
+	if conf.GetBoolConf("jaeger", "enable") {
+		s = micro.NewService(
+			micro.WrapClient(
+				opentracing.NewClientWrapper(jaegerTracer)),
+		)
+		s.Init()
+		ser := esbak.NewEsHistoryService(fmt.Sprintf("%s", serviceName), s.Client())
+		return ser, addr, nil
+	}
+	s = micro.NewService()
+	s.Init()
+	ser := esbak.NewEsHistoryService(fmt.Sprintf("%s", serviceName), s.Client())
+	return ser, addr, nil
+}
+
 func GetBakService(serviceName string) (bak.BakService, string, error) {
 	// 配置jaeger连接
 	jaegerTracer, closer, err := trace.NewJaegerTracer(serviceName, JaegerAddr)

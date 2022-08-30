@@ -36,6 +36,7 @@ message ESHistoryListOutItem {
   int64 TaskID =9;
   string UUID =10;
   int64 DurationInMillis =11;
+  string Host =12;
   string Snapshot =2;
   string Repository =3;
   string Indices =4;

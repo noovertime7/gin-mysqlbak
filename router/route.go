@@ -186,6 +186,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	{
 		agentcontroller.EsTaskRegister(EsRouter)
 		agentcontroller.EsBakRegister(EsRouter)
+		agentcontroller.EsHistoryRegister(EsRouter)
 	}
 
 	return router
