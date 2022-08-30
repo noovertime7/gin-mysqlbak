@@ -1,0 +1,46 @@
+syntax = "proto3";
+package go.micro.service.backupAgent;
+option go_package="./;EsBak";
+
+
+
+service EsHistoryService {
+  rpc GetEsHistoryList(GetEsHistoryListInput) returns (ESHistoryListOutput) {}
+  rpc DeleteESHistory(ESHistoryIDInput) returns(ESHistoryOneMessage) {}
+}
+
+message GetEsHistoryListInput {
+  string Info =1 ;
+  int64 PageNo =2;
+  int64 PageSize =3 ;
+  string Sort =4;
+}
+
+
+message ESHistoryIDInput{
+  int64 ID = 1;
+}
+
+message ESHistoryOneMessage {
+  string Message  =1;
+  bool OK =2;
+}
+
+message ESHistoryListOutput {
+  int64 Total =1;
+  repeated ESHistoryListOutItem esHistoryListOutItem =2 ;
+}
+
+message ESHistoryListOutItem {
+  int64 ID =1 ;
+  int64 TaskID =9;
+  string UUID =10;
+  int64 DurationInMillis =11;
+  string Snapshot =2;
+  string Repository =3;
+  string Indices =4;
+  string State =5;
+  string StartTime =6;
+  string  EndTime =7;
+  string Message =8;
+}

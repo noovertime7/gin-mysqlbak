@@ -10,10 +10,8 @@ type ESBakTaskAddInput struct {
 	Host        string `json:"host" form:"host" comment:"主机"  validate:"required"`
 	User        string `json:"user" form:"user" comment:"用户名"  validate:"required"`
 	Password    string `json:"password" form:"password" comment:"密码"  validate:"required"`
-	Index       string `json:"index" form:"index" comment:"备份索引"  validate:""`
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle" comment:"备份周期"  validate:"required"`
 	KeepNumber  int64  `json:"keep_number" form:"keep_number" comment:"保存时间"  validate:""`
-	IsEsBakAll  int64  `json:"is_es_bak_all" form:"is_es_bak_all" comment:"是否备份全部索引"  validate:""`
 }
 
 type ESBakTaskUpdateInput struct {
@@ -22,10 +20,8 @@ type ESBakTaskUpdateInput struct {
 	Host        string `json:"host" form:"host" comment:"主机"  validate:"required"`
 	User        string `json:"user" form:"user" comment:"用户名"  validate:"required"`
 	Password    string `json:"password" form:"password" comment:"密码"  validate:"required"`
-	Index       string `json:"index" form:"index" comment:"备份索引"  validate:""`
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle" comment:"备份周期"  validate:"required"`
 	KeepNumber  int64  `json:"keep_number" form:"keep_number" comment:"保存时间"  validate:""`
-	IsEsBakAll  int64  `json:"is_es_bak_all" form:"is_es_bak_all" comment:"是否备份全部索引"  validate:""`
 }
 
 type ESBakTaskIDInput struct {

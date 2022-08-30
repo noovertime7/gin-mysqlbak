@@ -11,7 +11,7 @@ service  EsService {
   rpc GetTaskDetail(EsTaskIDInput) returns(EsTaskDetailOutPut) {}
 }
 
-message EsBakTaskADDInput  {
+message EsBakTaskADDInput {
  string EsHost =1 ;
  string EsUser =2;
  string EsPassword = 3;
@@ -56,6 +56,7 @@ message EsTaskListOutPutItem {
   string BackupCycle =5;
   int64 KeepNumber =6;
   bool Status =7;
+  string CreateAt =8;
 }
 
 message EsTaskDetailOutPut {
@@ -70,4 +71,5 @@ message EsTaskInfo {
   string BackupCycle =4;
   int64 KeepNumber =5;
   bool Status =7;
+  string CreateAt =8;
 }
