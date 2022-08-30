@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/controller"
+	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/services"
 	"log"
 	"net/http"
@@ -16,6 +17,8 @@ var (
 )
 
 func HttpServerRun() {
+	//打印logo
+	public.PrintLogo()
 	gin.SetMode(conf.GetStringConf("base", "debug_mode"))
 	r := InitRouter()
 	HttpSrvHandler = &http.Server{
