@@ -24,7 +24,7 @@ spec:
         app: gin-mysqlbak-web
     spec:
       containers:
-        - image: 'harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-web:2.0.2-SP3'
+        - image: 'harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-web:2.0.4'
           imagePullPolicy: IfNotPresent
           name: mysql-pod
           terminationMessagePath: /dev/termination-log

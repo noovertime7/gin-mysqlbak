@@ -8,11 +8,11 @@ data:
     content = "公司环境"
     photoUrl = "https://lmg.jj20.com/up/allimg/tp09/210F2130512J47-0-lp.jpg"
     [register]
-    registerAddr = "10.20.110.60:39010"  ## 注册地址，用于服务端调用,向server上报自己的地址
+    registerAddr = "192.168.1.60:39010"  ## agent地址，用于服务端调用,向server上报自己的地址
     registrationCycle = 10 ## 注册周期,单位分钟
     content = "公司环境"  ## 备注
-    registerUrl = http://10.20.110.51:19008/prod-api/public/register ## server前端地址，用于向服务发起注册
-    deregisterUrl = http://10.20.110.51:19008/prod-api/public/deregister ##server前端地址，用于向服务发起注册
+    registerUrl = http://192.168.1.51:19008/prod-api/public/register ## server前端地址，用于向服务发起注册
+    deregisterUrl = http://192.168.1.51:19008/prod-api/public/deregister ##server前端地址，用于向服务发起注册
     [mysql]
     autoInit = true  ## 是否自动初始化sql,首次安装请打开，需要手动创建数据库
     host = mysql.video
@@ -20,6 +20,9 @@ data:
     user = root
     password = tsit@123
     dbname = backup-agent
+    [EsBackup]
+    RepositoryName = test    ## es备份使用的默认仓库名
+    RepositoryDir = "/usr/share/elasticsearch/bakfile"  ## 备份快照存储文件夹，需要手动创建 path.repo: ["/usr/share/elasticsearch/bakfile"]
     [dingProxyAgent]
     enable = false  ## 用于外网环境下发送钉钉消息
     addr = 172.20.96.56:39999

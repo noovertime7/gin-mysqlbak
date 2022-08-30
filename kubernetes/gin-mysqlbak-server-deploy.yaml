@@ -24,7 +24,7 @@ spec:
         app: gin-mysqlbak-server
     spec:
       containers:
-        - image: 'harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-server:2.0.3-SP3'
+        - image: 'harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-server:2.0.4'
           imagePullPolicy: IfNotPresent
           name: gin-mysqlbak-server
           terminationMessagePath: /dev/termination-log
