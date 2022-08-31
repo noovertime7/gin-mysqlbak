@@ -32,7 +32,8 @@ gin-mysqlbak:一款简单高效、支持多集群统一备份的Mysql数据库�
 4. 支持主机健康检查，主机离线通过钉钉发送告警
 5. 支持钉钉推送备份状态，成功失败发送钉钉消息
 6. 通过部署agent完成异地多节点备份，备份任务统一管理，备份数据集中存储
-7、支持ElasticSearch快照管理，快照信息查看
+7. 支持ElasticSearch快照管理，快照信息查看
+
 
 项目地址：https://github.com/noovertime7/gin-mysqlbak
 
