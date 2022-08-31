@@ -18,6 +18,11 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # gin-mysqlbak
+<p> 
+<img src=https://img.shields.io/github/languages/top/noovertime7/gin-mysqlbak  alt="code-size" />
+<img src="https://img.shields.io/github/languages/code-size/noovertime7/gin-mysqlbak" alt="code-size" />
+<img src="https://img.shields.io/github/last-commit/noovertime7/gin-mysqlbak" alt="code-size"/>
+</p>
 
 gin-mysqlbak:一款简单高效、支持多集群统一备份的Mysql数据库备份平台！
 
