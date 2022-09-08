@@ -92,7 +92,10 @@ docker run -itd --name gin-mysql-web -p 8881:80 -v /root/default.conf:/etc/nginx
 首先请在root目录下准备好agent配置文件，agent配置文件在agent仓库下的/domain/config/config.ini
 
 ```docker
-docker run -itd --name gin-mysql-agent -v /root/config.ini:/app/domain/config/config.ini harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-agent:2.0.2-SP5
+docker run -itd --name gin-mysql-agent \
+-v /root/config.ini:/app/domain/config/config.ini \
+-v /root/bakfile:/app/bakfile \
+harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-agent:2.0.4
 ```
 
 ### 1.3 Kubernetes环境部署
