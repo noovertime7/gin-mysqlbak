@@ -93,6 +93,7 @@ docker run -itd --name gin-mysql-web -p 8881:80 -v /root/default.conf:/etc/nginx
 
 ```docker
 docker run -itd --name gin-mysql-agent \
+-- net=host \
 -v /root/config.ini:/app/domain/config/config.ini \
 -v /root/bakfile:/app/bakfile \
 harbor-tj.ts-it.cn:63333/mysqlbak/gin-mysqlbak-agent:2.0.4
