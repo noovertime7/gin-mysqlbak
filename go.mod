@@ -4,7 +4,6 @@ go 1.14
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
-	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/e421083458/gin_scaffold v0.0.0-20211226015300-616fc31c0400
 	github.com/e421083458/golang_common v1.2.1
@@ -30,6 +29,7 @@ require (
 	github.com/swaggo/swag v1.8.2
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	github.com/wumansgy/goEncrypt v1.1.0
 	golang.org/x/tools v0.1.11 // indirect
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/go-playground/validator.v9 v9.29.0

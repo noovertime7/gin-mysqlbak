@@ -19,7 +19,6 @@ func AdminRegister(group *gin.RouterGroup) {
 	admininfo := &AdminController{}
 	group.GET("/admin_info", admininfo.AdminInfo)
 	group.POST("/changepwd", admininfo.ChangePwd)
-
 }
 
 func (a *AdminController) AdminInfo(ctx *gin.Context) {
