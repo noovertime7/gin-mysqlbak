@@ -24,12 +24,14 @@ require (
 	github.com/opentracing/opentracing-go v1.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/stretchr/testify v1.8.0 // indirect
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.8.2
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
-	github.com/wumansgy/goEncrypt v1.1.0
+	github.com/wenzhenxi/gorsa v0.0.0-20220418014903-15feec0f05a6
+	github.com/yuchenfw/gocrypt v0.0.0-20201117020417-b36b23ab462e
 	golang.org/x/tools v0.1.11 // indirect
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/go-playground/validator.v9 v9.29.0
