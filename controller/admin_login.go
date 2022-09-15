@@ -1,16 +1,13 @@
 package controller
 
 import (
-	"encoding/json"
 	"github.com/e421083458/golang_common/lib"
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
-	"log"
-	"time"
+	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
 type AdminLoginController struct {
@@ -41,11 +38,11 @@ func (a *AdminLoginController) AdminLogin(ctx *gin.Context) {
 	var err error
 	params.Password, err = public.RsaDecode(params.Password)
 	if err != nil {
-		log.Println("rsa解密失败", err)
+		log.Logger.Error("rsa解密失败", err)
 		middleware.ResponseError(ctx, 2001, err)
 		return
 	}
-	log.Println("解密后密码:", params.Password)
+	log.Logger.Debug("解密后密码:", params.Password)
 	//获取数据库连接池
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
@@ -59,33 +56,42 @@ func (a *AdminLoginController) AdminLogin(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 2002, err)
 		return
 	}
-	//设置session
-	sessioninin := &dto.AdminSessionInfo{
-		ID:        admin.Id,
-		UserName:  admin.UserName,
-		LoginTime: time.Now(),
-	}
-	sessBts, err := json.Marshal(sessioninin)
+	//生成token
+	token, err := public.JWTToken.GenerateToken(&admin.Id)
 	if err != nil {
+		log.Logger.Error("生成token失败", err)
 		middleware.ResponseError(ctx, 2002, err)
 		return
 	}
-	sess := sessions.Default(ctx)
-	sess.Set(public.AdminSessionInfoKey, string(sessBts))
-	if err := sess.Save(); err != nil {
+	//更新用户在线状态
+	admin.Status = 1
+	if err = admin.UpdateStatus(ctx, tx, admin); err != nil {
+		log.Logger.Error("更新用户状态失败", err)
 		middleware.ResponseError(ctx, 2002, err)
 		return
 	}
-	out := &dto.AdminLoginOut{Token: admin.UserName}
+	out := &dto.AdminLoginOut{Token: token, Message: "登录成功"}
 	middleware.ResponseSuccess(ctx, out)
 }
 
 func (a *AdminLoginController) AdminLoginOut(ctx *gin.Context) {
 	//获取数据库连接池
-	sess := sessions.Default(ctx)
-	sess.Delete(public.AdminSessionInfoKey)
-	if err := sess.Save(); err != nil {
-		middleware.ResponseError(ctx, 3002, err)
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(ctx, 2001, err)
+		return
+	}
+	claims, exists := ctx.Get("claims")
+	if !exists {
+		log.Logger.Error("claims不存在,请检查jwt中间件")
+	}
+	cla, _ := claims.(*public.CustomClaims)
+	adminDB := &dao.Admin{Id: cla.Uid}
+	admin, err := adminDB.Find(ctx, tx, adminDB)
+	admin.Status = 0
+	if err := admin.UpdateStatus(ctx, tx, admin); err != nil {
+		log.Logger.Error("退出失败", err)
+		middleware.ResponseError(ctx, 2000, err)
 		return
 	}
 	middleware.ResponseSuccess(ctx, "退出成功")

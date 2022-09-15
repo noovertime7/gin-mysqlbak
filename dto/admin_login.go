@@ -12,7 +12,8 @@ type AdminLoginInput struct {
 }
 
 type AdminLoginOut struct {
-	Token string `form:"token" json:"token" comment:"token"  example:"token"`
+	Message string `json:"message"`
+	Token   string `form:"token" json:"token" comment:"token"  example:"token"`
 }
 
 type AdminSessionInfo struct {

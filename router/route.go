@@ -2,7 +2,6 @@ package router
 
 import (
 	"github.com/e421083458/gin_scaffold/docs"
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentcontroller"
 	"github.com/noovertime7/gin-mysqlbak/conf"
@@ -10,7 +9,6 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	"log"
 )
 
 // @title Swagger Example API
@@ -77,12 +75,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	adminLoginRouter := router.Group("/admin_login")
-	store, err := sessions.NewRedisStore(10, "tcp", conf.GetStringConf("redis", "host"), conf.GetStringConf("redis", "password"), []byte("store"))
-	if err != nil {
-		log.Fatalln("new redis err", err)
-	}
 	adminLoginRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware(),
@@ -93,10 +86,9 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	adminRouter := router.Group("/admin")
 	adminRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
+		middleware.JWTAuth(),
 		middleware.TranslationMiddleware(),
 	)
 	{
@@ -105,10 +97,9 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	taskRouter := router.Group("/task")
 	taskRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
+		middleware.JWTAuth(),
 		middleware.TranslationMiddleware(),
 	)
 	{
@@ -117,10 +108,9 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	BakRouter := router.Group("/bak")
 	BakRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
+		middleware.JWTAuth(),
 		middleware.TranslationMiddleware(),
 	)
 	{
@@ -139,10 +129,9 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	dashRouter := router.Group("/dashboard")
 	dashRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
+		middleware.JWTAuth(),
 		middleware.TranslationMiddleware())
 	{
 		controller.DashboardRegister(dashRouter)
@@ -150,10 +139,9 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	hostRouter := router.Group("/host")
 	hostRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
+		middleware.JWTAuth(),
 		middleware.TranslationMiddleware())
 	{
 		controller.HostRegister(hostRouter)
@@ -162,10 +150,9 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	//Agent相关路由
 	AgentRouter := router.Group("/agent")
 	AgentRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
+		middleware.JWTAuth(),
 		middleware.TranslationMiddleware())
 	{
 		agentcontroller.AgentTaskRegister(AgentRouter)
@@ -177,10 +164,9 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	//es备份相关路由
 	EsRouter := router.Group("/agent/es")
 	EsRouter.Use(
-		sessions.Sessions("mysession", store),
 		middleware.RecoveryMiddleware(),
 		middleware.RequestLog(),
-		middleware.SessionAuthMiddleware(),
+		middleware.JWTAuth(),
 		middleware.TranslationMiddleware(),
 	)
 	{

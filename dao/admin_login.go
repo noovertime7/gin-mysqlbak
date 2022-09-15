@@ -17,6 +17,8 @@ type Admin struct {
 	UpdatedAt time.Time `json:"update_at" gorm:"column:update_at" description:"更新时间"`
 	CreatedAt time.Time `json:"create_at" gorm:"column:create_at" description:"创建时间"`
 	IsDelete  int       `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
+	Role      int       `gorm:"column:role;type:int(11)" json:"role"`
+	Status    int       `gorm:"column:status;type:int(11);comment:在线状态" json:"status"`
 }
 
 func (t *Admin) TableName() string {
@@ -46,4 +48,13 @@ func (t *Admin) Find(c *gin.Context, tx *gorm.DB, search *Admin) (*Admin, error)
 
 func (t *Admin) Save(c *gin.Context, tx *gorm.DB) error {
 	return tx.WithContext(c).Save(t).Error
+}
+
+func (t *Admin) UpdateStatus(ctx *gin.Context, tx *gorm.DB, info *Admin) error {
+	if info.Id == 0 {
+		return errors.New("ID 为 0")
+	}
+	return tx.WithContext(ctx).Table(t.TableName()).Where("id = ?", info.Id).Updates(map[string]interface{}{
+		"status": info.Status,
+	}).Error
 }

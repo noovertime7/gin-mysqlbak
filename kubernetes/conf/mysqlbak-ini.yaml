@@ -11,12 +11,6 @@ data:
     read_timeout = 10                   # 读取超时时长
     write_timeout = 10                  # 写入超时时长
     max_header_bytes = 20               # 最大的header大小，二进制位长度
-    [redis]
-    host="redis.middleware:6379"   ## redis地址
-    password="xxxx"   ## redis密码,没有填空
-    max_active = 100
-    max_idle = 100
-    down_grade = false
     [HostLostAlarms]
     enable = true  ## 是否启动主机检测 
     accessToken = "77f579efbefeefc316b55d3caea1ba1963db2f1319aa7520cbfd9626de073fdc"  ## 主机检测钉钉报警配置
