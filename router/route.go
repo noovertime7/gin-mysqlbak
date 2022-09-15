@@ -77,6 +77,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	adminLoginRouter := router.Group("/admin_login")
 	adminLoginRouter.Use(
 		middleware.RecoveryMiddleware(),
+		middleware.JWTAuth(),
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware(),
 	)

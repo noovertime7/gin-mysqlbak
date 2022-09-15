@@ -7,6 +7,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/services"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"time"
 )
@@ -36,6 +37,10 @@ func (a *AdminController) AdminInfo(ctx *gin.Context) {
 	adminDB := &dao.Admin{Id: cla.Uid}
 	admin, err := adminDB.Find(ctx, tx, adminDB)
 	//2、取出数据然后封装输出
+	roleInfo, err := services.RuleService.GetRoleInfo(ctx, cla.Uid)
+	if err != nil {
+		return
+	}
 	out := dto.AdminInfoOutput{
 		ID:           admin.Id,
 		Name:         admin.UserName,
@@ -44,7 +49,7 @@ func (a *AdminController) AdminInfo(ctx *gin.Context) {
 		Introduction: "用户介绍",
 		Status:       admin.Status,
 		CreatorId:    "system",
-		Role:         dto.InitDemoInfo(),
+		Role:         roleInfo,
 	}
 	middleware.ResponseSuccess(ctx, out)
 }

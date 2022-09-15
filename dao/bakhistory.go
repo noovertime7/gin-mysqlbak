@@ -21,15 +21,15 @@ type BakHistory struct {
 	BakTime    time.Time `gorm:"column:bak_time" description:"备份时间"`
 }
 
-func (s *BakHistory) TableName() string {
+func (b *BakHistory) TableName() string {
 	return "bak_history"
 }
 
-func (s *BakHistory) Save(c *gin.Context, tx *gorm.DB) error {
-	return tx.WithContext(c).Save(s).Error
+func (b *BakHistory) Save(c *gin.Context, tx *gorm.DB) error {
+	return tx.WithContext(c).Save(b).Error
 }
 
-func (s *BakHistory) Find(c *gin.Context, tx *gorm.DB, search *BakHistory) (*BakHistory, error) {
+func (b *BakHistory) Find(c *gin.Context, tx *gorm.DB, search *BakHistory) (*BakHistory, error) {
 	out := &BakHistory{}
 	err := tx.WithContext(c).Where(search).Find(out).Error
 	if err != nil {
@@ -64,12 +64,12 @@ func (b *BakHistory) FindAllHistory(c *gin.Context, tx *gorm.DB, status string) 
 	return nil, nil
 }
 
-func (s *BakHistory) PageList(c *gin.Context, tx *gorm.DB, params *dto.HistoryListInput) ([]BakHistory, int, error) {
+func (b *BakHistory) PageList(c *gin.Context, tx *gorm.DB, params *dto.HistoryListInput) ([]BakHistory, int, error) {
 	var total int64 = 0
 	list := []BakHistory{}
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
-	query = query.Table(s.TableName())
+	query = query.Table(b.TableName())
 	query.Find(&list).Count(&total)
 	if params.Info != "" {
 		query = query.Where("(host like ? or db_name like ?)", "%"+params.Info+"%", "%"+params.Info+"%")

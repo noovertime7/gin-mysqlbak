@@ -9,10 +9,10 @@ import (
 // JWTAuth jwt认证函数
 func JWTAuth() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		//if len(context.Request.URL.String()) == 15 && context.Request.URL.String()[0:17] == "/admin_login/login" {
-		//	context.Next()
-		//	return
-		//}
+		if context.Request.Method == "POST" && context.Request.URL.String()[0:18] == "/admin_login/login" {
+			context.Next()
+			return
+		}
 		// 处理验证逻辑
 		token := context.Request.Header.Get("Access-Token")
 		if token == "" {
