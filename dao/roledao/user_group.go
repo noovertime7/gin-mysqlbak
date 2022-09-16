@@ -21,3 +21,8 @@ func (u *UserGroupDB) Find(ctx *gin.Context, tx *gorm.DB, search *UserGroupDB) (
 	out := &UserGroupDB{}
 	return out, tx.WithContext(ctx).Where(search).Find(out).Error
 }
+
+func (u *UserGroupDB) FindList(ctx *gin.Context, tx *gorm.DB, search *UserGroupDB) ([]*UserGroupDB, error) {
+	var out []*UserGroupDB
+	return out, tx.WithContext(ctx).Where(search).Find(&out).Error
+}

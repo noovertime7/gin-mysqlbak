@@ -61,3 +61,23 @@ func (t *Admin) UpdateStatus(ctx *gin.Context, tx *gorm.DB, info *Admin) error {
 		"login_time": info.LoginTime,
 	}).Error
 }
+
+func (u *Admin) PageList(c *gin.Context, tx *gorm.DB, params *dto.GroupUserListInput, groupId int) ([]*Admin, int, error) {
+	var total int64 = 0
+	var list []*Admin
+	offset := (params.PageNo - 1) * params.PageSize
+	query := tx.WithContext(c)
+	if groupId == 0 {
+		query = query.Table(u.TableName())
+	} else {
+		query = query.Table(u.TableName()).Where("group_id = ?", groupId)
+	}
+	query.Find(&list).Count(&total)
+	if params.Info != "" {
+		query = query.Where("(user_name like ?)", "%"+params.Info+"%")
+	}
+	if err := query.Limit(params.PageSize).Offset(offset).Order("id desc").Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
+		return nil, 0, err
+	}
+	return list, int(total), nil
+}

@@ -16,6 +16,8 @@ func AdminRegister(group *gin.RouterGroup) {
 	admininfo := &AdminController{}
 	group.GET("/role_info", admininfo.RoleInfo)
 	group.GET("/user_info", admininfo.UserInfo)
+	group.GET("/userinfo_by_group", admininfo.GetUserByGroup)
+	group.GET("/user_group_list", admininfo.GetUserGroupList)
 	group.POST("/changepwd", admininfo.ChangePwd)
 }
 
@@ -65,7 +67,7 @@ func (a *AdminController) RoleInfo(ctx *gin.Context) {
 // ChangePwd 更改密码
 func (a *AdminController) ChangePwd(ctx *gin.Context) {
 	params := &dto.ChangePwdInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, 2000, err)
 		return
 	}
@@ -75,4 +77,29 @@ func (a *AdminController) ChangePwd(ctx *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(ctx, "更改密码成功")
+}
+
+func (a *AdminController) GetUserGroupList(ctx *gin.Context) {
+	out, err := services.UserService.GetUserGroupList(ctx)
+	if err != nil {
+		log.Logger.Error("查询业务组失败", err)
+		middleware.ResponseError(ctx, 30002, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, out)
+}
+
+func (a *AdminController) GetUserByGroup(ctx *gin.Context) {
+	params := &dto.GroupUserListInput{}
+	if err := params.BindValidParams(ctx); err != nil {
+		middleware.ResponseError(ctx, 2000, err)
+		return
+	}
+	out, err := services.UserService.FindUserByGroup(ctx, params)
+	if err != nil {
+		log.Logger.Error("根据group查询用户信息失败", err)
+		middleware.ResponseError(ctx, 30002, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, out)
 }

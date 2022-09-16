@@ -8,6 +8,7 @@ import (
 // UserInfo 用户信息表
 type UserInfo struct {
 	Id           int    `gorm:"column:id;type:int(11);AUTO_INCREMENT;primary_key" json:"id"`
+	Uid          int    `gorm:"column:uid;type:int(11)" json:"uid"`
 	Avatar       string `gorm:"column:avatar;type:varchar(255);comment:头像" json:"avatar"`
 	CreateId     string `gorm:"column:create_id;type:varchar(20);comment:创建用户" json:"create_id"`
 	Email        string `gorm:"column:email;type:varchar(30);comment:邮箱" json:"email"`
@@ -16,11 +17,11 @@ type UserInfo struct {
 	Introduction string `gorm:"column:introduction;type:varchar(255);comment:介绍" json:"introduction"`
 }
 
-func (m *UserInfo) TableName() string {
+func (u *UserInfo) TableName() string {
 	return "user_info"
 }
 
-func (m *UserInfo) Find(ctx *gin.Context, tx *gorm.DB, search *UserInfo) (*UserInfo, error) {
+func (u *UserInfo) Find(ctx *gin.Context, tx *gorm.DB, search *UserInfo) (*UserInfo, error) {
 	out := &UserInfo{}
 	return out, tx.WithContext(ctx).Where(search).Find(out).Error
 }
