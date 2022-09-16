@@ -7,6 +7,11 @@ import (
 )
 
 type AdminInfoOutput struct {
+	*UserInfoOutPut
+	Role *RoleInfo `json:"role"`
+}
+
+type UserInfoOutPut struct {
 	ID           int       `json:"id"`
 	Name         string    `json:"name"`
 	LoginTime    time.Time `json:"login_time"`
@@ -14,11 +19,13 @@ type AdminInfoOutput struct {
 	Introduction string    `json:"introduction"`
 	Status       int       `json:"status"`
 	CreatorId    string    `json:"creatorId"`
-	Role         *RoleInfo `json:"role"`
+	GroupName    string    `json:"group_name"`
+	RoleName     string    `json:"role_name"`
 }
 
 type ChangePwdInput struct {
-	Password string `form:"password" json:"password" comment:"密码"   validate:"required" example:"123456"`
+	OldPassword string `form:"old_password" json:"old_password" comment:"旧密码"   validate:"required" example:"123456"`
+	Password    string `form:"password" json:"password" comment:"密码"   validate:"required" example:"123456"`
 }
 
 type RoleInfo struct {
@@ -49,50 +56,4 @@ type ActionEntitySetInfo struct {
 
 func (a *ChangePwdInput) BindValidParm(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, a)
-}
-
-func InitDemoInfo() *RoleInfo {
-	return &RoleInfo{
-		CreateTime: time.Now(),
-		CreatorId:  "system",
-		Deleted:    0,
-		Describe:   "拥有所有权限",
-		ID:         "admin",
-		Name:       "管理员",
-		Permissions: []*PermissionsInfo{
-			{
-				RoleId:         "admin",
-				PermissionId:   "dashboard",
-				PermissionName: "仪表盘",
-				Actions:        "[{\"action\":\"add\",\"defaultCheck\":false,\"describe\":\"新增\"},{\"action\":\"query\",\"defaultCheck\":false,\"describe\":\"查询\"},{\"action\":\"get\",\"defaultCheck\":false,\"describe\":\"详情\"},{\"action\":\"update\",\"defaultCheck\":false,\"describe\":\"修改\"},{\"action\":\"delete\",\"defaultCheck\":false,\"describe\":\"删除\"}]",
-				ActionEntitySet: []*ActionEntitySetInfo{
-					{
-						Action:       "add",
-						Describe:     "add",
-						DefaultCheck: false,
-					},
-					{
-						Action:       "query",
-						Describe:     "查询",
-						DefaultCheck: false,
-					},
-					{
-						Action:       "get",
-						Describe:     "详情",
-						DefaultCheck: false,
-					},
-					{
-						Action:       "update",
-						Describe:     "修改",
-						DefaultCheck: false,
-					},
-					{
-						Action:       "delete",
-						Describe:     "删除",
-						DefaultCheck: false,
-					},
-				},
-			},
-		},
-	}
 }

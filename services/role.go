@@ -7,7 +7,6 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dao/roledao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/public"
-	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
 var RuleService *roleService
@@ -19,29 +18,33 @@ func (r *roleService) GetRoleInfo(ctx *gin.Context, uid int) (*dto.RoleInfo, err
 	if err != nil {
 		return nil, err
 	}
-	//从ctx中获取用户id
-	claims, exists := ctx.Get("claims")
-	if !exists {
-		log.Logger.Error("claims不存在,请检查jwt中间件")
-	}
-	cla, _ := claims.(*public.CustomClaims)
-	adminDB := &dao.Admin{Id: cla.Uid}
+	adminDB := &dao.Admin{Id: uid}
 	admin, err := adminDB.Find(ctx, tx, adminDB)
-	roleDB := &roledao.RoleDB{Id: admin.Role}
+	//首先查询用户所属的用户组
+	groupDB := &roledao.UserGroupDB{Id: admin.GroupId}
+	group, err := groupDB.Find(ctx, tx, groupDB)
+	if err != nil {
+		return nil, err
+	}
+	//通过用户组role_id查询权限
+	roleDB := &roledao.RoleDB{Id: group.RoleId}
 	role, err := roleDB.Find(ctx, tx, roleDB)
 	if err != nil {
 		return nil, err
 	}
+	//通过role查询Permission
 	PermissionDB := &roledao.PermissionDB{RoleId: role.RoleId}
 	permissionList, err := PermissionDB.FindPermissions(ctx, tx, PermissionDB)
 	if err != nil {
 		return nil, err
 	}
+	//通过permission查询所属的action
 	actionDB := &roledao.ActionDB{PermissionId: role.PermissionId}
 	actions, err := actionDB.FindActions(ctx, tx, actionDB)
 	if err != nil {
 		return nil, err
 	}
+	//数据组装输出
 	var Permissions []*dto.PermissionsInfo
 	for _, permission := range permissionList {
 		var actionList []*dto.ActionEntitySetInfo

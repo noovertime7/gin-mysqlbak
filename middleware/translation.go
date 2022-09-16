@@ -52,24 +52,24 @@ func TranslationMiddleware() gin.HandlerFunc {
 
 			//自定义验证方法
 			//https://github.com/go-playground/validator/blob/v9/_examples/custom-validation/main.go
-			err = val.RegisterValidation("is_valid_username", func(fl validator.FieldLevel) bool {
-				return fl.Field().String() == "admin"
-			})
-			if err != nil {
-				return
-			}
+			//err = val.RegisterValidation("is_valid_username", func(fl validator.FieldLevel) bool {
+			//	return fl.Field().String() == "admin"
+			//})
+			//if err != nil {
+			//	return
+			//}
 
 			//自定义验证器
 			//https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
-			err = val.RegisterTranslation("is_valid_username", trans, func(ut ut.Translator) error {
-				return ut.Add("is_valid_username", "{0} 填写不正确哦", true)
-			}, func(ut ut.Translator, fe validator.FieldError) string {
-				t, _ := ut.T("is_valid_username", fe.Field())
-				return t
-			})
-			if err != nil {
-				return
-			}
+			//err = val.RegisterTranslation("is_valid_username", trans, func(ut ut.Translator) error {
+			//	return ut.Add("is_valid_username", "{0} 填写不正确哦", true)
+			//}, func(ut ut.Translator, fe validator.FieldError) string {
+			//	t, _ := ut.T("is_valid_username", fe.Field())
+			//	return t
+			//})
+			//if err != nil {
+			//	return
+			//}
 
 			//ParseValidation
 			//自定义验证方法

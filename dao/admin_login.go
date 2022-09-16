@@ -17,8 +17,10 @@ type Admin struct {
 	UpdatedAt time.Time `json:"update_at" gorm:"column:update_at" description:"更新时间"`
 	CreatedAt time.Time `json:"create_at" gorm:"column:create_at" description:"创建时间"`
 	IsDelete  int       `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
-	Role      int       `gorm:"column:role;type:int(11)" json:"role"`
+	GroupId   int       `gorm:"column:group_id;type:int(11)" json:"group_id"`
+	InfoId    int       `gorm:"column:info_id;type:int(11);comment:用户信息关联" json:"info_id"`
 	Status    int       `gorm:"column:status;type:int(11);comment:在线状态" json:"status"`
+	LoginTime time.Time `gorm:"column:login_time;type:datetime" json:"login_time"`
 }
 
 func (t *Admin) TableName() string {
@@ -27,7 +29,7 @@ func (t *Admin) TableName() string {
 
 func (t *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.AdminLoginInput) (*Admin, error) {
 	admininfo, err := t.Find(c, tx, &Admin{UserName: param.UserName, IsDelete: 0})
-	if err != nil {
+	if err == gorm.ErrRecordNotFound || admininfo.Id == 0 {
 		return nil, errors.New("用户信息不存在")
 	}
 	saltPassword := public.GenSaltPassword(admininfo.Salt, param.Password)
@@ -55,6 +57,7 @@ func (t *Admin) UpdateStatus(ctx *gin.Context, tx *gorm.DB, info *Admin) error {
 		return errors.New("ID 为 0")
 	}
 	return tx.WithContext(ctx).Table(t.TableName()).Where("id = ?", info.Id).Updates(map[string]interface{}{
-		"status": info.Status,
+		"status":     info.Status,
+		"login_time": info.LoginTime,
 	}).Error
 }
