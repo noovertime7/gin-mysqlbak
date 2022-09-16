@@ -24,6 +24,7 @@
 <img src="https://img.shields.io/github/last-commit/noovertime7/gin-mysqlbak" alt="code-size"/>
 </p>
 
+### 注意：最新正在重构前端代码，所以仓库文件可能会有频繁变动，建议使用容器最新版本部署，或等待前端重构完成后使用源码部署
 gin-mysqlbak:一款简单高效、支持多集群统一备份的Mysql数据库备份平台！
 
 1. 请求链路日志打印，涵盖mysql/redis/request，集群版本支持jaeger链路追踪
