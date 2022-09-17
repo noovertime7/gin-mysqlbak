@@ -174,8 +174,15 @@ kubectl apply -f gin-mysqlbak-server-web.yaml  ## 创建前端服务
 
  ![cluster_history.gif](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/cluster_history.gif?raw=true) 
 
-## 四、其他
+## 四、FAQ
 
-### log / redis / mysql / http.client 常用方法
+1.为什么服务端会有三个配置文件？
 
-参考文档：https://github.com/e421083458/golang_common
+前期使用脚手架创建，后面发现对脚手架太过依赖，正在逐步去除脚手架相关配置，主要配置文件为config.ini
+
+2.目前的工作方向？
+
+目前正在使用ant design vue重构前端代码，主要增加权限管理、安全相关功能，也是为了前端美化页面
+
+## 五、其他
+这个项目的前端后端都是我一个人完成，所以会有很多不足，希望能提issue，或者提PR一起来完善这个项目
