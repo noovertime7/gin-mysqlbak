@@ -1,6 +1,7 @@
 package services
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
@@ -280,7 +281,10 @@ func (u *userService) DeleteUser(ctx *gin.Context, params *dto.UserIDInput) erro
 	if user.UserName == "admin" {
 		return errors.New("默认admin用户不能删除")
 	}
-	user.IsDelete = 1
+	user.IsDelete = sql.NullInt32{
+		Int32: 1,
+		Valid: true,
+	}
 	return user.Updates(ctx, tx)
 }
 

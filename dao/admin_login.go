@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"database/sql"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/public"
@@ -10,17 +11,17 @@ import (
 )
 
 type Admin struct {
-	Id        int       `json:"id" gorm:"primary_key" description:"自增主键"`
-	UserName  string    `json:"user_name" gorm:"column:user_name" description:"管理员用户名"`
-	Salt      string    `json:"salt" gorm:"column:salt" description:"盐"`
-	Password  string    `json:"password" gorm:"column:password" description:"密码"`
-	UpdatedAt time.Time `json:"update_at" gorm:"column:update_at" description:"更新时间"`
-	CreatedAt time.Time `json:"create_at" gorm:"column:create_at" description:"创建时间"`
-	IsDelete  int       `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
-	GroupId   int       `gorm:"column:group_id;type:int(11)" json:"group_id"`
-	InfoId    int       `gorm:"column:info_id;type:int(11);comment:用户信息关联" json:"info_id"`
-	Status    int       `gorm:"column:status;type:int(11);comment:在线状态" json:"status"`
-	LoginTime time.Time `gorm:"column:login_time;type:datetime" json:"login_time"`
+	Id        int           `json:"id" gorm:"primary_key" description:"自增主键"`
+	UserName  string        `json:"user_name" gorm:"column:user_name" description:"管理员用户名"`
+	Salt      string        `json:"salt" gorm:"column:salt" description:"盐"`
+	Password  string        `json:"password" gorm:"column:password" description:"密码"`
+	UpdatedAt time.Time     `json:"update_at" gorm:"column:update_at" description:"更新时间"`
+	CreatedAt time.Time     `json:"create_at" gorm:"column:create_at" description:"创建时间"`
+	IsDelete  sql.NullInt32 `json:"is_delete" gorm:"column:is_delete" description:"是否删除"`
+	GroupId   int           `gorm:"column:group_id;type:int(11)" json:"group_id"`
+	InfoId    int           `gorm:"column:info_id;type:int(11);comment:用户信息关联" json:"info_id"`
+	Status    int           `gorm:"column:status;type:int(11);comment:在线状态" json:"status"`
+	LoginTime time.Time     `gorm:"column:login_time;type:datetime" json:"login_time"`
 }
 
 func (t *Admin) TableName() string {
@@ -28,7 +29,7 @@ func (t *Admin) TableName() string {
 }
 
 func (t *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.AdminLoginInput) (*Admin, error) {
-	admininfo, err := t.Find(c, tx, &Admin{UserName: param.UserName, IsDelete: 0})
+	admininfo, err := t.Find(c, tx, &Admin{UserName: param.UserName, IsDelete: sql.NullInt32{0, true}})
 	if err == gorm.ErrRecordNotFound || admininfo.Id == 0 {
 		return nil, errors.New("用户信息不存在")
 	}
@@ -41,11 +42,7 @@ func (t *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.AdminLoginInp
 
 func (t *Admin) Find(c *gin.Context, tx *gorm.DB, search *Admin) (*Admin, error) {
 	out := &Admin{}
-	err := tx.WithContext(c).Where(search).Find(out).Error
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	return out, tx.WithContext(c).Where(search).Find(out).Error
 }
 
 func (t *Admin) Save(c *gin.Context, tx *gorm.DB) error {
