@@ -14,8 +14,11 @@ type AdminController struct {
 
 func AdminRegister(group *gin.RouterGroup) {
 	admininfo := &AdminController{}
+	group.DELETE("/user_delete", admininfo.DeleteUser)
+	group.GET("/user_reset_pwd", admininfo.ResetUserPasswd)
 	group.GET("/role_info", admininfo.RoleInfo)
 	group.GET("/user_info", admininfo.UserInfo)
+	group.PUT("/user_info_update", admininfo.UpdateUserInfo)
 	group.GET("/userinfo_by_group", admininfo.GetUserByGroup)
 	group.GET("/user_group_list", admininfo.GetUserGroupList)
 	group.POST("/changepwd", admininfo.ChangePwd)
@@ -68,7 +71,7 @@ func (a *AdminController) RoleInfo(ctx *gin.Context) {
 func (a *AdminController) ChangePwd(ctx *gin.Context) {
 	params := &dto.ChangePwdInput{}
 	if err := params.BindValidParams(ctx); err != nil {
-		middleware.ResponseError(ctx, 2000, err)
+		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
 	if err := services.UserService.ChangePwd(ctx, params); err != nil {
@@ -92,7 +95,7 @@ func (a *AdminController) GetUserGroupList(ctx *gin.Context) {
 func (a *AdminController) GetUserByGroup(ctx *gin.Context) {
 	params := &dto.GroupUserListInput{}
 	if err := params.BindValidParams(ctx); err != nil {
-		middleware.ResponseError(ctx, 2000, err)
+		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
 	out, err := services.UserService.FindUserByGroup(ctx, params)
@@ -102,4 +105,51 @@ func (a *AdminController) GetUserByGroup(ctx *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(ctx, out)
+}
+
+func (a *AdminController) UpdateUserInfo(ctx *gin.Context) {
+	params := &dto.UpdateUserInfo{}
+	if err := params.BindValidParams(ctx); err != nil {
+		log.Logger.Error("绑定失败", err)
+		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		return
+	}
+	if err := services.UserService.UpdateUserInfo(ctx, params); err != nil {
+		log.Logger.Error("更新失败")
+		middleware.ResponseError(ctx, 30003, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, "更新成功")
+}
+
+// ResetUserPasswd 重置用户密码
+func (a *AdminController) ResetUserPasswd(ctx *gin.Context) {
+	params := &dto.UserIDInput{}
+	if err := params.BindValidParams(ctx); err != nil {
+		log.Logger.Error("绑定失败", err)
+		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		return
+	}
+	if err := services.UserService.ResetUserPassword(ctx, params); err != nil {
+		log.Logger.Error("重置密码失败", err)
+		middleware.ResponseError(ctx, 30004, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, "重置密码成功,默认密码:admin@123")
+}
+
+// DeleteUser 删除用户
+func (a *AdminController) DeleteUser(ctx *gin.Context) {
+	params := &dto.UserIDInput{}
+	if err := params.BindValidParams(ctx); err != nil {
+		log.Logger.Error("绑定失败", err)
+		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		return
+	}
+	if err := services.UserService.DeleteUser(ctx, params); err != nil {
+		log.Logger.Error("删除用户失败", err)
+		middleware.ResponseError(ctx, 30006, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, "删除成功")
 }

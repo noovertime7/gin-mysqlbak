@@ -9,7 +9,7 @@ import (
 // JWTAuth jwt认证函数
 func JWTAuth() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		if context.Request.Method == "POST" && context.Request.URL.String()[0:18] == "/admin_login/login" {
+		if len(context.Request.URL.String()) >= 18 && context.Request.Method == "POST" && context.Request.URL.String()[0:18] == "/admin_login/login" {
 			context.Next()
 			return
 		}
@@ -30,7 +30,7 @@ func JWTAuth() gin.HandlerFunc {
 				return
 			}
 			// 解析其他错误
-			ResponseError(context, 11002, errors.New("token解析失败"))
+			ResponseError(context, 11002, errors.New("token无效或已过期"))
 			context.Abort()
 			return
 		}

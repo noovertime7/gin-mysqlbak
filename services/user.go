@@ -66,20 +66,14 @@ func (u *userService) LoginOut(ctx *gin.Context) error {
 
 // ChangePwd 修改密码
 func (u *userService) ChangePwd(ctx *gin.Context, params *dto.ChangePwdInput) error {
-	//1、通过claims解析用户id
-	claims, exists := ctx.Get("claims")
-	if !exists {
-		return errors.New("claims不存在,请检查jwt中间件")
-	}
-	cla, _ := claims.(*public.CustomClaims)
 	//2、利用结构体中的id去读取数据库信息 adminInfo
 	//获取数据库连接池
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		return err
 	}
-	adminInfo := &dao.Admin{}
-	adminInfo, err = adminInfo.Find(ctx, tx, &dao.Admin{Id: cla.Uid})
+	adminInfo := &dao.Admin{Id: params.ID}
+	adminInfo, err = adminInfo.Find(ctx, tx, adminInfo)
 	if err != nil {
 		return err
 	}
@@ -164,24 +158,33 @@ func (u *userService) FindUserByGroup(ctx *gin.Context, info *dto.GroupUserListI
 		return nil, err
 	}
 	//通过key查询所属的group
-	var uid int
+	var groupId int
 	if info.Key != "" {
 		groupDB := &roledao.UserGroupDB{Key: info.Key}
 		group, err := groupDB.Find(ctx, tx, groupDB)
 		if err != nil {
 			return nil, err
 		}
-		uid = group.Id
+		groupId = group.Id
 	} else {
-		uid = 0
+		groupId = 0
 	}
 	//查询在当前组下的所有用户
 	userDB := &dao.Admin{}
-	list, total, err := userDB.PageList(ctx, tx, info, uid)
+	list, total, err := userDB.PageList(ctx, tx, info, groupId)
 	if err != nil {
 		return nil, err
 	}
-	var out []*dto.UserInfoOutPut
+	if len(list) == 0 {
+		//当前组没有任何用户，直接return
+		return &dto.GroupUserListOutPut{
+			Total:    total,
+			List:     []dto.UserInfoOutPut{},
+			PageNo:   info.PageNo,
+			PageSize: info.PageSize,
+		}, nil
+	}
+	var out []dto.UserInfoOutPut
 	for _, user := range list {
 		// 因为key可能为空，所以要重新查询一下group
 		groupDB := &roledao.UserGroupDB{Id: user.GroupId}
@@ -190,7 +193,7 @@ func (u *userService) FindUserByGroup(ctx *gin.Context, info *dto.GroupUserListI
 			return nil, err
 		}
 		//需要用户的userinfo 信息，查询userinfo表
-		userInfoDB := &roledao.UserInfo{Id: userDB.InfoId}
+		userInfoDB := &roledao.UserInfo{Id: user.InfoId}
 		info, err := userInfoDB.Find(ctx, tx, userInfoDB)
 		if err != nil {
 			return nil, err
@@ -201,7 +204,7 @@ func (u *userService) FindUserByGroup(ctx *gin.Context, info *dto.GroupUserListI
 		if err != nil {
 			return nil, err
 		}
-		outTemp := &dto.UserInfoOutPut{
+		outTemp := dto.UserInfoOutPut{
 			ID:           user.Id,
 			Name:         user.UserName,
 			LoginTime:    user.LoginTime.Format("2006年01月02日15:04:01"),
@@ -222,7 +225,74 @@ func (u *userService) FindUserByGroup(ctx *gin.Context, info *dto.GroupUserListI
 	}, nil
 }
 
-//
-//func (u *userService) DeleteUser(ctx *gin.Context) error {}
-//
-//func (u *userService) ChangeUserGroup(ctx *gin.Context) error {}
+func (u *userService) UpdateUserInfo(ctx *gin.Context, info *dto.UpdateUserInfo) error {
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		return err
+	}
+	adminDB := &dao.Admin{Id: info.ID}
+	admin, err := adminDB.Find(ctx, tx, adminDB)
+	if err != nil {
+		return err
+	}
+	admin.UserName = info.Name
+	admin.GroupId = info.GroupID
+	//开启事务
+	tx = tx.Begin()
+	if err := admin.Updates(ctx, tx); err != nil {
+		tx.Rollback()
+		return err
+	}
+	userinfoDB := &roledao.UserInfo{Id: admin.InfoId, Introduction: info.Introduction}
+	//获取操作用户名
+	//从ctx中取出当前操作用户的uid
+	claims, exists := ctx.Get("claims")
+	if !exists {
+		return errors.New("claims不存在,请检查jwt中间件")
+	}
+	cla, _ := claims.(*public.CustomClaims)
+	tempAdminDB := &dao.Admin{Id: cla.Uid}
+	tempAdmin, err := tempAdminDB.Find(ctx, tx, tempAdminDB)
+	if err != nil {
+		userinfoDB.CreateId = "unknown"
+	} else {
+		userinfoDB.CreateId = tempAdmin.UserName
+	}
+	if err := userinfoDB.Updates(ctx, tx); err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
+}
+
+// DeleteUser 删除用户
+func (u *userService) DeleteUser(ctx *gin.Context, params *dto.UserIDInput) error {
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		return err
+	}
+	userDB := &dao.Admin{Id: params.ID}
+	user, err := userDB.Find(ctx, tx, userDB)
+	if err != nil {
+		return err
+	}
+	if user.UserName == "admin" {
+		return errors.New("默认admin用户不能删除")
+	}
+	user.IsDelete = 1
+	return user.Updates(ctx, tx)
+}
+
+// ResetUserPassword 重置用户密码为  admin@123
+func (u *userService) ResetUserPassword(ctx *gin.Context, params *dto.UserIDInput) error {
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		return err
+	}
+	userDB := &dao.Admin{Id: params.ID}
+	user, err := userDB.Find(ctx, tx, userDB)
+	newHashPassword := public.GenSaltPassword(user.Salt, "admin@123")
+	user.Password = newHashPassword
+	return user.Updates(ctx, tx)
+}

@@ -11,7 +11,12 @@ type AdminInfoOutput struct {
 	Role *RoleInfo `json:"role"`
 }
 
+type UserIDInput struct {
+	ID int `form:"id" json:"id"`
+}
+
 type ChangePwdInput struct {
+	ID          int    `form:"id" json:"id"`
 	OldPassword string `form:"old_password" json:"old_password" comment:"旧密码"   validate:"required" example:"123456"`
 	Password    string `form:"password" json:"password" comment:"密码"   validate:"required" example:"123456"`
 }
@@ -63,10 +68,10 @@ type GroupUserListInput struct {
 }
 
 type GroupUserListOutPut struct {
-	Total    int               `form:"total" json:"total" comment:"总数"   validate:"" example:""`
-	PageNo   int               `form:"page_no" json:"page_no" comment:"当前页数"   validate:"" example:"1"`
-	PageSize int               `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
-	List     []*UserInfoOutPut `json:"list"`
+	Total    int              `form:"total" json:"total" comment:"总数"   validate:"" example:""`
+	PageNo   int              `form:"page_no" json:"page_no" comment:"当前页数"   validate:"" example:"1"`
+	PageSize int              `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+	List     []UserInfoOutPut `json:"list"`
 }
 
 type UserInfoOutPut struct {
@@ -81,6 +86,15 @@ type UserInfoOutPut struct {
 	RoleName     string `json:"role_name"`
 }
 
+// 更新用户信息
+
+type UpdateUserInfo struct {
+	ID           int    `json:"id" form:"id"`
+	Name         string `json:"name" form:"name"`
+	GroupID      int    `json:"group_name" form:"group_name"`
+	Introduction string `json:"introduction" form:"introduction"`
+}
+
 //绑定参数
 
 func (a *ChangePwdInput) BindValidParams(ctx *gin.Context) error {
@@ -88,5 +102,13 @@ func (a *ChangePwdInput) BindValidParams(ctx *gin.Context) error {
 }
 
 func (a *GroupUserListInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, a)
+}
+
+func (a *UpdateUserInfo) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, a)
+}
+
+func (a *UserIDInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, a)
 }

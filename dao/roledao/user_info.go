@@ -21,6 +21,14 @@ func (u *UserInfo) TableName() string {
 	return "user_info"
 }
 
+func (u *UserInfo) Save(ctx *gin.Context, tx *gorm.DB) error {
+	return tx.WithContext(ctx).Table(u.TableName()).Save(u).Error
+}
+
+func (u *UserInfo) Updates(ctx *gin.Context, tx *gorm.DB) error {
+	return tx.WithContext(ctx).Table(u.TableName()).Updates(u).Error
+}
+
 func (u *UserInfo) Find(ctx *gin.Context, tx *gorm.DB, search *UserInfo) (*UserInfo, error) {
 	out := &UserInfo{}
 	return out, tx.WithContext(ctx).Where(search).Find(out).Error

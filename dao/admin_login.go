@@ -62,15 +62,19 @@ func (t *Admin) UpdateStatus(ctx *gin.Context, tx *gorm.DB, info *Admin) error {
 	}).Error
 }
 
+func (a *Admin) Updates(ctx *gin.Context, tx *gorm.DB) error {
+	return tx.WithContext(ctx).Table(a.TableName()).Updates(a).Error
+}
+
 func (u *Admin) PageList(c *gin.Context, tx *gorm.DB, params *dto.GroupUserListInput, groupId int) ([]*Admin, int, error) {
 	var total int64 = 0
 	var list []*Admin
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
 	if groupId == 0 {
-		query = query.Table(u.TableName())
+		query = query.Table(u.TableName()).Where("is_delete = 0")
 	} else {
-		query = query.Table(u.TableName()).Where("group_id = ?", groupId)
+		query = query.Table(u.TableName()).Where("is_delete = 0 and group_id = ?", groupId)
 	}
 	query.Find(&list).Count(&total)
 	if params.Info != "" {
