@@ -5,10 +5,9 @@ go 1.14
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/e421083458/gin_scaffold v0.0.0-20211226015300-616fc31c0400
 	github.com/e421083458/golang_common v1.2.1
-	github.com/gin-gonic/contrib v0.0.0-20190526021735-7fb7810ed2a0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-openapi/spec v0.20.6 // indirect
 	github.com/go-openapi/swag v0.21.1 // indirect
@@ -31,7 +30,6 @@ require (
 	github.com/swaggo/swag v1.8.2
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
-	github.com/wenzhenxi/gorsa v0.0.0-20220418014903-15feec0f05a6
 	github.com/yuchenfw/gocrypt v0.0.0-20201117020417-b36b23ab462e
 	golang.org/x/tools v0.1.11 // indirect
 	google.golang.org/protobuf v1.28.0
