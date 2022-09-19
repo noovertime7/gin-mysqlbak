@@ -11,14 +11,6 @@ const api = {
 
 export default api
 
-export function getUserList (parameter) {
-  return request({
-    url: api.user,
-    method: 'get',
-    params: parameter
-  })
-}
-
 export function getRoleList (parameter) {
   return request({
     url: api.role,

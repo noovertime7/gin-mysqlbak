@@ -19,8 +19,8 @@
           :alert="false"
           :rowSelection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
         >
-          <span slot='status' slot-scope='text'>
-            <a-badge :status='text | statusTypeFilter' :text='text | statusFilter' />
+          <span slot="status" slot-scope="text">
+            <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
           </span>
           <span slot="action" slot-scope="text, record">
             <template v-if="$auth('table.update')">
@@ -33,21 +33,62 @@
               </a>
               <a-menu slot="overlay">
                 <a-menu-item>
-                  <a href="javascript:;">详情</a>
+                  <a @click="changePasswd(record)">修改密码</a>
                 </a-menu-item>
-                <a-menu-item v-if="$auth('table.disable')">
-                  <a href="javascript:;">禁用</a>
+                <a-menu-item >
+                  <a @click="resetPasswd(record)">重置密码</a>
                 </a-menu-item>
-                <a-menu-item v-if="$auth('table.delete')">
-                  <a href="javascript:;">删除</a>
+                <a-menu-item >
+                  <a-popconfirm
+                    title="您确定要删除此用户吗?"
+                    ok-text="Yes"
+                    cancel-text="No"
+                    @confirm="deleteUser(record)"
+                    placement="leftTop"
+                  >
+                    <a>删除用户</a>
+                  </a-popconfirm>
                 </a-menu-item>
               </a-menu>
             </a-dropdown>
           </span>
         </s-table>
+        <create-form
+          ref="createModal"
+          :visible="visible"
+          :loading="confirmLoading"
+          :model="mdl"
+          @cancel="handleCancel"
+          @ok="handleOk"
+        />
       </a-col>
     </a-row>
-
+    <a-modal
+      title="修改密码"
+      :visible="changePwdVisible"
+      :confirm-loading="changePwdConfirmLoading"
+      @ok="changePwdHandleOk"
+      @cancel="handleChangePwdChancel"
+    >
+      <template>
+        <div class="components-input-demo-presuffix">
+          <a-input ref="oldPwdInput" v-model="oldPwd" placeholder="原密码">
+            <a-icon slot="prefix" type="lock" />
+            <a-tooltip slot="suffix" title="请输入原密码">
+              <a-icon type="info-circle" style="color: rgba(0,0,0,.45)" />
+            </a-tooltip>
+          </a-input>
+          <br />
+          <br />
+          <a-input ref="newPwdInput" v-model="newPwd" placeholder="新密码">
+            <a-icon slot="prefix" type="safety" />
+            <a-tooltip slot="suffix" title="请输入新密码">
+              <a-icon type="info-circle" style="color: rgba(0,0,0,.45)" />
+            </a-tooltip>
+          </a-input>
+        </div>
+      </template>
+    </a-modal>
     <org-modal ref="modal" @ok="handleSaveOk" @close="handleSaveClose" />
   </a-card>
 </template>
@@ -56,7 +97,8 @@
 import STree from '@/components/Tree/Tree'
 import { STable } from '@/components'
 import OrgModal from './modules/OrgModal'
-import { getgroupList, getUserByGroup } from '@/api/user'
+import { ChangePwd, DeleteUser, getgroupList, getUserByGroup, ResetUserPassword, UpdateUserInfo } from '@/api/user'
+import CreateForm from './modules/CreateForm'
 
 const statusMap = {
   0: {
@@ -77,12 +119,22 @@ const statusMap = {
   }
 }
 
+const groupMap = {
+  '管理员': {
+     id: 1
+  },
+  '用户': {
+    id: 2
+  }
+}
+
 export default {
   name: 'TreeList',
   components: {
     STable,
     STree,
-    OrgModal
+    OrgModal,
+    CreateForm
   },
   data () {
     return {
@@ -142,7 +194,18 @@ export default {
       },
       orgTree: [],
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      // create model
+      visible: false,
+      confirmLoading: false,
+      mdl: null,
+      // 修改密码弹窗相关
+      changePwdVisible: false,
+      changePwdConfirmLoading: false,
+      oldPwd: '',
+      newPwd: '',
+      userID: 0,
+      recordName: ''
     }
   },
   created () {
@@ -159,8 +222,32 @@ export default {
     }
   },
   methods: {
+    changePwdHandleOk (e) {
+      const changeQuery = {
+        'id': this.userID,
+        'old_password': this.oldPwd,
+        'password': this.newPwd
+      }
+      this.changePwdConfirmLoading = true
+      ChangePwd(changeQuery).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.changePwdVisible = false
+          this.changePwdConfirmLoading = false
+          if (this.recordName === this.userInfo().name) {
+            this.$store.dispatch('Logout')
+          }
+        }
+        this.changePwdConfirmLoading = false
+      })
+    },
+    handleGroupName (type) {
+      if (typeof type === 'number') {
+        return type
+      }
+      return groupMap[type].id
+    },
     handleClick (e) {
-      console.log('handleClick', e)
       this.queryParam = {
         key: e.key
       }
@@ -172,6 +259,7 @@ export default {
     //   this.$refs.modal.add(item.key)
     // },
     handleTitleClick (item) {
+      alert('title')
       console.log('handleTitleClick', item)
     },
     titleClick (e) {
@@ -183,10 +271,68 @@ export default {
     handleSaveClose () {
 
     },
-
+    handleChangePwdChancel () {
+      this.changePwdVisible = false
+    },
+    handleCancel () {
+      this.visible = false
+      const form = this.$refs.createModal.form
+      form.resetFields() // 清理表单数据（可不做）
+    },
+    handleOk () {
+      const form = this.$refs.createModal.form
+      this.confirmLoading = true
+      form.validateFields((errors, values) => {
+          if (!errors) {
+            values.group_name = this.handleGroupName(values.group_name)
+            UpdateUserInfo(values).then((res) => {
+              this.$message.success(res.data)
+              this.$refs.table.refresh(true)
+              this.visible = false
+              this.confirmLoading = false
+            })
+          }
+      })
+    },
+    handleEdit (record) {
+      this.visible = true
+      this.mdl = { ...record }
+    },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
+    },
+    changePasswd (record) {
+      this.userID = record.id
+      this.recordName = record.name
+      this.changePwdVisible = true
+    },
+    resetPasswd (record) {
+      const query = {
+        'id': record.id
+      }
+      ResetUserPassword(query).then((res) => {
+        this.$message.success(res.data)
+        // 如果操作的是自己，马上退出登录
+       if (record.name === this.userInfo().name) {
+         this.$store.dispatch('Logout')
+       }
+      })
+    },
+    deleteUser (record) {
+      const query = {
+        'id': record.id
+      }
+      DeleteUser(query).then((res) => {
+        this.$message.success(res.data)
+        this.$refs.table.refresh(true)
+        if (record.name === this.userInfo().name) {
+          this.$store.dispatch('Logout')
+        }
+      })
+    },
+    userInfo () {
+      return this.$store.getters.userInfo
     }
   }
 }

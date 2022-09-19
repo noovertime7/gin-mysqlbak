@@ -8,9 +8,9 @@ const userApi = {
   twoStepCode: '/auth/2step-code',
   SendSms: '/account/sms',
   SendSmsErr: '/account/sms_err',
-  // get my info
   UserRoleInfo: '/admin/role_info',
-  UserMenu: '/user/nav'
+  UserMenu: '/user/nav',
+  Test: 'test'
 }
 
 /**
