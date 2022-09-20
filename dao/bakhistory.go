@@ -119,6 +119,7 @@ func (b *BakHistory) PageList(c *gin.Context, tx *gorm.DB, params *dto.HistoryLi
 	}
 	if params.SortField == "" {
 		params.SortField = "id"
+		sortRules = "desc"
 	}
 	if err := query.Limit(params.PageSize).Offset(offset).Order(fmt.Sprintf("%s %s", params.SortField, sortRules)).Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
