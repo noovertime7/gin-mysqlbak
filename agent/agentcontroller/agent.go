@@ -24,7 +24,7 @@ func AgentRegister(group *gin.RouterGroup) {
 
 func (a *AgentController) GetAgentList(ctx *gin.Context) {
 	params := &agentdto.AgentListInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
@@ -40,7 +40,7 @@ func (a *AgentController) GetAgentList(ctx *gin.Context) {
 
 func (a *AgentController) Register(ctx *gin.Context) {
 	params := &agentdto.AgentRegisterInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
@@ -58,7 +58,7 @@ func (a *AgentController) Register(ctx *gin.Context) {
 
 func (a *AgentController) DeRegister(ctx *gin.Context) {
 	params := &agentdto.AgentDeRegisterInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return

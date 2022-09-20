@@ -25,13 +25,12 @@ func AdminRegister(group *gin.RouterGroup) {
 }
 
 func (a *AdminController) UserInfo(ctx *gin.Context) {
-	//1、通过claims解析用户id
-	claims, exists := ctx.Get("claims")
+	Iuid, exists := ctx.Get("uid")
 	if !exists {
-		log.Logger.Error("claims不存在,请检查jwt中间件")
+		log.Logger.Error("uid不存在,请检查jwt中间件")
 	}
-	cla, _ := claims.(*public.CustomClaims)
-	userinfo, err := services.UserService.GetUserInfo(ctx, cla.Uid)
+	uid := Iuid.(int)
+	userinfo, err := services.UserService.GetUserInfo(ctx, uid)
 	if err != nil {
 		log.Logger.Error("查询用户信息失败", err)
 		middleware.ResponseError(ctx, 2002, err)
@@ -41,20 +40,18 @@ func (a *AdminController) UserInfo(ctx *gin.Context) {
 }
 
 func (a *AdminController) RoleInfo(ctx *gin.Context) {
-	//1、通过claims解析用户id
-	claims, exists := ctx.Get("claims")
+	Iuid, exists := ctx.Get("uid")
 	if !exists {
-		log.Logger.Error("claims不存在,请检查jwt中间件")
+		log.Logger.Error("uid不存在,请检查jwt中间件")
 	}
-	cla, _ := claims.(*public.CustomClaims)
-	//2、取出数据然后封装输出
-	roleInfo, err := services.RuleService.GetRoleInfo(ctx, cla.Uid)
+	uid := Iuid.(int)
+	roleInfo, err := services.RuleService.GetRoleInfo(ctx, uid)
 	if err != nil {
 		log.Logger.Error("查询用户权限失败", err)
 		middleware.ResponseError(ctx, 2002, err)
 		return
 	}
-	userinfo, err := services.UserService.GetUserInfo(ctx, cla.Uid)
+	userinfo, err := services.UserService.GetUserInfo(ctx, uid)
 	if err != nil {
 		log.Logger.Error("查询用户信息失败", err)
 		middleware.ResponseError(ctx, 2002, err)

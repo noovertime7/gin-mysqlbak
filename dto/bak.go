@@ -9,7 +9,7 @@ type Bak struct {
 	ID int `json:"id" form:"id" validate:"required"`
 }
 
-func (d *Bak) BindValidParm(ctx *gin.Context) error {
+func (d *Bak) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
@@ -20,16 +20,24 @@ type BakHistoryOutPut struct {
 	Baktime string `json:"bak_time"`
 }
 
+type HistoryIDInput struct {
+	ID int `json:"id" form:"id"`
+}
+
 type HistoryListInput struct {
-	Info     string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
-	PageNo   int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
-	PageSize int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
-	Sort     string `form:"sort" json:"sort" comment:"排序" `
+	Info      string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
+	PageNo    int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
+	PageSize  int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+	Status    string `form:"status" json:"status" validate:""`
+	SortField string `form:"sortField" json:"sortField" comment:"排序字段" `
+	SortOrder string `json:"sortOrder" form:"sortOrder" comment:"排序规则"`
 }
 
 type HistoryListOutput struct {
-	Total int                  `form:"total" json:"total" comment:"总数"   validate:"" example:""`
-	List  []HistoryListOutItem `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
+	Total    int                  `form:"total" json:"total" comment:"总数"   validate:"" example:""`
+	List     []HistoryListOutItem `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
+	PageNo   int                  `form:"page_no" json:"page_no" comment:"当前页数"   validate:"" example:"1"`
+	PageSize int                  `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
 type HistoryListOutItem struct {
@@ -44,6 +52,16 @@ type HistoryListOutItem struct {
 	BakTime    string `json:"bak_time" form:"bak_time"`
 }
 
-func (d *HistoryListInput) BindValidParm(ctx *gin.Context) error {
+type HistoryNumInfoOutput struct {
+	WeekNums    int    `json:"week_nums"`
+	AllNums     int    `json:"all_nums"`
+	AllFileSize string `json:"all_filesize"`
+}
+
+func (d *HistoryListInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
+}
+
+func (d *HistoryIDInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }

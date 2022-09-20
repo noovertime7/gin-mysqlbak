@@ -1,11 +1,17 @@
 package public
 
 const (
-	ValidatorKey        = "ValidatorKey"
-	TranslatorKey       = "TranslatorKey"
-	AdminSessionInfoKey = "AdminSessionInfoKey"
-	ParamsBindErrorCode = 23333
-	PublicKey           = `-----BEGIN Public Key-----
+	ValidatorKey         = "ValidatorKey"
+	TranslatorKey        = "TranslatorKey"
+	ParamsBindErrorCode  = 23333
+	HistoryStatusAll     = "all"
+	HistoryStatusSuccess = "success"
+	HistoryStatusFail    = "fail"
+)
+
+//加解密相关
+const (
+	PublicKey = `-----BEGIN Public Key-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA783z1uGIn78nmRnlfoP5
 RsnbmdhB+tDoyxAKAPVSrWenMdgJFvn2RcaiQBeH2BbKNQcP/ygYeOEC2Zhb+EZH
 AwyT0Zo34vZQAgVWOi5zVDNwxu4VPfc+25+YNAr+Zy/txqJlWF5EbPyqjSZGQQI/

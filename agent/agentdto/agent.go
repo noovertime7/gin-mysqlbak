@@ -38,14 +38,14 @@ type AgentListInput struct {
 	PageSize int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
-func (a *AgentRegisterInput) BindValidParm(ctx *gin.Context) error {
+func (a *AgentRegisterInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, a)
 }
 
-func (a *AgentListInput) BindValidParm(ctx *gin.Context) error {
+func (a *AgentListInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, a)
 }
 
-func (a *AgentDeRegisterInput) BindValidParm(ctx *gin.Context) error {
+func (a *AgentDeRegisterInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, a)
 }

@@ -2,10 +2,10 @@ package agentservice
 
 import (
 	"context"
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdao"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"time"
 )
 
@@ -23,40 +23,31 @@ func (a *AgentService) Register(ctx *gin.Context, agentInfo *agentdto.AgentRegis
 		CreateAt:    time.Now(),
 		IsDeleted:   0,
 	}
-	tx, err := lib.GetGormPool("default")
+	agent, err := agentDb.Find(ctx, database.GetDB(), &agentdao.AgentDB{ServiceName: agentInfo.ServiceName, IsDeleted: 0})
 	if err != nil {
 		return err
 	}
-	agent, err := agentDb.Find(ctx, tx, &agentdao.AgentDB{ServiceName: agentInfo.ServiceName, IsDeleted: 0})
 	if agent.Id != 0 {
 		agentDb.Id = agent.Id
 		agentDb.CreateAt = agent.CreateAt
-		return agentDb.Update(ctx, tx)
+		return agentDb.Update(ctx, database.GetDB())
 	}
-	return agentDb.Save(ctx, tx)
+	return agentDb.Save(ctx, database.GetDB())
 }
 
 func (a *AgentService) DeRegister(ctx *gin.Context, serviceName string) error {
 	agentDb := &agentdao.AgentDB{ServiceName: serviceName}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return err
-	}
-	agent, err := agentDb.Find(ctx, tx, agentDb)
+	agent, err := agentDb.Find(ctx, database.GetDB(), agentDb)
 	if err != nil {
 		return err
 	}
 	agent.AgentStatus = 0
-	return agent.UpdateStatus(ctx, tx)
+	return agent.UpdateStatus(ctx, database.GetDB())
 }
 
 func (a *AgentService) GetAgentList(ctx *gin.Context, agentInfo *agentdto.AgentListInput) (*agentdto.AgentListOutPut, error) {
 	agentDB := &agentdao.AgentDB{}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return nil, err
-	}
-	agents, total, err := agentDB.PageList(ctx, tx, agentInfo)
+	agents, total, err := agentDB.PageList(ctx, database.GetDB(), agentInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +74,7 @@ func (a *AgentService) GetAgentList(ctx *gin.Context, agentInfo *agentdto.AgentL
 
 func (a *AgentService) GetServiceAddr(ctx context.Context, serviceName string) (string, error) {
 	agentDb := &agentdao.AgentDB{ServiceName: serviceName}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return "unknown", err
-	}
-	agent, err := agentDb.Find(ctx, tx, agentDb)
+	agent, err := agentDb.Find(ctx, database.GetDB(), agentDb)
 	if err != nil {
 		return "unknown", err
 	}

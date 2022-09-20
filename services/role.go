@@ -1,12 +1,12 @@
 package services
 
 import (
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dao/roledao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 )
 
 var RuleService *roleService
@@ -14,10 +14,7 @@ var RuleService *roleService
 type roleService struct{}
 
 func (r *roleService) GetRoleInfo(ctx *gin.Context, uid int) (*dto.RoleInfo, error) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return nil, err
-	}
+	tx := database.GetDB()
 	adminDB := &dao.Admin{Id: uid}
 	admin, err := adminDB.Find(ctx, tx, adminDB)
 	//首先查询用户所属的用户组

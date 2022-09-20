@@ -23,7 +23,7 @@ func AgentHostRegister(group *gin.RouterGroup) {
 
 func (a *AgentHostController) AddHost(c *gin.Context) {
 	params := &agentdto.HostAddInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
@@ -53,7 +53,7 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 
 func (a *AgentHostController) DeleteHost(c *gin.Context) {
 	params := &agentdto.HostDeleteInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
@@ -80,7 +80,7 @@ func (a *AgentHostController) DeleteHost(c *gin.Context) {
 
 func (a *AgentHostController) UpdateHost(c *gin.Context) {
 	params := &agentdto.HostUpdateInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
@@ -111,7 +111,7 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 
 func (a *AgentHostController) HostList(c *gin.Context) {
 	params := &agentdto.HostListInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}

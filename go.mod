@@ -35,7 +35,8 @@ require (
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/go-playground/validator.v9 v9.29.0
 	gopkg.in/ini.v1 v1.67.0
-	gorm.io/gorm v1.22.4
+	gorm.io/driver/mysql v1.3.6 // indirect
+	gorm.io/gorm v1.23.8
 )
 
 replace github.com/gin-contrib/sse v0.1.0 => github.com/e421083458/sse v0.1.1

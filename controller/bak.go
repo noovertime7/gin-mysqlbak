@@ -8,6 +8,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
@@ -26,47 +27,14 @@ func BakRegister(group *gin.RouterGroup) {
 	group.GET("/stop", bak.StopBak)
 	group.GET("/stop_bak_all_byhost", bak.StopBakAllByHost)
 	group.GET("/stop_bak_all", bak.StopBakAll)
-	group.GET("/findallhistory", bak.FindAllHistory)
-	group.GET("/historylist", bak.HistoryList)
 }
 
-func (b *BakController) FindAllHistory(c *gin.Context) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
-	bakhis := &dao.BakHistory{}
-	bakhistorys, err := bakhis.FindAllHistory(c, tx, "")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 2002, err)
-	}
-	var bakhistorysOutputs []*dto.BakHistoryOutPut
-	for _, bakhistory := range bakhistorys {
-		his := &dto.BakHistoryOutPut{
-			Host:    bakhistory.Host,
-			DBName:  bakhistory.DBName,
-			Message: bakhistory.Msg,
-			Baktime: bakhistory.BakTime.Format("2006年01月02日15:04:01"),
-		}
-		bakhistorysOutputs = append(bakhistorysOutputs, his)
-	}
-	middleware.ResponseSuccess(c, bakhistorysOutputs)
-}
-
-func (b *BakController) StartBak(c *gin.Context) {
+func (bak *BakController) StartBak(c *gin.Context) {
+	tx := database.GetDB()
 	params := &dto.Bak{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
-		return
-	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 2001, err)
 		return
 	}
 	taskinfo := &dao.TaskInfo{Id: params.ID}
@@ -82,9 +50,9 @@ func (b *BakController) StartBak(c *gin.Context) {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
-	b.AfterBakChan = make(chan *core.BakHandler, 10)
-	go b.ListenAndSave(c, tx, b.AfterBakChan)
-	bakhandler, err := core.NewBakHandler(taskdetail, b.AfterBakChan)
+	bak.AfterBakChan = make(chan *core.BakHandler, 10)
+	go bak.ListenAndSave(c, database.GetDB(), bak.AfterBakChan)
+	bakhandler, err := core.NewBakHandler(taskdetail, bak.AfterBakChan)
 	if err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 2003, err)
@@ -96,7 +64,7 @@ func (b *BakController) StartBak(c *gin.Context) {
 		return
 	}
 	taskinfo.Status = 1
-	if err = taskinfo.Updates(c, tx); err != nil {
+	if err = taskinfo.Updates(c, database.GetDB()); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 2004, err)
 		return
@@ -106,14 +74,8 @@ func (b *BakController) StartBak(c *gin.Context) {
 
 func (bak *BakController) StartBakAll(c *gin.Context) {
 	var b BakController
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
 	taskinfo := &dao.TaskInfo{}
-	result, err := taskinfo.FindAllTask(c, tx, nil)
+	result, err := taskinfo.FindAllTask(c, database.GetDB(), nil)
 	if err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 2002, err)
@@ -126,6 +88,7 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 		return
 	}
 	b.AfterBakChan = make(chan *core.BakHandler, 10)
+	tx := database.GetDB()
 	go b.ListenAndSave(c, tx, b.AfterBakChan)
 	for _, task := range result {
 		if task.Status == 1 {
@@ -150,7 +113,7 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 		// 修改任务启动状态
 		taskinfo.Status = 1
 		taskinfo.Id = task.Id
-		if err = taskinfo.UpdatesStatus(tx); err != nil {
+		if err = taskinfo.UpdatesStatus(database.GetDB()); err != nil {
 			log.Logger.Error(err)
 			return
 		}
@@ -160,20 +123,14 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 
 func (bak *BakController) StartBakAllByHost(c *gin.Context) {
 	params := &dto.HostIDInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
 	var b BakController
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
 	taskinfo := &dao.TaskInfo{}
-	result, err := taskinfo.FindAllTask(c, tx, params)
+	result, err := taskinfo.FindAllTask(c, database.GetDB(), params)
 	if err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 2002, err)
@@ -185,14 +142,14 @@ func (bak *BakController) StartBakAllByHost(c *gin.Context) {
 		return
 	}
 	b.AfterBakChan = make(chan *core.BakHandler, 10)
-	go b.ListenAndSave(c, tx, b.AfterBakChan)
+	go b.ListenAndSave(c, database.GetDB(), b.AfterBakChan)
 	for _, task := range result {
 		if task.Status == 1 {
 			log.Logger.Infof("TASK_ID:%d,HOSTID:%d,%s数据库任务已经打开,返回", task.Id, task.HostID, task.DBName)
 			continue
 		}
 
-		taskdetail, err := taskinfo.TaskDetail(c, tx, task)
+		taskdetail, err := taskinfo.TaskDetail(c, database.GetDB(), task)
 		if err != nil {
 			log.Logger.Error(err)
 			return
@@ -209,7 +166,7 @@ func (bak *BakController) StartBakAllByHost(c *gin.Context) {
 		// 修改任务启动状态
 		taskinfo.Status = 1
 		taskinfo.Id = task.Id
-		if err = taskinfo.UpdatesStatus(tx); err != nil {
+		if err = taskinfo.UpdatesStatus(database.GetDB()); err != nil {
 			log.Logger.Error(err)
 			return
 		}
@@ -217,30 +174,25 @@ func (bak *BakController) StartBakAllByHost(c *gin.Context) {
 	middleware.ResponseSuccess(c, "批量启动任务成功")
 }
 
-func (b *BakController) StopBak(c *gin.Context) {
+func (bak *BakController) StopBak(c *gin.Context) {
 	params := &dto.Bak{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error("BakHandleController 解析参数失败")
 		middleware.ResponseError(c, 1007, err)
 		return
 	}
-
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
+	var err error
 	//将任务状态改为false
 	taskinfo := &dao.TaskInfo{
 		Id: params.ID,
 	}
-	taskinfo, err = taskinfo.Find(c, tx, taskinfo)
+	taskinfo, err = taskinfo.Find(c, database.GetDB(), taskinfo)
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
 	taskinfo.Status = 0
-	if err = taskinfo.UpdatesStatus(tx); err != nil {
+	if err = taskinfo.UpdatesStatus(database.GetDB()); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
@@ -254,14 +206,8 @@ func (b *BakController) StopBak(c *gin.Context) {
 }
 
 func (bak *BakController) StopBakAll(c *gin.Context) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
 	taskinfo := &dao.TaskInfo{}
-	result, err := taskinfo.FindAllTask(c, tx, nil)
+	result, err := taskinfo.FindAllTask(c, database.GetDB(), nil)
 	if err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 2002, err)
@@ -287,7 +233,7 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 		// 修改任务启动状态为关闭
 		taskinfo.Id = task.Id
 		taskinfo.Status = 0
-		if err = taskinfo.UpdatesStatus(tx); err != nil {
+		if err = taskinfo.UpdatesStatus(database.GetDB()); err != nil {
 			log.Logger.Error(err)
 			middleware.ResponseError(c, 2005, err)
 			return
@@ -298,19 +244,13 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 
 func (bak *BakController) StopBakAllByHost(c *gin.Context) {
 	params := &dto.HostIDInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
 	taskinfo := &dao.TaskInfo{}
-	result, err := taskinfo.FindAllTask(c, tx, params)
+	result, err := taskinfo.FindAllTask(c, database.GetDB(), params)
 	if err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 2002, err)
@@ -336,7 +276,7 @@ func (bak *BakController) StopBakAllByHost(c *gin.Context) {
 		// 修改任务启动状态为关闭
 		taskinfo.Id = task.Id
 		taskinfo.Status = 0
-		if err = taskinfo.UpdatesStatus(tx); err != nil {
+		if err = taskinfo.UpdatesStatus(database.GetDB()); err != nil {
 			log.Logger.Error(err)
 			middleware.ResponseError(c, 2005, err)
 			return
@@ -345,49 +285,7 @@ func (bak *BakController) StopBakAllByHost(c *gin.Context) {
 	middleware.ResponseSuccess(c, "批量停止任务成功")
 }
 
-func (b *BakController) HistoryList(c *gin.Context) {
-	params := &dto.HistoryListInput{}
-	if err := params.BindValidParm(c); err != nil {
-		log.Logger.Error("BakHandleController 解析参数失败")
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
-		return
-	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 10003, err)
-		return
-	}
-	his := &dao.BakHistory{}
-	list, total, err := his.PageList(c, tx, params)
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 10004, err)
-		return
-	}
-	var outlist []dto.HistoryListOutItem
-	for _, listIterm := range list {
-		outItem := dto.HistoryListOutItem{
-			ID:         listIterm.Id,
-			Host:       listIterm.Host,
-			DBName:     listIterm.DBName,
-			DingStatus: listIterm.DingStatus,
-			OSSStatus:  listIterm.OssStatus,
-			Message:    listIterm.Msg,
-			FileSize:   listIterm.FileSize,
-			FileName:   listIterm.FileName,
-			BakTime:    listIterm.BakTime.Format("2006年01月02日15:04:01"),
-		}
-		outlist = append(outlist, outItem)
-	}
-	out := &dto.HistoryListOutput{
-		Total: total,
-		List:  outlist,
-	}
-	middleware.ResponseSuccess(c, out)
-}
-
-func (b *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakChan chan *core.BakHandler) {
+func (bak *BakController) ListenAndSave(ctx *gin.Context, tx *gorm.DB, AfterBakChan chan *core.BakHandler) {
 	log.Logger.Info("开始监听备份状态消息")
 	for {
 		select {

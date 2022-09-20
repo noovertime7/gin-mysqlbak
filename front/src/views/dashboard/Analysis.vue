@@ -13,7 +13,7 @@
             </trend>
             <trend flag="down">
               <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
-              11%
+              21%
             </trend>
           </div>
           <template slot="footer">{{ $t('dashboard.analysis.day-sales') }}<span>￥ 234.56</span></template>
@@ -31,7 +31,7 @@
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="6560 | NumberFormat">
+        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="8888 | NumberFormat">
           <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>

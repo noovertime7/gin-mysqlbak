@@ -13,7 +13,7 @@ type HostAddInput struct {
 	Password string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
 }
 
-func (d *HostAddInput) BindValidParm(ctx *gin.Context) error {
+func (d *HostAddInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
@@ -22,7 +22,7 @@ type HostDeleteInput struct {
 	ID int `json:"id" form:"id" validate:"required"`
 }
 
-func (d *HostDeleteInput) BindValidParm(ctx *gin.Context) error {
+func (d *HostDeleteInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
@@ -35,7 +35,7 @@ type HostUpdateInput struct {
 	Password string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
 }
 
-func (d *HostUpdateInput) BindValidParm(ctx *gin.Context) error {
+func (d *HostUpdateInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
@@ -46,7 +46,7 @@ type HostListInput struct {
 	PageSize int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
-func (d *HostListInput) BindValidParm(ctx *gin.Context) error {
+func (d *HostListInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
@@ -69,6 +69,6 @@ type HostIDInput struct {
 	HostID int `json:"host_id" form:"host_id"`
 }
 
-func (d *HostIDInput) BindValidParm(ctx *gin.Context) error {
+func (d *HostIDInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }

@@ -23,7 +23,7 @@ func PublicRegister(group *gin.RouterGroup) {
 
 func (p *PublicController) DownLoadBakfile(ctx *gin.Context) {
 	params := &dto.Bak{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		return
 	}
@@ -47,7 +47,7 @@ func (p *PublicController) DownLoadBakfile(ctx *gin.Context) {
 
 func (p *PublicController) BakFileExists(ctx *gin.Context) {
 	params := &dto.Bak{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		return
 	}

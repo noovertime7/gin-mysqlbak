@@ -23,7 +23,7 @@ func BakRegister(group *gin.RouterGroup) {
 
 func (b *BakController) StartBak(ctx *gin.Context) {
 	params := &agentdto.StartBakInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
@@ -50,7 +50,7 @@ func (b *BakController) StartBak(ctx *gin.Context) {
 }
 func (b *BakController) StopBak(ctx *gin.Context) {
 	params := &agentdto.StopBakInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
@@ -77,7 +77,7 @@ func (b *BakController) StopBak(ctx *gin.Context) {
 }
 func (b *BakController) StartBakByHost(ctx *gin.Context) {
 	params := &agentdto.StartBakByHostInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
@@ -104,7 +104,7 @@ func (b *BakController) StartBakByHost(ctx *gin.Context) {
 }
 func (b *BakController) StopBakByHost(ctx *gin.Context) {
 	params := &agentdto.StopBakByHostInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}

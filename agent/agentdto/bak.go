@@ -22,18 +22,18 @@ type StopBakByHostInput struct {
 	HostID      int64  `json:"host_id" form:"host_id" validate:"required"`
 }
 
-func (b *StartBakInput) BindValidParm(ctx *gin.Context) error {
+func (b *StartBakInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, b)
 }
 
-func (b *StopBakInput) BindValidParm(ctx *gin.Context) error {
+func (b *StopBakInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, b)
 }
 
-func (b *StartBakByHostInput) BindValidParm(ctx *gin.Context) error {
+func (b *StartBakByHostInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, b)
 }
 
-func (b *StopBakByHostInput) BindValidParm(ctx *gin.Context) error {
+func (b *StopBakByHostInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, b)
 }

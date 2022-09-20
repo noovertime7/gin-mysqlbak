@@ -30,7 +30,7 @@ func AdminLoginRegister(group *gin.RouterGroup) {
 // @Router /admin_login/login [post]
 func (a *AdminLoginController) AdminLogin(ctx *gin.Context) {
 	params := &dto.AdminLoginInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, 2000, err)
 		return
 	}

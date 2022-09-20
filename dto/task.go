@@ -44,7 +44,7 @@ type TaskUpdateInput struct {
 	Directory       string `json:"directory" validate:"" `
 }
 
-func (d *TaskUpdateInput) BindValidParm(ctx *gin.Context) error {
+func (d *TaskUpdateInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
@@ -77,14 +77,14 @@ type TaskDeleteInput struct {
 	ID int `json:"id" form:"id" validate:"required"`
 }
 
-func (d *TaskDeleteInput) BindValidParm(ctx *gin.Context) error {
+func (d *TaskDeleteInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
-func (d *TaskAddInput) BindValidParm(ctx *gin.Context) error {
+func (d *TaskAddInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
-func (d *TaskListInput) BindValidParm(ctx *gin.Context) error {
+func (d *TaskListInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }

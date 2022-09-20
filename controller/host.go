@@ -12,6 +12,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/noovertime7/gin-mysqlbak/public/ding"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
@@ -32,8 +33,9 @@ func HostRegister(group *gin.RouterGroup) {
 }
 
 func (h *HostController) HostAdd(c *gin.Context) {
+	tx := database.GetDB()
 	params := &dto.HostAddInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
@@ -42,14 +44,8 @@ func (h *HostController) HostAdd(c *gin.Context) {
 		middleware.ResponseError(c, 1111, errors.New("数据库连接失败，请检查IP地址或端口"))
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 10003, err)
-		return
-	}
 	host := &dao.HostDatabase{Host: params.Host, Password: params.Password, User: params.User, HostStatus: 1, Content: params.Content}
-	if err = host.Save(c, tx); err != nil {
+	if err := host.Save(c, tx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 10004, err)
 		return
@@ -58,18 +54,15 @@ func (h *HostController) HostAdd(c *gin.Context) {
 }
 
 func (s *HostController) HostDelete(ctx *gin.Context) {
+	tx := database.GetDB()
 	params := &dto.HostDeleteInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, 30001, err)
-		return
-	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(ctx, 30002, err)
 		return
 	}
 	// 读取基本信息
 	hostinfo := &dao.HostDatabase{Id: params.ID}
+	var err error
 	hostinfo, err = hostinfo.Find(ctx, tx, hostinfo)
 	if err != nil {
 		middleware.ResponseError(ctx, 30003, err)
@@ -92,7 +85,7 @@ func (s *HostController) HostDelete(ctx *gin.Context) {
 
 func (h *HostController) HostUpdate(c *gin.Context) {
 	params := &dto.HostUpdateInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
@@ -102,11 +95,6 @@ func (h *HostController) HostUpdate(c *gin.Context) {
 		middleware.ResponseError(c, 1111, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(c, 30002, err)
-		return
-	}
 	host := &dao.HostDatabase{
 		Id:       params.ID,
 		Host:     params.Host,
@@ -114,7 +102,8 @@ func (h *HostController) HostUpdate(c *gin.Context) {
 		Password: params.Password,
 		Content:  params.Content,
 	}
-	if err = host.Save(c, tx); err != nil {
+	var err error
+	if err = host.Save(c, database.GetDB()); err != nil {
 		middleware.ResponseError(c, 30003, err)
 		return
 	}
@@ -123,17 +112,12 @@ func (h *HostController) HostUpdate(c *gin.Context) {
 
 func (t *HostController) HostList(c *gin.Context) {
 	params := &dto.HostListInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 10003, err)
-		return
-	}
+	tx := database.GetDB()
 	hostinfo := &dao.HostDatabase{}
 	list, total, err := hostinfo.PageList(c, tx, params)
 	if err != nil {

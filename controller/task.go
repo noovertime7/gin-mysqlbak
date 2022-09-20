@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
 )
@@ -24,15 +24,12 @@ func TaskRegister(group *gin.RouterGroup) {
 
 func (t *TaskController) TaskAdd(c *gin.Context) {
 	params := &dto.TaskAddInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Panic(err)
-	}
+	tx := database.GetDB()
 	//if err := TaskPingCheck(params, tx, c); err != nil {
 	//	log.Logger.Error(err)
 	//	middleware.ResponseError(c, 10000, err)
@@ -49,7 +46,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 		Status:      0,
 		IsDelete:    0,
 	}
-	if err = taskinfo.Save(c, tx); err != nil {
+	if err := taskinfo.Save(c, tx); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 10001, err)
@@ -65,7 +62,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 		BucketName: params.BucketName,
 		Directory:  params.Directory,
 	}
-	if err = ossdb.Save(c, tx); err != nil {
+	if err := ossdb.Save(c, tx); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err)
 		middleware.ResponseError(c, 10002, err)
@@ -89,18 +86,14 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 
 func (s *TaskController) TaskDelete(ctx *gin.Context) {
 	params := &dto.TaskDeleteInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, 30001, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(ctx, 30002, err)
-		return
-	}
+	tx := database.GetDB()
 	// 读取基本信息
 	taskinfo := &dao.TaskInfo{Id: params.ID}
-	taskinfo, err = taskinfo.Find(ctx, tx, taskinfo)
+	taskinfo, err := taskinfo.Find(ctx, tx, taskinfo)
 	if err != nil {
 		middleware.ResponseError(ctx, 30003, err)
 		return
@@ -119,15 +112,11 @@ func (s *TaskController) TaskDelete(ctx *gin.Context) {
 
 func (t *TaskController) TaskUpdate(c *gin.Context) {
 	params := &dto.TaskUpdateInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(c, 30002, err)
-		return
-	}
+	tx := database.GetDB()
 	tx = tx.Begin()
 	taskinfo := &dao.TaskInfo{
 		Id:          params.ID,
@@ -137,7 +126,7 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 		KeepNumber:  params.KeepNumber,
 		IsAllDBBak:  params.IsAllDBBak,
 	}
-	if err = taskinfo.Updates(c, tx); err != nil {
+	if err := taskinfo.Updates(c, tx); err != nil {
 		tx.Rollback()
 		middleware.ResponseError(c, 30002, err)
 		return
@@ -147,7 +136,7 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 		DingSecret:      params.DingSecret,
 		DingAccessToken: params.DingAccessToken,
 		IsDingSend:      params.IsDingSend}
-	if err = ding.Updates(c, tx); err != nil {
+	if err := ding.Updates(c, tx); err != nil {
 		tx.Rollback()
 		middleware.ResponseError(c, 30002, err)
 		return
@@ -163,7 +152,7 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 		BucketName: params.BucketName,
 		Directory:  params.Directory,
 	}
-	if err = oss.Updates(c, tx); err != nil {
+	if err := oss.Updates(c, tx); err != nil {
 		tx.Rollback()
 		middleware.ResponseError(c, 30002, err)
 		return
@@ -174,17 +163,12 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 
 func (t *TaskController) TaskList(c *gin.Context) {
 	params := &dto.TaskListInput{}
-	if err := params.BindValidParm(c); err != nil {
+	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 10003, err)
-		return
-	}
+	tx := database.GetDB()
 	taskinfo := &dao.TaskInfo{}
 	list, total, err := taskinfo.PageList(c, tx, params)
 	if err != nil {
@@ -223,18 +207,14 @@ func (t *TaskController) TaskList(c *gin.Context) {
 
 func (s *TaskController) TaskDetail(ctx *gin.Context) {
 	params := &dto.TaskDeleteInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(ctx, 30002, err)
-		return
-	}
+	tx := database.GetDB()
 	// 读取基本信息
 	taskinfo := &dao.TaskInfo{Id: params.ID}
-	taskinfo, err = taskinfo.Find(ctx, tx, taskinfo)
+	taskinfo, err := taskinfo.Find(ctx, tx, taskinfo)
 	if err != nil {
 		middleware.ResponseError(ctx, 30003, err)
 		return

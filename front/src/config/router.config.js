@@ -174,52 +174,30 @@ export const asyncRouterMap = [
       },
 
       // // Exception
-      // {
-      //   path: '/exception',
-      //   name: 'exception',
-      //   component: RouteView,
-      //   redirect: '/exception/403',
-      //   meta: { title: 'menu.exception', icon: 'warning', permission: ['exception'] },
-      //   children: [
-      //     {
-      //       path: '/exception/403',
-      //       name: 'Exception403',
-      //       component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/403'),
-      //       meta: { title: 'menu.exception.not-permission', permission: ['exception'] }
-      //     },
-      //     {
-      //       path: '/exception/404',
-      //       name: 'Exception404',
-      //       component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
-      //       meta: { title: 'menu.exception.not-find', permission: ['exception'] }
-      //     },
-      //     {
-      //       path: '/exception/500',
-      //       name: 'Exception500',
-      //       component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
-      //       meta: { title: 'menu.exception.server-error', permission: ['exception'] }
-      //     }
-      //   ]
-      // },
-// history
       {
-        path: '/history',
+        path: '/local',
+        name: 'local',
         component: RouteView,
-        name: 'history',
-        redirect: '/history/workplace',
-        meta: { title: 'menu.history', keepAlive: true, icon: 'history', permission: ['history'] },
+        redirect: '/local/app',
+        meta: { title: '本地备份', icon: 'project', permission: ['local'] },
         children: [
           {
-            path: '/history/workplace',
-            name: 'MysqlHistory',
-            component: () => import('@/views/history/mysql/MysqlBasicList'),
-            meta: { title: 'menu.mysqlHistory', keepAlive: true, permission: ['history'] }
+            path: '/local/task',
+            name: '任务列表',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
+            meta: { title: '任务列表', permission: ['local'] }
           },
           {
-            path: '/history/es',
-            name: 'ESHistory',
-            component: () => import('@/views/history/elastic/ElasticBasicList'),
-            meta: { title: 'menu.esHistory', keepAlive: true, permission: ['history'] }
+            path: '/local/app',
+            name: '应用管理',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
+            meta: { title: '应用管理', permission: ['local'] }
+          },
+          {
+            path: '/local/history',
+            name: '备份历史',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/local/history/mysql/MysqlBasicList'),
+            meta: { title: '备份历史', permission: ['local'] }
           }
         ]
       },
@@ -309,18 +287,6 @@ export const asyncRouterMap = [
             name: 'UserList',
             component: () => import('@/views/settings/TreeList'),
             meta: { title: '用户管理', keepAlive: true }
-          },
-          {
-            path: '/settings/list/edit-table',
-            name: 'EditList',
-            component: () => import('@/views/settings/TableInnerEditList'),
-            meta: { title: '内联编辑表格', keepAlive: true }
-          },
-          {
-            path: '/settings/list/role-list',
-            name: 'RoleList',
-            component: () => import('@/views/settings/RoleList'),
-            meta: { title: '角色列表', keepAlive: true }
           },
           {
             path: '/settings/list/permission-list',

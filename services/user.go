@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dao/roledao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
+	"github.com/noovertime7/mysqlbak/pkg/log"
 	"time"
 )
 
@@ -19,13 +20,10 @@ type userService struct{}
 
 func (u *userService) Login(ctx *gin.Context, params *dto.AdminLoginInput) (string, error) {
 	//获取数据库连接池
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return "", err
-	}
+	tx := database.GetDB()
 	//进行密码校验
 	admin := &dao.Admin{}
-	admin, err = admin.LoginCheck(ctx, tx, params)
+	admin, err := admin.LoginCheck(ctx, tx, params)
 	if err != nil {
 		fmt.Println(err)
 		return "", err
@@ -46,17 +44,17 @@ func (u *userService) Login(ctx *gin.Context, params *dto.AdminLoginInput) (stri
 
 func (u *userService) LoginOut(ctx *gin.Context) error {
 	//获取数据库连接池
-	tx, err := lib.GetGormPool("default")
+	tx := database.GetDB()
+	Iuid, exists := ctx.Get("uid")
+	if !exists {
+		log.Logger.Error("uid不存在,请检查jwt中间件")
+	}
+	uid := Iuid.(int)
+	adminDB := &dao.Admin{Id: uid}
+	admin, err := adminDB.Find(ctx, tx, adminDB)
 	if err != nil {
 		return err
 	}
-	claims, exists := ctx.Get("claims")
-	if !exists {
-		return err
-	}
-	cla, _ := claims.(*public.CustomClaims)
-	adminDB := &dao.Admin{Id: cla.Uid}
-	admin, err := adminDB.Find(ctx, tx, adminDB)
 	admin.Status = 0
 	admin.LoginTime = time.Now()
 	if err := admin.UpdateStatus(ctx, tx, admin); err != nil {
@@ -69,12 +67,9 @@ func (u *userService) LoginOut(ctx *gin.Context) error {
 func (u *userService) ChangePwd(ctx *gin.Context, params *dto.ChangePwdInput) error {
 	//2、利用结构体中的id去读取数据库信息 adminInfo
 	//获取数据库连接池
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return err
-	}
+	tx := database.GetDB()
 	adminInfo := &dao.Admin{Id: params.ID}
-	adminInfo, err = adminInfo.Find(ctx, tx, adminInfo)
+	adminInfo, err := adminInfo.Find(ctx, tx, adminInfo)
 	if err != nil {
 		return err
 	}
@@ -94,10 +89,7 @@ func (u *userService) ChangePwd(ctx *gin.Context, params *dto.ChangePwdInput) er
 
 // GetUserInfo 获取用户信息
 func (u *userService) GetUserInfo(ctx *gin.Context, uid int) (*dto.UserInfoOutPut, error) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return nil, err
-	}
+	tx := database.GetDB()
 	adminDB := &dao.Admin{Id: uid}
 	admin, err := adminDB.Find(ctx, tx, adminDB)
 	//2、取出数据然后封装输出
@@ -129,10 +121,7 @@ func (u *userService) GetUserInfo(ctx *gin.Context, uid int) (*dto.UserInfoOutPu
 }
 
 func (u *userService) GetUserGroupList(ctx *gin.Context) (*dto.UserGroupOutPut, error) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return nil, err
-	}
+	tx := database.GetDB()
 	groupDB := &roledao.UserGroupDB{}
 	groups, err := groupDB.FindList(ctx, tx, groupDB)
 	if err != nil {
@@ -154,10 +143,7 @@ func (u *userService) GetUserGroupList(ctx *gin.Context) (*dto.UserGroupOutPut, 
 }
 
 func (u *userService) FindUserByGroup(ctx *gin.Context, info *dto.GroupUserListInput) (*dto.GroupUserListOutPut, error) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return nil, err
-	}
+	tx := database.GetDB()
 	//通过key查询所属的group
 	var groupId int
 	if info.Key != "" {
@@ -227,11 +213,8 @@ func (u *userService) FindUserByGroup(ctx *gin.Context, info *dto.GroupUserListI
 }
 
 func (u *userService) UpdateUserInfo(ctx *gin.Context, info *dto.UpdateUserInfo) error {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return err
-	}
 	adminDB := &dao.Admin{Id: info.ID}
+	tx := database.GetDB()
 	admin, err := adminDB.Find(ctx, tx, adminDB)
 	if err != nil {
 		return err
@@ -245,14 +228,12 @@ func (u *userService) UpdateUserInfo(ctx *gin.Context, info *dto.UpdateUserInfo)
 		return err
 	}
 	userinfoDB := &roledao.UserInfo{Id: admin.InfoId, Introduction: info.Introduction}
-	//获取操作用户名
-	//从ctx中取出当前操作用户的uid
-	claims, exists := ctx.Get("claims")
+	Iuid, exists := ctx.Get("uid")
 	if !exists {
-		return errors.New("claims不存在,请检查jwt中间件")
+		log.Logger.Error("uid不存在,请检查jwt中间件")
 	}
-	cla, _ := claims.(*public.CustomClaims)
-	tempAdminDB := &dao.Admin{Id: cla.Uid}
+	uid := Iuid.(int)
+	tempAdminDB := &dao.Admin{Id: uid}
 	tempAdmin, err := tempAdminDB.Find(ctx, tx, tempAdminDB)
 	if err != nil {
 		userinfoDB.CreateId = "unknown"
@@ -269,12 +250,8 @@ func (u *userService) UpdateUserInfo(ctx *gin.Context, info *dto.UpdateUserInfo)
 
 // DeleteUser 删除用户
 func (u *userService) DeleteUser(ctx *gin.Context, params *dto.UserIDInput) error {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		return err
-	}
 	userDB := &dao.Admin{Id: params.ID}
-	user, err := userDB.Find(ctx, tx, userDB)
+	user, err := userDB.Find(ctx, database.GetDB(), userDB)
 	if err != nil {
 		return err
 	}
@@ -285,18 +262,17 @@ func (u *userService) DeleteUser(ctx *gin.Context, params *dto.UserIDInput) erro
 		Int32: 1,
 		Valid: true,
 	}
-	return user.Updates(ctx, tx)
+	return user.Updates(ctx, database.GetDB())
 }
 
 // ResetUserPassword 重置用户密码为  admin@123
 func (u *userService) ResetUserPassword(ctx *gin.Context, params *dto.UserIDInput) error {
-	tx, err := lib.GetGormPool("default")
+	userDB := &dao.Admin{Id: params.ID}
+	user, err := userDB.Find(ctx, database.GetDB(), userDB)
 	if err != nil {
 		return err
 	}
-	userDB := &dao.Admin{Id: params.ID}
-	user, err := userDB.Find(ctx, tx, userDB)
 	newHashPassword := public.GenSaltPassword(user.Salt, "admin@123")
 	user.Password = newHashPassword
-	return user.Updates(ctx, tx)
+	return user.Updates(ctx, database.GetDB())
 }

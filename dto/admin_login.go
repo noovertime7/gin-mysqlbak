@@ -22,7 +22,7 @@ type AdminSessionInfo struct {
 	LoginTime time.Time `json:"login_time"`
 }
 
-// BindValidParm 绑定并校验参数
-func (a *AdminLoginInput) BindValidParm(ctx *gin.Context) error {
+// BindValidParams 绑定并校验参数
+func (a *AdminLoginInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, a)
 }

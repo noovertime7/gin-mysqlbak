@@ -21,7 +21,7 @@ func BakHistoryRegister(group *gin.RouterGroup) {
 
 func (b *BakHistoryController) HistoryList(ctx *gin.Context) {
 	params := &agentdto.HistoryListInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
@@ -53,7 +53,7 @@ func (b *BakHistoryController) HistoryList(ctx *gin.Context) {
 
 func (b *BakHistoryController) DeleteHistory(ctx *gin.Context) {
 	params := &agentdto.BakHistoryDeleteInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return

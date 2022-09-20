@@ -116,6 +116,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	)
 	{
 		controller.BakRegister(BakRouter)
+		controller.HistoryRegister(BakRouter)
 	}
 
 	PublicRouter := router.Group("/public")

@@ -25,7 +25,7 @@ func AgentTaskRegister(group *gin.RouterGroup) {
 
 func (a *AgentTaskController) TaskAdd(ctx *gin.Context) {
 	params := &agentdto.TaskAddInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
@@ -69,7 +69,7 @@ func (a *AgentTaskController) TaskAdd(ctx *gin.Context) {
 
 func (a *AgentTaskController) TaskList(ctx *gin.Context) {
 	params := &agentdto.TaskListInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
@@ -102,7 +102,7 @@ func (a *AgentTaskController) TaskList(ctx *gin.Context) {
 
 func (a *AgentTaskController) TaskDetail(ctx *gin.Context) {
 	params := &agentdto.TaskDeleteInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
@@ -129,7 +129,7 @@ func (a *AgentTaskController) TaskDetail(ctx *gin.Context) {
 
 func (a *AgentTaskController) TaskDelete(ctx *gin.Context) {
 	params := &agentdto.TaskDeleteInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
@@ -156,7 +156,7 @@ func (a *AgentTaskController) TaskDelete(ctx *gin.Context) {
 
 func (a *AgentTaskController) TaskUpdate(ctx *gin.Context) {
 	params := &agentdto.TaskUpdateInput{}
-	if err := params.BindValidParm(ctx); err != nil {
+	if err := params.BindValidParams(ctx); err != nil {
 		log.Logger.Error(err)
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return

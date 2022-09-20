@@ -42,10 +42,10 @@ type HistoryListOutItem struct {
 	BakTime    string `json:"bak_time" form:"bak_time"`
 }
 
-func (d *HistoryListInput) BindValidParm(ctx *gin.Context) error {
+func (d *HistoryListInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
-func (d *BakHistoryDeleteInput) BindValidParm(ctx *gin.Context) error {
+func (d *BakHistoryDeleteInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }

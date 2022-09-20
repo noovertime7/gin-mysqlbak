@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/core"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/pkg/errors"
 )
 
@@ -21,30 +21,25 @@ func DashboardRegister(group *gin.RouterGroup) {
 var HostNameMap = make(map[int]string)
 
 func (service *DashboardController) PanelGroupData(c *gin.Context) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
 	taskinfo := &dao.TaskInfo{}
-	_, taskNum, err := taskinfo.PageList(c, tx, &dto.TaskListInput{PageNo: 1, PageSize: 1})
+	_, taskNum, err := taskinfo.PageList(c, database.GetDB(), &dto.TaskListInput{PageNo: 1, PageSize: 1})
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
 	histry := &dao.BakHistory{}
-	_, histryNum, err := histry.PageList(c, tx, &dto.HistoryListInput{PageNo: 1, PageSize: 1})
+	_, histryNum, err := histry.PageList(c, database.GetDB(), &dto.HistoryListInput{PageNo: 1, PageSize: 1})
 	if err != nil {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
 	hostdb := &dao.HostDatabase{}
-	_, hostNum, err := hostdb.PageList(c, tx, &dto.HostListInput{PageNo: 1, PageSize: 1})
+	_, hostNum, err := hostdb.PageList(c, database.GetDB(), &dto.HostListInput{PageNo: 1, PageSize: 1})
 	if err != nil {
 		middleware.ResponseError(c, 2004, err)
 		return
 	}
-	_, err = taskinfo.FindAllTask(c, tx, nil)
+	_, err = taskinfo.FindAllTask(c, database.GetDB(), nil)
 	if err != nil {
 		middleware.ResponseError(c, 2005, err)
 		return
@@ -60,13 +55,8 @@ func (service *DashboardController) PanelGroupData(c *gin.Context) {
 }
 
 func (service *DashboardController) PieChartData(c *gin.Context) {
-	tx, err := lib.GetGormPool("default")
-	if err != nil {
-		middleware.ResponseError(c, 2001, err)
-		return
-	}
 	hostdb := &dao.HostDatabase{}
-	hosts, err := hostdb.FindAllHost(tx)
+	hosts, err := hostdb.FindAllHost(database.GetDB())
 	if err != nil {
 		middleware.ResponseError(c, 2005, err)
 		return
@@ -76,7 +66,7 @@ func (service *DashboardController) PieChartData(c *gin.Context) {
 	}
 
 	taskInfo := &dao.TaskInfo{}
-	list, err := taskInfo.GroupByHost(c, tx)
+	list, err := taskInfo.GroupByHost(c, database.GetDB())
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
 		return
