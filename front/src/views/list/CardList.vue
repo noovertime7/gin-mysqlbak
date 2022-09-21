@@ -7,9 +7,6 @@
     }"
     content="段落示意：蚂蚁金服务设计平台 ant.design，用最小的工作量，无缝接入蚂蚁金服生态， 提供跨越设计与开发的体验解决方案。"
   >
-    <template v-slot:extraContent>
-      <div style="width: 155px; margin-top: -20px;"><img style="width: 100%" :src="extraImage" /></div>
-    </template>
     <a-list
       rowKey="id"
       :grid="{gutter: 24, lg: 3, md: 2, sm: 1, xs: 1}"
@@ -20,7 +17,7 @@
         <template v-if="!item || item.id === undefined">
           <a-button class="new-btn" type="dashed">
             <a-icon type="plus"/>
-            新增产品
+            新增应用
           </a-button>
         </template>
         <template v-else>
@@ -33,6 +30,7 @@
             <template class="ant-card-actions" slot="actions">
               <a>操作一</a>
               <a>操作二</a>
+              <a>操作三</a>
             </template>
           </a-card>
         </template>
@@ -59,12 +57,11 @@ export default {
   data () {
     this.tabList = [
       { key: 'tab1', tab: '快速开始' },
-      { key: 'tab2', tab: '产品简介' },
+      { key: 'tab2', tab: '测试简介' },
       { key: 'tab3', tab: '产品文档' }
     ]
     return {
       tabActiveKey: 'tab1',
-
       extraImage: 'https://gw.alipayobjects.com/zos/rmsportal/RzwpdLnhmvDJToTdfDPe.png',
       dataSource
     }
@@ -73,6 +70,9 @@ export default {
     testFun () {
       this.$message.info('快速开始被点击！')
     }
+  },
+  created () {
+    console.log(dataSource)
   }
 }
 </script>

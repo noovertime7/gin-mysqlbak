@@ -33,9 +33,6 @@ spec:
             - mountPath: /app/conf/dev/base.toml
               name: baseconf
               subPath: base.toml
-            - mountPath: /app/conf/dev/mysql_map.toml
-              name: mysqlconf
-              subPath: mysql_map.toml
             - mountPath: /app/conf/config.ini
               name: iniconf
               subPath: config.ini
@@ -55,9 +52,6 @@ spec:
             defaultMode: 420
             name: mysqlbak-base-conf
           name: baseconf
-        - configMap:
-            defaultMode: 420
-            name: mysqlbak-mysql-conf
           name: mysqlconf
         - configMap:
             defaultMode: 420

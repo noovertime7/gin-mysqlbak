@@ -182,16 +182,16 @@ export const asyncRouterMap = [
         meta: { title: '本地备份', icon: 'project', permission: ['local'] },
         children: [
           {
+            path: '/local/app',
+            name: '应用管理',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/local/app/app'),
+            meta: { title: '应用管理', permission: ['local'] }
+          },
+          {
             path: '/local/task',
             name: '任务列表',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
             meta: { title: '任务列表', permission: ['local'] }
-          },
-          {
-            path: '/local/app',
-            name: '应用管理',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
-            meta: { title: '应用管理', permission: ['local'] }
           },
           {
             path: '/local/history',
