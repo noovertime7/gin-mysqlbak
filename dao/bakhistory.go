@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func (b *BakHistory) TableName() string {
 	return "bak_history"
 }
 
-func (b *BakHistory) Save(c *gin.Context, tx *gorm.DB) error {
+func (b *BakHistory) Save(c context.Context, tx *gorm.DB) error {
 	return tx.WithContext(c).Save(b).Error
 }
 

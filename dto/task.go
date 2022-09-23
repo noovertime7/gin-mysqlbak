@@ -68,7 +68,7 @@ type TaskListOutItem struct {
 	DBName      string `json:"db_name" form:"db_name"`
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle"`
 	KeepNumber  int    `json:"keep_number" form:"keep_number"`
-	Status      bool   `json:"status" form:"status"`
+	Status      int    `json:"status" form:"status"`
 	CreateAt    string `json:"create_at" form:"create_at"`
 }
 

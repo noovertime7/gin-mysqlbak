@@ -188,6 +188,14 @@ export const asyncRouterMap = [
             meta: { title: '应用管理', permission: ['local'] }
           },
           {
+            path: '/local/app/task-list/:hostID(\\d+)',
+            hidden: true,
+            name: '主机任务列表',
+            hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
+            component: () => import('@/views/local/task/taskList'),
+            meta: { title: '主机任务列表', keepAlive: false, hiddenHeaderContent: true, permission: ['local'] }
+          },
+          {
             path: '/local/task',
             name: '任务列表',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),

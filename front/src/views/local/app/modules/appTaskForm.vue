@@ -125,6 +125,7 @@ export default {
             'content': values.content,
             'type': values.type
           }
+          console.log('进行修改')
           hostUpdate(query).then((res) => {
             if (res.errno === 0) {
               this.$message.success(res.data)

@@ -13,7 +13,7 @@
         <a-button type="dashed" style="width: 100%" icon="plus" @click="add">添加</a-button>
       </div>
 
-      <a-list size="large" :pagination="paginationProps">
+      <a-list size="large" :pagination="paginationProps" :loading="listLoading">
         <a-list-item :key="index" v-for="(item, index) in data">
           <a-list-item-meta :description="item.content">
             <a-avatar slot="avatar" size="large" shape="square" :src="item.avatar"/>
@@ -23,7 +23,7 @@
             <a @click="edit(item)">编辑</a>
           </div>
           <div slot="actions">
-            <a @click="edit(item)">任务</a>
+            <a @click="handleTaskList(item)">任务</a>
           </div>
           <div slot="actions">
             <a style="color: red" @click="handleDelete(item)">删除</a>
@@ -83,12 +83,11 @@ export default {
       total: 0,
       pageNo: 1,
       PageSize: 10,
-      loading: false
+      listLoading: false
     }
   },
   mounted () {
     this.getListData()
-    window.GetData = this.getListData
   },
   filters: {
     statusFilter (type) {
@@ -113,6 +112,7 @@ export default {
   methods: {
     getListData () {
       console.log('get data')
+      this.listLoading = true
       const query = {
         'page_no': this.pageNo,
         'page_size': this.PageSize
@@ -120,8 +120,11 @@ export default {
       hostList(query).then((res) => {
         this.data = res.data.list
         this.total = res.data.total
-        console.log('data = ', this.data)
+       this.listLoading = false
       })
+    },
+    handleTaskList (record) {
+      this.$router.push('/local/app/task-list/' + record.id)
     },
     handleDelete (record) {
         const query = {
@@ -140,19 +143,25 @@ export default {
       this.getListData()
     },
     add () {
+      const self = this
       this.$dialog(TaskForm,
         {
           record: {},
           on: {
-            ok () {
-              console.log('ok 回调')
-              window.GetData()
+            ok: () => {
+              return new Promise((resolve, reject) => {
+                self.getListData()
+                resolve()
+              })
             },
             cancel () {
               console.log('cancel 回调')
             },
             close () {
               console.log('modal close 回调')
+            },
+            get () {
+              console.log('get get get ')
             }
           }
         },
@@ -171,9 +180,11 @@ export default {
         {
           record,
           on: {
-            ok () {
-              console.log('ok 回调')
-              window.GetData()
+            ok: () => {
+              return new Promise((resolve, reject) => {
+                self.getListData()
+                resolve()
+              })
             },
             cancel () {
               console.log('cancel 回调')

@@ -1,12 +1,15 @@
 package core
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"github.com/go-xorm/xorm"
 	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/alioss"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/noovertime7/gin-mysqlbak/public/ding"
 	"github.com/noovertime7/gin-mysqlbak/public/minio"
 	"github.com/noovertime7/mysqlbak/pkg/log"
@@ -20,48 +23,42 @@ import (
 )
 
 type BakHandler struct {
-	TaskID       int
-	Cron         *cron.Cron
-	Engine       *xorm.Engine
-	Host         string
-	BackInfoId   string
-	PassWord     string
-	User         string
-	Port         string
-	DbName       string
-	BackupCycle  string
-	KeepNumber   int
-	ISAllDBBak   int
-	DingConfig   *dao.DingDatabase
-	OssConfig    *dao.OssDatabase
-	DingStatus   int
-	OssStatus    int
-	BakStatus    int
-	BakMsg       string
-	FileName     string
-	FileSize     int
-	AfterBakChan chan *BakHandler
+	TaskID      int
+	Cron        *cron.Cron
+	Engine      *xorm.Engine
+	Host        string
+	BackInfoId  string
+	PassWord    string
+	User        string
+	Port        string
+	DbName      string
+	BackupCycle string
+	KeepNumber  int
+	ISAllDBBak  int
+	DingConfig  *dao.DingDatabase
+	OssConfig   *dao.OssDatabase
+	DingStatus  int
+	OssStatus   int
+	BakStatus   int
+	BakMsg      string
+	FileName    string
+	FileSize    int
 }
 
 var CronJob = make(map[int]*cron.Cron)
 
-//func init() {
-//	CronJob = make(map[int]*cron.Cron, 10)
-//}
-
-func NewBakHandler(detail *dao.TaskDetail, afterBakChan chan *BakHandler) (*BakHandler, error) {
+func NewBakHandler(detail *dao.TaskDetail) (*BakHandler, error) {
 	bakhandler := &BakHandler{
-		TaskID:       detail.Info.Id,
-		Host:         detail.Host.Host,
-		PassWord:     detail.Host.Password,
-		User:         detail.Host.User,
-		DbName:       detail.Info.DBName,
-		BackupCycle:  detail.Info.BackupCycle,
-		KeepNumber:   detail.Info.KeepNumber,
-		ISAllDBBak:   detail.Info.IsAllDBBak,
-		DingConfig:   detail.Ding,
-		OssConfig:    detail.Oss,
-		AfterBakChan: afterBakChan,
+		TaskID:      detail.Info.Id,
+		Host:        detail.Host.Host,
+		PassWord:    detail.Host.Password,
+		User:        detail.Host.User,
+		DbName:      detail.Info.DBName,
+		BackupCycle: detail.Info.BackupCycle,
+		KeepNumber:  detail.Info.KeepNumber,
+		ISAllDBBak:  detail.Info.IsAllDBBak,
+		DingConfig:  detail.Ding,
+		OssConfig:   detail.Oss,
 	}
 	en, err := xorm.NewEngine("mysql", bakhandler.User+":"+bakhandler.PassWord+"@tcp("+bakhandler.Host+")/"+bakhandler.DbName+"?charset=utf8&parseTime=true")
 	if err != nil {
@@ -139,8 +136,10 @@ func (b *BakHandler) Run() {
 			b.FileName = "unknown"
 			AfterBak(b)
 			log.Logger.Error("备份失败,保存备份历史到数据库,停止备份任务,发送消息", err)
-			b.AfterBakChan <- b
-			log.Logger.Debug("BakHandler 发送消息成功")
+			if err := b.StoreDatabase(); err != nil {
+				log.Logger.Error("数据库存储失败", err)
+				return
+			}
 			return
 		}
 		b.BakMsg = "success"
@@ -153,8 +152,10 @@ func (b *BakHandler) Run() {
 		AfterBak(b)
 		//发送对象到channel
 		log.Logger.Info("备份数据库成功,保存备份历史到数据库,发送消息")
-		b.AfterBakChan <- b
-		log.Logger.Debug("BakHandler 发送消息成功")
+		if err := b.StoreDatabase(); err != nil {
+			log.Logger.Error("数据库存储失败", err)
+			return
+		}
 		return
 	}
 	b.BakMsg = "success"
@@ -167,8 +168,10 @@ func (b *BakHandler) Run() {
 	AfterBak(b)
 	//发送对象到channel
 	log.Logger.Info("备份数据库成功,保存备份历史到数据库,发送消息")
-	b.AfterBakChan <- b
-	log.Logger.Debug("BakHandler 发送消息成功")
+	if err := b.StoreDatabase(); err != nil {
+		log.Logger.Error("数据库存储失败", err)
+		return
+	}
 }
 
 func (b *BakHandler) RunMysqlDump() error {
@@ -249,4 +252,21 @@ func AfterBak(b *BakHandler) {
 		b.DingStatus = 1
 		log.Logger.Infof("%s:%s发送钉钉消息成功", b.Host, b.DbName)
 	}
+}
+
+func (b *BakHandler) StoreDatabase() error {
+	historyDB := &dao.BakHistory{
+		TaskID:     b.TaskID,
+		Host:       b.Host,
+		DBName:     b.DbName,
+		OssStatus:  b.OssStatus,
+		DingStatus: b.DingStatus,
+		BakStatus:  b.BakStatus,
+		Msg:        b.BakMsg,
+		FileSize:   b.FileSize,
+		FileName:   b.FileName,
+		BakTime:    time.Now(),
+		IsDelete:   sql.NullInt32{Int32: 0, Valid: true},
+	}
+	return historyDB.Save(context.Background(), database.GetDB())
 }

@@ -193,7 +193,7 @@ func (t *TaskController) TaskList(c *gin.Context) {
 			DBName:      listIterm.DBName,
 			BackupCycle: cronstr,
 			KeepNumber:  listIterm.KeepNumber,
-			Status:      public.IntToBool(listIterm.Status),
+			Status:      listIterm.Status,
 			CreateAt:    listIterm.CreatedAt.Format("2006年01月02日15:04"),
 		}
 		outList = append(outList, outItem)

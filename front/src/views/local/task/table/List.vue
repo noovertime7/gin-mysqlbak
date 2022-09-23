@@ -17,44 +17,10 @@
               </a-select>
             </a-form-item>
           </a-col>
-          <template v-if="advanced">
-            <a-col :md="8" :sm="24">
-              <a-form-item label="调用次数">
-                <a-input-number v-model="queryParam.callNo" style="width: 100%"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="更新日期">
-                <a-date-picker v-model="queryParam.date" style="width: 100%" placeholder="请输入更新日期"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="使用状态">
-                <a-select v-model="queryParam.useStatus" placeholder="请选择" default-value="0">
-                  <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="使用状态">
-                <a-select placeholder="请选择" default-value="0">
-                  <a-select-option value="0">全部</a-select-option>
-                  <a-select-option value="1">关闭</a-select-option>
-                  <a-select-option value="2">运行中</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </template>
-          <a-col :md="!advanced && 8 || 24" :sm="24">
+          <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
               <a-button style="margin-left: 8px" @click="() => queryParam = {}">重置</a-button>
-              <a @click="toggleAdvanced" style="margin-left: 8px">
-                {{ advanced ? '收起' : '展开' }}
-                <a-icon :type="advanced ? 'up' : 'down'"/>
-              </a>
             </span>
           </a-col>
         </a-row>
@@ -63,17 +29,8 @@
 
     <div class="table-operator">
       <a-button type="primary" icon="plus" @click="handleEdit()">新建</a-button>
-      <a-button type="dashed" @click="tableOption">{{ optionAlertShow && '关闭' || '开启' }} alert</a-button>
-      <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-          <!-- lock | unlock -->
-          <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px">
-          批量操作 <a-icon type="down" />
-        </a-button>
-      </a-dropdown>
+      <a-button type="primary" icon="rocket" @click="handleEdit()">start all</a-button>
+      <a-button type="primary" icon="poweroff" @click="handleEdit()">stop all</a-button>
     </div>
 
     <s-table
@@ -82,15 +39,21 @@
       rowKey="key"
       :columns="columns"
       :data="loadData"
-      :alert="options.alert"
-      :rowSelection="options.rowSelection"
+      :alert="false"
     >
+      <span slot="status" slot-scope="text">
+        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+      </span>
       <span slot="serial" slot-scope="text, record, index">
         {{ index + 1 }}
       </span>
       <span slot="action" slot-scope="text, record">
         <template>
-          <a @click="handleEdit(record)">编辑</a>
+          <a @click="startTask(record)">启动</a>
+          <a-divider type="vertical" />
+        </template>
+        <template>
+          <a @click="stopBak(record)">停止</a>
           <a-divider type="vertical" />
         </template>
         <a-dropdown>
@@ -101,11 +64,8 @@
             <a-menu-item>
               <a href="javascript:;">详情</a>
             </a-menu-item>
-            <a-menu-item v-if="$auth('table.disable')">
-              <a href="javascript:;">禁用</a>
-            </a-menu-item>
             <a-menu-item v-if="$auth('table.delete')">
-              <a href="javascript:;">删除</a>
+              <a @click="handleDelete(record)">删除</a>
             </a-menu-item>
           </a-menu>
         </a-dropdown>
@@ -115,9 +75,21 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { STable } from '@/components'
-import { getRoleList, getServiceList } from '@/api/manage'
+import { getRoleList } from '@/api/manage'
+import { taskDelete, taskList } from '@/api/task'
+import { startBak, stopBak } from '@/api/bak'
+
+const statusMap = {
+  0: {
+    status: 'error',
+    text: '停止'
+  },
+  1: {
+    status: 'success',
+    text: '运行中'
+  }
+}
 
 export default {
   name: 'TableList',
@@ -134,47 +106,49 @@ export default {
       // 表头
       columns: [
         {
-          title: '#',
-          scopedSlots: { customRender: 'serial' }
+          title: '任务ID',
+          dataIndex: 'id'
         },
         {
-          title: '规则编号',
-          dataIndex: 'no'
+          title: '主机',
+          dataIndex: 'host'
         },
         {
-          title: '描述',
-          dataIndex: 'description'
+          title: '数据库',
+          dataIndex: 'db_name'
         },
         {
-          title: '服务调用次数',
-          dataIndex: 'callNo',
-          sorter: true,
-          needTotal: true,
-          customRender: (text) => text + ' 次'
+          title: '下次备份时间',
+          dataIndex: 'backup_cycle'
+        },
+        {
+          title: '保留天数',
+          dataIndex: 'keep_number',
+          customRender: (text) => text + ' 天'
         },
         {
           title: '状态',
           dataIndex: 'status',
-          needTotal: true
+          scopedSlots: { customRender: 'status' }
         },
         {
-          title: '更新时间',
-          dataIndex: 'updatedAt',
+          title: '创建时间',
+          dataIndex: 'create_at',
           sorter: true
         },
         {
           title: '操作',
           dataIndex: 'action',
-          width: '150px',
+          width: '190px',
           scopedSlots: { customRender: 'action' }
         }
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log('loadData.parameter', parameter)
-        return getServiceList(Object.assign(parameter, this.queryParam))
+        this.queryParam['host_id'] = this.hostID
+        return taskList(Object.assign(parameter, this.queryParam))
           .then(res => {
-            return res.result
+            return res.data
           })
       },
       selectedRowKeys: [],
@@ -187,12 +161,23 @@ export default {
           onChange: this.onSelectChange
         }
       },
-      optionAlertShow: false
+      optionAlertShow: false,
+      // 查询相关
+      hostID: 0
+    }
+  },
+  filters: {
+    statusFilter (type) {
+      return statusMap[type].text
+    },
+    statusTypeFilter (type) {
+      return statusMap[type].status
     }
   },
   created () {
     this.tableOption()
     getRoleList({ t: new Date() })
+    this.hostID = this.$route.params && this.$route.params.hostID
   },
   methods: {
     tableOption () {
@@ -213,26 +198,65 @@ export default {
         this.optionAlertShow = false
       }
     },
-
     handleEdit (record) {
       this.$emit('onEdit', record)
     },
     handleOk () {
 
     },
-
+    startTask (record) {
+      const query = {
+        'id': record.id,
+        'host_id': this.hostID
+      }
+      startBak(query).then((res) => {
+        this.$message.success(res.data)
+        this.$refs.table.refresh(true)
+      })
+    },
+    stopBak (record) {
+      const query = {
+        'id': record.id,
+        'host_id': this.hostID
+      }
+      stopBak(query).then((res) => {
+        this.$message.success(res.data)
+        this.$refs.table.refresh(true)
+      })
+    },
+    delete (record) {
+      const query = {
+        'id': record.id
+      }
+      taskDelete(query).then((res) => {
+        this.$success(res.data)
+        this.$refs.table.refresh(true)
+      })
+    },
+    handleDelete (record) {
+      const self = this
+        this.$confirm({
+          title: '您确认要删除此任务吗?',
+          content: '删除后，任务无法通过页面管理，已启动的任务仍在后台运行',
+          destroyOnClose: true,
+          onOk () {
+            return new Promise((resolve, reject) => {
+              const query = {
+                'id': record.id
+              }
+              taskDelete(query).then((res) => {
+                self.$message.success(res.data)
+                self.$refs.table.refresh(true)
+                resolve()
+              })
+            })
+          },
+          onCancel () {}
+        })
+    },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
-    },
-    toggleAdvanced () {
-      this.advanced = !this.advanced
-    },
-
-    resetSearchForm () {
-      this.queryParam = {
-        date: moment(new Date())
-      }
     }
   }
 }
