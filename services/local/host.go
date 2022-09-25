@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	localhostService *hostService
+	localhostService *HostService
 	hostServiceOnce  sync.Once
 )
 
@@ -22,17 +22,17 @@ const (
 )
 
 // GetHostService 单例模式
-func GetHostService() *hostService {
+func GetHostService() *HostService {
 	hostServiceOnce.Do(func() {
-		localhostService = &hostService{}
+		localhostService = &HostService{}
 	})
 	return localhostService
 }
 
-type hostService struct{}
+type HostService struct{}
 
 // HostAdd 添加主机
-func (h *hostService) HostAdd(ctx *gin.Context, info *dto.HostAddInput) error {
+func (h *HostService) HostAdd(ctx *gin.Context, info *dto.HostAddInput) error {
 	tx := database.GetDB()
 	host := &dao.HostDatabase{Host: info.Host, Password: info.Password, User: info.User, HostStatus: 1, Content: info.Content, Type: sql.NullInt32{Int32: info.Type, Valid: true}}
 	switch info.Type {
@@ -50,7 +50,7 @@ func (h *hostService) HostAdd(ctx *gin.Context, info *dto.HostAddInput) error {
 }
 
 // HostDelete 删除主机
-func (h *hostService) HostDelete(ctx *gin.Context, info *dto.HostDeleteInput) error {
+func (h *HostService) HostDelete(ctx *gin.Context, info *dto.HostDeleteInput) error {
 	tx := database.GetDB()
 	// 读取基本信息
 	hostDB := &dao.HostDatabase{Id: info.ID}
@@ -68,7 +68,7 @@ func (h *hostService) HostDelete(ctx *gin.Context, info *dto.HostDeleteInput) er
 }
 
 // HostUpdate 更新host
-func (h *hostService) HostUpdate(ctx *gin.Context, info *dto.HostUpdateInput) error {
+func (h *HostService) HostUpdate(ctx *gin.Context, info *dto.HostUpdateInput) error {
 	tx := database.GetDB()
 	host := &dao.HostDatabase{
 		Id:         info.ID,
@@ -91,7 +91,7 @@ func (h *hostService) HostUpdate(ctx *gin.Context, info *dto.HostUpdateInput) er
 }
 
 // GetHostList 查询host
-func (h *hostService) GetHostList(ctx *gin.Context, info *dto.HostListInput) (*dto.HostListOutput, error) {
+func (h *HostService) GetHostList(ctx *gin.Context, info *dto.HostListInput) (*dto.HostListOutput, error) {
 	tx := database.GetDB()
 	hostDB := &dao.HostDatabase{}
 	list, total, err := hostDB.PageList(ctx, tx, info)

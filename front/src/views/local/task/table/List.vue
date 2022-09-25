@@ -4,15 +4,15 @@
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
-            <a-form-item label="规则编号">
-              <a-input v-model="queryParam.id" placeholder=""/>
+            <a-form-item label="数据库">
+              <a-input v-model="queryParam.info" placeholder=""/>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24">
             <a-form-item label="使用状态">
               <a-select v-model="queryParam.status" placeholder="请选择" default-value="0">
                 <a-select-option value="0">全部</a-select-option>
-                <a-select-option value="1">关闭</a-select-option>
+                <a-select-option value="1">停止</a-select-option>
                 <a-select-option value="2">运行中</a-select-option>
               </a-select>
             </a-form-item>
@@ -29,8 +29,8 @@
 
     <div class="table-operator">
       <a-button type="primary" icon="plus" @click="handleEdit()">新建</a-button>
-      <a-button type="primary" icon="rocket" @click="handleEdit()">start all</a-button>
-      <a-button type="primary" icon="poweroff" @click="handleEdit()">stop all</a-button>
+      <a-button type="primary" ghost="ghost" icon="rocket" @click="startBakByHost()">start all</a-button>
+      <a-button type="primary" ghost="ghost" icon="poweroff" @click="stopBakByHost()">stop all</a-button>
     </div>
 
     <s-table
@@ -56,6 +56,10 @@
           <a @click="stopBak(record)">停止</a>
           <a-divider type="vertical" />
         </template>
+        <template>
+          <a @click="handleEdit(record)">编辑</a>
+          <a-divider type="vertical" />
+        </template>
         <a-dropdown>
           <a class="ant-dropdown-link">
             更多 <a-icon type="down" />
@@ -64,7 +68,7 @@
             <a-menu-item>
               <a href="javascript:;">详情</a>
             </a-menu-item>
-            <a-menu-item v-if="$auth('table.delete')">
+            <a-menu-item>
               <a @click="handleDelete(record)">删除</a>
             </a-menu-item>
           </a-menu>
@@ -76,9 +80,8 @@
 
 <script>
 import { STable } from '@/components'
-import { getRoleList } from '@/api/manage'
 import { taskDelete, taskList } from '@/api/task'
-import { startBak, stopBak } from '@/api/bak'
+import { startAllBakByHost, startBak, stopAllBakByHost, stopBak } from '@/api/bak'
 
 const statusMap = {
   0: {
@@ -98,6 +101,7 @@ export default {
   },
   data () {
     return {
+      ghost: true,
       mdl: {},
       // 高级搜索 展开/关闭
       advanced: false,
@@ -139,7 +143,7 @@ export default {
         {
           title: '操作',
           dataIndex: 'action',
-          width: '190px',
+          width: '220px',
           scopedSlots: { customRender: 'action' }
         }
       ],
@@ -176,7 +180,6 @@ export default {
   },
   created () {
     this.tableOption()
-    getRoleList({ t: new Date() })
     this.hostID = this.$route.params && this.$route.params.hostID
   },
   methods: {
@@ -214,6 +217,28 @@ export default {
         this.$refs.table.refresh(true)
       })
     },
+    startBakByHost () {
+      const query = {
+        'host_id': this.hostID
+      }
+      startAllBakByHost(query).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
+    },
+    stopBakByHost () {
+      const query = {
+        'host_id': this.hostID
+      }
+      stopAllBakByHost(query).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
+    },
     stopBak (record) {
       const query = {
         'id': record.id,
@@ -241,6 +266,11 @@ export default {
           destroyOnClose: true,
           onOk () {
             return new Promise((resolve, reject) => {
+              if (record.status === 1) {
+                self.$message.warn('任务运行中，请停止后重试')
+                resolve()
+                return
+              }
               const query = {
                 'id': record.id
               }

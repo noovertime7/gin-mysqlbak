@@ -9,8 +9,8 @@ import (
 )
 
 type TaskInfo struct {
-	Id          int       `gorm:"primary_key" description:"自增主键"`
-	HostID      int       `json:"id" gorm:"column:host_id" description:"主机关系id"`
+	Id          int       `gorm:"primary_key" description:"自增主键" json:"task_id"`
+	HostID      int       `json:"host_id" gorm:"column:host_id" description:"主机关系id"`
 	DBName      string    `json:"db_name" gorm:"column:db_name" description:"备份库名"`
 	BackupCycle string    `json:"backup_cycle" gorm:"column:backup_cycle" description:"备份周期"`
 	KeepNumber  int       `json:"keep_number"  gorm:"column:keep_number" description:"数据保留周期"`
@@ -82,12 +82,30 @@ func (s *TaskInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.TaskListInp
 	list := []TaskInfo{}
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
-	query.Find(&list).Count(&total)
 	if params.HostId > 0 {
 		query = query.Table(s.TableName()).Where("is_delete=0 and host_id = ?", params.HostId)
+		switch params.Status {
+		//查询关闭状态任务
+		case 1:
+			query = query.Table(s.TableName()).Where("is_delete=0 and status != 1 and host_id = ?", params.HostId)
+		case 2:
+			query = query.Table(s.TableName()).Where("is_delete=0 and status = 1 and host_id = ?", params.HostId)
+		default:
+			query = query.Table(s.TableName()).Where("is_delete=0 and host_id = ?", params.HostId)
+		}
 	} else {
 		query = query.Table(s.TableName()).Where("is_delete=0")
+		switch params.Status {
+		//查询关闭状态任务
+		case 1:
+			query = query.Table(s.TableName()).Where("is_delete=0 and status != 1")
+		case 2:
+			query = query.Table(s.TableName()).Where("is_delete=0 and status = 1")
+		default:
+			query = query.Table(s.TableName()).Where("is_delete=0")
+		}
 	}
+	query.Find(&list).Count(&total)
 	if params.Info != "" {
 		query = query.Where("( db_name like ?)", "%"+params.Info+"%")
 	}

@@ -48,17 +48,20 @@ func (d *TaskUpdateInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
-// TaskListInput 通过page pagesize 查询服务信息
+// TaskListInput 通过page page-size 查询服务信息
 type TaskListInput struct {
 	HostId   int    `json:"host_id" form:"host_id" validate:""`
 	Info     string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
+	Status   int    `form:"status" json:"status" comment:"任务状态,1为关闭，2为开启" validate:"" example:""`
 	PageNo   int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
 	PageSize int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
 type TaskListOutput struct {
-	Total int               `form:"total" json:"total" comment:"总数"   validate:"" example:""`
-	List  []TaskListOutItem `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
+	Total    int               `form:"total" json:"total" comment:"总数"   validate:"" example:""`
+	List     []TaskListOutItem `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
+	PageNo   int               `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
+	PageSize int               `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
 type TaskListOutItem struct {
@@ -72,7 +75,29 @@ type TaskListOutItem struct {
 	CreateAt    string `json:"create_at" form:"create_at"`
 }
 
-//删除task
+type TaskDeTailOutPut struct {
+	ID              int    `json:"id" form:"id"`
+	Host            string `json:"host" form:"host"`
+	HostID          int    `json:"host_id" form:"host_id"`
+	DBName          string `json:"db_name" form:"db_name"`
+	BackupCycle     string `json:"backup_cycle" form:"backup_cycle"`
+	KeepNumber      int    `json:"keep_number" form:"keep_number"`
+	CreateAt        string `json:"create_at" form:"create_at"`
+	DingID          int    `json:"ding_id"`
+	IsDingSend      int    `json:"is_ding_send"  comment:"是否发送钉钉消息"`
+	DingAccessToken string `json:"ding_access_token"  comment:"accessToken"`
+	DingSecret      string `json:"ding_secret" comment:"secret"`
+	OssID           int    `json:"oss_id"`
+	IsOssSave       int    `json:"is_oss_save"  comment:"是否保存到oss中 0关闭1开启"`
+	OssType         int    `json:"oss_type"  comment:"oss类型"`
+	Endpoint        string `json:"endpoint"   comment:"endpoint"`
+	OssAccess       string `json:"oss_access"  comment:"ossaccess"`
+	OssSecret       string `json:"oss_secret"   comment:"secret"`
+	BucketName      string `json:"bucket_name"  comment:"bucket名字"`
+	Directory       string `json:"directory"  comment:"目录"`
+}
+
+// TaskDeleteInput 删除task
 type TaskDeleteInput struct {
 	ID int `json:"id" form:"id" validate:"required"`
 }

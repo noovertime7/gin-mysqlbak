@@ -7,14 +7,17 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/database"
+	"github.com/noovertime7/gin-mysqlbak/services/local"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
 )
 
-type TaskController struct{}
+type TaskController struct {
+	service *local.TaskService
+}
 
 func TaskRegister(group *gin.RouterGroup) {
-	task := &TaskController{}
+	task := &TaskController{service: local.GetTaskService()}
 	group.POST("/taskadd", task.TaskAdd)
 	group.GET("/tasklist", task.TaskList)
 	group.GET("/taskdetail", task.TaskDetail)
@@ -168,39 +171,11 @@ func (t *TaskController) TaskList(c *gin.Context) {
 		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx := database.GetDB()
-	taskinfo := &dao.TaskInfo{}
-	list, total, err := taskinfo.PageList(c, tx, params)
+	out, err := t.service.GetTaskList(c, params)
 	if err != nil {
-		log.Logger.Error(err)
-		middleware.ResponseError(c, 10004, err)
+		log.Logger.Error("获取任务列表失败", err)
+		middleware.ResponseError(c, 20001, err)
 		return
-	}
-	var outList []dto.TaskListOutItem
-	for _, listIterm := range list {
-		nexttime, _ := public.Cronexpr(listIterm.BackupCycle)
-		cronstr := nexttime
-		database := &dao.HostDatabase{Id: listIterm.HostID}
-		databseres, err := database.Find(c, tx, database)
-		if err != nil {
-			middleware.ResponseError(c, 10005, err)
-			return
-		}
-		outItem := dto.TaskListOutItem{
-			ID:          listIterm.Id,
-			Host:        databseres.Host,
-			HostID:      listIterm.HostID,
-			DBName:      listIterm.DBName,
-			BackupCycle: cronstr,
-			KeepNumber:  listIterm.KeepNumber,
-			Status:      listIterm.Status,
-			CreateAt:    listIterm.CreatedAt.Format("2006年01月02日15:04"),
-		}
-		outList = append(outList, outItem)
-	}
-	out := &dto.TaskListOutput{
-		Total: total,
-		List:  outList,
 	}
 	middleware.ResponseSuccess(c, out)
 }
@@ -211,22 +186,11 @@ func (s *TaskController) TaskDetail(ctx *gin.Context) {
 		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
 		return
 	}
-	tx := database.GetDB()
-	// 读取基本信息
-	taskinfo := &dao.TaskInfo{Id: params.ID}
-	taskinfo, err := taskinfo.Find(ctx, tx, taskinfo)
+	detail, err := s.service.GetTaskDetail(ctx, params)
 	if err != nil {
-		middleware.ResponseError(ctx, 30003, err)
+		log.Logger.Error("获取任务详情失败", err)
+		middleware.ResponseError(ctx, 20001, err)
 		return
 	}
-	if taskinfo.Id == 0 {
-		middleware.ResponseError(ctx, 30004, errors.New("任务不存在,请检查id是否正确"))
-		return
-	}
-	taskdetail, err := taskinfo.TaskDetail(ctx, tx, taskinfo)
-	if err != nil {
-		middleware.ResponseError(ctx, 30004, err)
-		return
-	}
-	middleware.ResponseSuccess(ctx, taskdetail)
+	middleware.ResponseSuccess(ctx, detail)
 }

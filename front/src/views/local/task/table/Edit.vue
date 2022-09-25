@@ -3,16 +3,16 @@
     <a-form :form="form" @submit="handleSubmit">
 
       <a-form-item
+        v-show="isEdit"
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
-        label="规则编号"
+        label="任务ID"
         hasFeedback
-        validateStatus="success"
       >
         <a-input
-          placeholder="规则编号"
+          placeholder="任务ID"
           v-decorator="[
-            'no',
+            'id',
             {rules: [{ required: true, message: '请输入规则编号' }]}
           ]"
           :disabled="true"
@@ -22,53 +22,109 @@
       <a-form-item
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
-        label="服务调用次数"
+        label="数据库"
         hasFeedback
-        validateStatus="success"
       >
-        <a-input-number :min="1" style="width: 100%" v-decorator="['callNo', {rules: [{ required: true }]}]" />
+        <a-input :min="1" style="width: 100%" v-decorator="['db_name', {rules: [{ required: true }]}]" />
       </a-form-item>
 
       <a-form-item
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
-        label="状态"
+        label="备份周期"
         hasFeedback
-        validateStatus="warning"
       >
-        <a-select v-decorator="['status', {rules: [{ required: true, message: '请选择状态' }], initialValue: '1'}]">
-          <a-select-option :value="1">Option 1</a-select-option>
-          <a-select-option :value="2">Option 2</a-select-option>
-          <a-select-option :value="3">Option 3</a-select-option>
+        <a-input style="width: 100%" v-decorator="['backup_cycle', {rules: [{ required: true }]}]" />
+      </a-form-item>
+
+      <a-form-item
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="数据保留周期"
+      >
+        <a-input style="width: 100%" v-decorator="['keep_number', {rules: [{ required: true }]}]" />
+      </a-form-item>
+
+      <a-form-item
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="功能"
+        hasFeedback
+      >
+        <template>
+          钉钉通知:&ensp;<a-switch v-model="dingStatus" checked-children="开" un-checked-children="关" default-checked />
+        </template> &ensp;&ensp;&ensp;&ensp;&ensp;
+        <template>
+          存储设置:&ensp;<a-switch v-model="ossStatus" checked-children="开" un-checked-children="关" default-checked />
+        </template>
+      </a-form-item>
+      <a-form-item
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="钉钉AccessToken"
+        v-show="dingStatus"
+      >
+        <a-input style="width: 100%" v-decorator="['ding_access_token', {rules: [{}]}]" />
+      </a-form-item>
+      <a-form-item
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="钉钉Secret"
+        v-show="dingStatus"
+      >
+        <a-input style="width: 100%" v-decorator="['ding_secret', {rules: [{}]}]" />
+      </a-form-item>
+      <a-form-item
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="存储类型"
+        v-show="ossStatus"
+      >
+        <a-select v-model="ossType" style="width: 120px">
+          <a-select-option :value="0">
+            AliOSS
+          </a-select-option>
+          <a-select-option :value="1">
+            minio
+          </a-select-option>
+          <a-select-option :value="3">
+            other
+          </a-select-option>
         </a-select>
       </a-form-item>
 
       <a-form-item
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
-        label="描述"
-        hasFeedback
-        help="请填写一段描述"
+        label="oss_access"
+        v-show="ossStatus"
       >
-        <a-textarea :rows="5" placeholder="..." v-decorator="['description', {rules: [{ required: true }]}]" />
+        <a-input style="width: 100%" v-decorator="['oss_access', {rules: [{}]}]" />
       </a-form-item>
-
       <a-form-item
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
-        label="更新时间"
-        hasFeedback
-        validateStatus="error"
+        label="oss_secret"
+        v-show="ossStatus"
       >
-        <a-date-picker
-          style="width: 100%"
-          showTime
-          format="YYYY-MM-DD HH:mm:ss"
-          placeholder="Select Time"
-          v-decorator="['updatedAt']"
-        />
+        <a-input style="width: 100%" v-decorator="['oss_secret', {rules: [{}]}]" />
       </a-form-item>
-
+      <a-form-item
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="bucket_name"
+        v-show="ossStatus"
+      >
+        <a-input style="width: 100%" v-decorator="['bucket_name', {rules: [{}]}]" />
+      </a-form-item>
+      <a-form-item
+        :labelCol="labelCol"
+        :wrapperCol="wrapperCol"
+        label="directory"
+        v-show="ossStatus"
+      >
+        <a-input style="width: 100%" v-decorator="['directory', {rules: [{}]}]" />
+      </a-form-item>
       <a-form-item
         v-bind="buttonCol"
       >
@@ -87,8 +143,9 @@
 </template>
 
 <script>
-import moment from 'moment'
+
 import pick from 'lodash.pick'
+import { taskDetail } from '@/api/task'
 
 export default {
   name: 'TableEdit',
@@ -115,7 +172,13 @@ export default {
         }
       },
       form: this.$form.createForm(this),
-      id: 0
+      id: 0,
+      isEdit: false,
+      // 开关状态相关
+      dingStatus: false,
+      ossStatus: false,
+      // 存储类型相关
+      ossType: 1
     }
   },
   // beforeCreate () {
@@ -132,11 +195,17 @@ export default {
     },
     handleSubmit () {
       const { form: { validateFields } } = this
+      // eslint-disable-next-line handle-callback-err
       validateFields((err, values) => {
-        if (!err) {
-          // eslint-disable-next-line no-console
-          console.log('Received values of form: ', values)
-        }
+         if (this.isEdit) {
+           alert(values.id)
+           this.handleGoBack()
+           // taskUpdate(values).then((res) => {
+           //   if (res) {
+           //     this.$message.success(res.data)
+           //   }
+           // })
+         }
       })
     },
     handleGetInfo () {
@@ -144,16 +213,30 @@ export default {
     },
     loadEditInfo (data) {
       const { form } = this
-      // ajax
+      console.log('data = ', data)
       console.log(`将加载 ${this.id} 信息到表单`)
-      new Promise((resolve) => {
-        setTimeout(resolve, 1500)
-      }).then(() => {
-        const formData = pick(data, ['no', 'callNo', 'status', 'description', 'updatedAt'])
-        formData.updatedAt = moment(data.updatedAt)
-        console.log('formData', formData)
-        form.setFieldsValue(formData)
-      })
+      if (data) {
+        this.isEdit = true
+        new Promise((resolve) => {
+          resolve()
+        }).then(() => {
+          const query = { 'id': data.id }
+          taskDetail(query).then((res) => {
+            const formData = pick(res.data, ['host', 'backup_cycle', 'db_name', 'status', 'keep_number', 'id',
+              'is_ding_send', 'ding_access_token', 'ding_secret',
+            'is_oss_save', 'oss_type', 'endpoint', 'oss_access', 'oss_secret', 'bucket_name', 'directory'
+            ])
+            console.log('ding_secret = ', formData.ding_secret)
+            this.dingStatus = Boolean(formData.is_ding_send)
+            this.ossStatus = Boolean(formData.is_oss_save)
+            // 如果开关打开,修改存储类型
+            if (formData.is_oss_save !== 0) {
+              this.ossStatus = formData.oss_type
+            }
+            form.setFieldsValue(formData)
+          })
+        })
+      }
     }
   }
 }

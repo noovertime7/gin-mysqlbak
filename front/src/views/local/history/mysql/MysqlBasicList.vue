@@ -44,10 +44,10 @@
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a>下载文件</a>
+                <a @click="handleDownLoad">下载文件</a>
               </a-menu-item>
               <a-menu-item>
-                <a>还原文件</a>
+                <a @click="handleRestore">还原文件</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -181,6 +181,12 @@ export default {
     handleRadioClick () {
       this.queryParam = { 'status': this.radioStatus }
       this.$refs.table.refresh(true)
+    },
+    handleDownLoad () {
+      this.$message.warn('功能正在开发中...')
+    },
+    handleRestore () {
+      this.$message.warn('功能正在开发中...')
     }
   }
 }
