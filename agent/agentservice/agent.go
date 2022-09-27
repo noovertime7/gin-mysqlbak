@@ -51,7 +51,7 @@ func (a *AgentService) GetAgentList(ctx *gin.Context, agentInfo *agentdto.AgentL
 	if err != nil {
 		return nil, err
 	}
-	var agentOutitems []*agentdto.AgentOutPutItem
+	var agentOutItems []*agentdto.AgentOutPutItem
 	for _, agent := range agents {
 		tempAgent := &agentdto.AgentOutPutItem{
 			ServiceName: agent.ServiceName,
@@ -63,11 +63,11 @@ func (a *AgentService) GetAgentList(ctx *gin.Context, agentInfo *agentdto.AgentL
 			AgentStatus: agent.AgentStatus,
 			CreateAt:    agent.CreateAt.Format("2006年01月02日15:04:01"),
 		}
-		agentOutitems = append(agentOutitems, tempAgent)
+		agentOutItems = append(agentOutItems, tempAgent)
 	}
 	out := &agentdto.AgentListOutPut{
 		Total:           total,
-		AgentOutPutItem: agentOutitems,
+		AgentOutPutItem: agentOutItems,
 	}
 	return out, nil
 }
@@ -79,4 +79,26 @@ func (a *AgentService) GetServiceAddr(ctx context.Context, serviceName string) (
 		return "unknown", err
 	}
 	return agent.Address, nil
+}
+
+func (a *AgentService) GetServiceNumInfo(ctx *gin.Context) (*agentdto.AgentServiceNumInfoOutput, error) {
+	list, err := a.GetAgentList(ctx, &agentdto.AgentListInput{PageNo: 1, PageSize: 99999, Info: ""})
+	if err != nil {
+		return nil, err
+	}
+	var (
+		services    int
+		tasks       int
+		finishTasks int
+	)
+	services = list.Total
+	for _, s := range list.AgentOutPutItem {
+		tasks += s.TaskNum
+		finishTasks += s.FinishNum
+	}
+	return &agentdto.AgentServiceNumInfoOutput{
+		AllServices:    services,
+		AllTasks:       tasks,
+		AllFinishTasks: finishTasks,
+	}, nil
 }

@@ -198,7 +198,7 @@ export const asyncRouterMap = [
           {
             path: '/local/task',
             name: '任务列表',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/exception/404'),
+            component: () => import('@/views/local/taskList/taskList-List'),
             meta: { title: '任务列表', permission: ['local'] }
           },
           {
@@ -206,6 +206,22 @@ export const asyncRouterMap = [
             name: '备份历史',
             component: () => import(/* webpackChunkName: "fail" */ '@/views/local/history/mysql/MysqlBasicList'),
             meta: { title: '备份历史', permission: ['local'] }
+          }
+        ]
+      },
+      // cluster
+      {
+        path: '/cluster',
+        name: 'cluster',
+        component: RouteView,
+        redirect: '/cluster/service',
+        meta: { title: '集群备份', icon: 'project', permission: ['cluster'] },
+        children: [
+          {
+            path: '/local/service',
+            name: '服务列表',
+            component: () => import(/* webpackChunkName: "fail" */ '@/views/cluster/service/serviceList'),
+            meta: { title: '服务列表', permission: ['cluster'] }
           }
         ]
       },

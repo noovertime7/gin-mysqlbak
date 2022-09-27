@@ -128,8 +128,13 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 		return
 	}
 	if len(result) == 0 {
-		log.Logger.Info("当前主机备份任务为空")
-		middleware.ResponseError(c, 2003, errors.New("当前主机备份任务为空"))
+		log.Logger.Info("备份任务为空")
+		middleware.ResponseError(c, 2003, errors.New("备份任务为空"))
+		return
+	}
+	if len(core.CronJob) == 0 {
+		log.Logger.Info("运行任务为空")
+		middleware.ResponseError(c, 2003, errors.New("没有任务在运行"))
 		return
 	}
 	for _, task := range result {

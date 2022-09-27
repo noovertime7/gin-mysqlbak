@@ -167,7 +167,8 @@ export default {
       default: ''
     },
     host: {
-      type: Number
+      type: Number,
+      default: 0
     }
   },
   data () {

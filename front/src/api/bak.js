@@ -32,19 +32,17 @@ export function stopAllBakByHost (hostid) {
   })
 }
 
-export function startAllBak (query) {
+export function startAllBak () {
   return request({
     url: '/bak/start_bak_all',
-    method: 'get',
-    params: query
+    method: 'get'
   })
 }
 
-export function stopAllBak (hostid) {
+export function stopAllBak () {
   return request({
     url: '/bak/stop_bak_all',
-    method: 'get',
-    params: hostid
+    method: 'get'
   })
 }
 

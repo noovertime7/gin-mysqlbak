@@ -18,6 +18,7 @@ var AgentService *agentservice.AgentService
 func AgentRegister(group *gin.RouterGroup) {
 	agent := &AgentController{}
 	group.GET("/agentlist", agent.GetAgentList)
+	group.GET("/service_num_info", agent.GetServiceNumInfo)
 	group.POST("/register", agent.Register)
 	group.PUT("/deregister", agent.DeRegister)
 }
@@ -32,6 +33,16 @@ func (a *AgentController) GetAgentList(ctx *gin.Context) {
 	data, err := AgentService.GetAgentList(ctx, params)
 	if err != nil {
 		log.Logger.Error("查询列表出错", err)
+		middleware.ResponseError(ctx, 20001, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, data)
+}
+
+func (a *AgentController) GetServiceNumInfo(ctx *gin.Context) {
+	data, err := AgentService.GetServiceNumInfo(ctx)
+	if err != nil {
+		log.Logger.Error("获取服务任务数、完成任务数失败", err)
 		middleware.ResponseError(ctx, 20001, err)
 		return
 	}

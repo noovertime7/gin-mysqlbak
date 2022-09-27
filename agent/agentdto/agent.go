@@ -7,7 +7,7 @@ import (
 
 type AgentListOutPut struct {
 	Total           int                `json:"total"`
-	AgentOutPutItem []*AgentOutPutItem `json:"agent_list"`
+	AgentOutPutItem []*AgentOutPutItem `json:"list"`
 }
 
 type AgentOutPutItem struct {
@@ -36,6 +36,12 @@ type AgentListInput struct {
 	Info     string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
 	PageNo   int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
 	PageSize int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+}
+
+type AgentServiceNumInfoOutput struct {
+	AllServices    int `json:"all_services"`
+	AllTasks       int `json:"all_tasks"`
+	AllFinishTasks int `json:"all_finish_tasks"`
 }
 
 func (a *AgentRegisterInput) BindValidParams(ctx *gin.Context) error {
