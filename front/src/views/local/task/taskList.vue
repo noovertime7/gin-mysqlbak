@@ -1,6 +1,6 @@
 <template>
   <a-card :bordered="false">
-    <component @onEdit="handleEdit" @onGoBack="handleGoBack" :record="record" :is="currentComponet"></component>
+    <component @onEdit="handleEdit" @onGoBack="handleGoBack" :record="record" :host="HostID" :is="currentComponet"></component>
   </a-card>
 </template>
 
@@ -23,11 +23,13 @@ export default {
   data () {
     return {
       currentComponet: 'List',
-      record: ''
+      record: '',
+      HostID: 0
     }
   },
-  created () {
-
+  mounted () {
+    const temp = this.$route.params && this.$route.params.hostID
+    this.HostID = Number(temp)
   },
   methods: {
     handleEdit (record) {
