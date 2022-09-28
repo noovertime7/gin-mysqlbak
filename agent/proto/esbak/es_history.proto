@@ -1,6 +1,6 @@
 syntax = "proto3";
 package go.micro.service.backupAgent;
-option go_package="./;EsBak";
+option go_package="./;esbak";
 
 
 
@@ -13,7 +13,9 @@ message GetEsHistoryListInput {
   string Info =1 ;
   int64 PageNo =2;
   int64 PageSize =3 ;
-  string Sort =4;
+  string SortField = 5;
+  string SortOrder = 6;
+  string Status =7;
 }
 
 
@@ -27,21 +29,39 @@ message ESHistoryOneMessage {
 }
 
 message ESHistoryListOutput {
+  // @inject_tag: json:"total"
   int64 Total =1;
+  // @inject_tag: json:"list"
   repeated ESHistoryListOutItem esHistoryListOutItem =2 ;
+  // @inject_tag: json:"page_no"
+  int64 PageNo = 3;
+  // @inject_tag: json:"page_size"
+  int64 PageSize = 4 ;
 }
 
 message ESHistoryListOutItem {
+  // @inject_tag: json:"id"
   int64 ID =1 ;
+  // @inject_tag: json:"task_id"
   int64 TaskID =9;
+  // @inject_tag: json:"uuid"
   string UUID =10;
+  // @inject_tag: json:"duration_in_millis"
   int64 DurationInMillis =11;
+  // @inject_tag: json:"host"
   string Host =12;
+  // @inject_tag: json:"snapshot"
   string Snapshot =2;
+  // @inject_tag: json:"repository"
   string Repository =3;
+  // @inject_tag: json:"indices"
   string Indices =4;
+  // @inject_tag: json:"state"
   string State =5;
+  // @inject_tag: json:"start_time"
   string StartTime =6;
+  // @inject_tag: json:"end_time"
   string  EndTime =7;
+  // @inject_tag: json:"message"
   string Message =8;
 }

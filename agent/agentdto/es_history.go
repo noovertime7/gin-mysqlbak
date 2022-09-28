@@ -15,7 +15,9 @@ type ESHistoryListInput struct {
 	Info        string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
 	PageNo      int64  `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
 	PageSize    int64  `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
-	Sort        string `form:"sort" json:"sort" comment:"排序" `
+	Status      string `form:"status" json:"status" validate:""`
+	SortField   string `form:"sortField" json:"sortField" comment:"排序字段" `
+	SortOrder   string `json:"sortOrder" form:"sortOrder" comment:"排序规则"`
 }
 
 func (d *ESHistoryListInput) BindValidParam(ctx *gin.Context) error {

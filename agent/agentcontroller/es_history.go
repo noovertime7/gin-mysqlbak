@@ -60,10 +60,12 @@ func (e *EsHistoryController) GetEsHistoryList(ctx *gin.Context) {
 		options.Address = []string{addr}
 	}
 	data, err := EsHistoryService.GetEsHistoryList(ctx, &esbak.GetEsHistoryListInput{
-		Info:     params.Info,
-		PageNo:   params.PageNo,
-		PageSize: params.PageSize,
-		Sort:     params.Sort,
+		Info:      params.Info,
+		PageNo:    params.PageNo,
+		PageSize:  params.PageSize,
+		SortOrder: params.SortOrder,
+		SortField: params.SortField,
+		Status:    params.Status,
 	}, ops)
 	if err != nil {
 		log.Logger.Error("获取es_task历史记录失败")
