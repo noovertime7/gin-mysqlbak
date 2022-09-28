@@ -218,10 +218,16 @@ export const asyncRouterMap = [
         meta: { title: '集群备份', icon: 'project', permission: ['cluster'] },
         children: [
           {
-            path: '/local/service',
+            path: '/cluster/service',
             name: '服务列表',
-            component: () => import(/* webpackChunkName: "fail" */ '@/views/cluster/service/serviceList'),
+            component: () => import('@/views/cluster/service/serviceList'),
             meta: { title: '服务列表', permission: ['cluster'] }
+          },
+          {
+            path: '/cluster/history',
+            name: '历史记录',
+            component: () => import('@/views/cluster/history/model'),
+            meta: { title: '备份历史', permission: ['cluster'] }
           }
         ]
       },

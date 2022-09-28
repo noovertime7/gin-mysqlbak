@@ -164,7 +164,7 @@ export default {
       if ((typeof result === 'object' || typeof result === 'function') && typeof result.then === 'function') {
         result.then(r => {
           // eslint-disable-next-line valid-typeof
-          if (typeof r.list == null) {
+          if (!r.list) {
             r.list = []
           }
           this.localPagination = this.showPagination && Object.assign({}, this.localPagination, {

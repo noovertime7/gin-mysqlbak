@@ -1,22 +1,22 @@
 syntax = "proto3";
 package go.micro.service.backupAgent;
-option go_package="./;History";
-
+option go_package = "./;bakhistory";
 
 service History {
   rpc GetHistoryList(HistoryListInput) returns (HistoryListOutput) {}
   rpc DeleteHistory(HistoryIDInput) returns (HistoryOneMessage) {}
+  rpc GetHistoryNumInfo(Empty) returns (HistoryNumInfoOut) {}
 }
 
+message Empty {}
 
 message HistoryListInput {
-  // @inject_tag: json:"info" form:"info" uri:"info"
-  string Info =1 ;
-  // @inject_tag: json:"page_no" form:"page_no" uri:"page_no"
-  int64 PageNo =2;
-  // @inject_tag: json:"page_size" form:"page_size" uri:"page_size"
-  int64 PageSize =3 ;
-  string Sort =4;
+  string Info = 1 ;
+  int64 PageNo = 2;
+  int64 PageSize = 3 ;
+  string SortField = 5;
+  string SortOrder = 6;
+  string Status =7;
 }
 
 
@@ -25,25 +25,47 @@ message HistoryIDInput{
 }
 
 message HistoryOneMessage {
-  // @inject_tag: json:"message" form:"message" uri:"message"
-  string Message  =1;
-  // @inject_tag: json:"content" form:"content" uri:"content"
-  bool OK =2;
+  string Message = 1;
+  bool OK = 2;
 }
 
 message HistoryListOutput {
-  int64 Total =1;
-  repeated HistoryListOutItem historyListOutItem =2 ;
+  // @inject_tag: json:"total"
+  int64 Total = 1;
+  // @inject_tag: json:"list"
+  repeated HistoryListOutItem historyListOutItem = 2 ;
+  // @inject_tag: json:"page_no"
+  int64 PageNo = 3;
+  // @inject_tag: json:"page_size"
+  int64 PageSize = 4 ;
 }
 
 message HistoryListOutItem {
-  int64 ID =1 ;
-  string Host =2;
-  string DBName =3;
-  int64 DingStatus =4;
-  int64  OSSStatus =5;
-  string Message =6;
-  string FileSize =7;
-  string FileName =8;
-  string BakTime=9;
+  // @inject_tag: json:"id"
+  int64 ID = 1 ;
+  // @inject_tag: json:"host"
+  string Host = 2;
+  // @inject_tag: json:"db_name"
+  string DBName = 3;
+  // @inject_tag: json:"ding_status"
+  int64 DingStatus = 4;
+  // @inject_tag: json:"oss_status"
+  int64  OSSStatus = 5;
+  // @inject_tag: json:"message"
+  string Message = 6;
+  // @inject_tag: json:"file_size"
+  string FileSize = 7;
+  // @inject_tag: json:"file_name"
+  string FileName = 8;
+  // @inject_tag: json:"bak_time"
+  string BakTime = 9;
+}
+
+message HistoryNumInfoOut {
+  // @inject_tag: json:"week_nums"
+  int64 WeekNums = 1;
+  // @inject_tag: json:"all_nums"
+  int64 AllNums = 2;
+  // @inject_tag: json:"all_filesize"
+  string  AllFileSize = 3;
 }

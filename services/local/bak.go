@@ -28,13 +28,9 @@ type bakBakService struct {
 	AfterBakChan chan *core.BakHandler
 }
 
-func (bak *bakBakService) Start(c *gin.Context) error {
+func (bak *bakBakService) Start(c *gin.Context, info *dto.Bak) error {
 	tx := database.GetDB()
-	params := &dto.Bak{}
-	if err := params.BindValidParams(c); err != nil {
-		return err
-	}
-	taskInfo := &dao.TaskInfo{Id: params.ID}
+	taskInfo := &dao.TaskInfo{Id: info.ID}
 	taskDetail, err := taskInfo.TaskDetail(c, tx, taskInfo)
 	if err != nil {
 		return err

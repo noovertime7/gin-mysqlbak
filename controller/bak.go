@@ -33,7 +33,7 @@ func (bak *BakController) StartBak(c *gin.Context) {
 		return
 	}
 	service := local.GetBakBakService()
-	if err := service.Start(c); err != nil {
+	if err := service.Start(c, params); err != nil {
 		log.Logger.Error("启动任务失败", err)
 		middleware.ResponseError(c, 10002, err)
 		return

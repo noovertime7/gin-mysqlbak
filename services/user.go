@@ -3,7 +3,6 @@ package services
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dao/roledao"
@@ -25,7 +24,6 @@ func (u *userService) Login(ctx *gin.Context, params *dto.AdminLoginInput) (stri
 	admin := &dao.Admin{}
 	admin, err := admin.LoginCheck(ctx, tx, params)
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	//生成token
