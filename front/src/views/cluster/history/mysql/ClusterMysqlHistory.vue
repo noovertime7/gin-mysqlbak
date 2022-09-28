@@ -203,7 +203,8 @@ export default {
       this.$refs.table.refresh(true)
     },
     handleSelectChange (value) {
-      alert(this.value)
+      this.getMysqlHistoryNunInfo()
+      this.$refs.table.refresh(true)
     },
     handleDownLoad () {
       this.$message.warn('功能正在开发中...')
