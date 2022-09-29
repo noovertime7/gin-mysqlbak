@@ -11,8 +11,8 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
-	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/ding"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/gin-mysqlbak/services/local"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"github.com/pkg/errors"
@@ -38,16 +38,16 @@ func (h *HostController) HostAdd(c *gin.Context) {
 	params := &dto.HostAddInput{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.HostAddError, err))
 		return
 	}
 	if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
-		middleware.ResponseError(c, 1111, errors.New("数据库连接失败，请检查IP地址或端口"))
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.HostCheckError, errors.New("数据库连接失败，请检查IP地址或端口")))
 		return
 	}
 	if err := hostService.HostAdd(c, params); err != nil {
 		log.Logger.Error("添加host失败", err)
-		middleware.ResponseError(c, 30001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.HostAddError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, "添加成功")
@@ -56,12 +56,12 @@ func (h *HostController) HostAdd(c *gin.Context) {
 func (h *HostController) HostDelete(ctx *gin.Context) {
 	params := &dto.HostDeleteInput{}
 	if err := params.BindValidParams(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	if err := hostService.HostDelete(ctx, params); err != nil {
 		log.Logger.Error("删除主机失败", err)
-		middleware.ResponseError(ctx, 30002, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryDeleteError, err))
 		return
 	}
 	//从在线列表中删除主机
@@ -72,17 +72,17 @@ func (h *HostController) HostDelete(ctx *gin.Context) {
 func (h *HostController) HostUpdate(c *gin.Context) {
 	params := &dto.HostUpdateInput{}
 	if err := params.BindValidParams(c); err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	// 更改主机后进行ping测试
 	if err := HostPingCheck(params.User, params.Password, params.Host); err != nil {
-		middleware.ResponseError(c, 1111, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.HostCheckError, err))
 		return
 	}
 	if err := hostService.HostUpdate(c, params); err != nil {
 		log.Logger.Error("更新失败", err)
-		middleware.ResponseError(c, 30003, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.HostUpdateError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, "修改主机成功")
@@ -92,13 +92,13 @@ func (h *HostController) HostList(c *gin.Context) {
 	params := &dto.HostListInput{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	out, err := hostService.GetHostList(c, params)
 	if err != nil {
 		log.Logger.Error("查询host列表失败")
-		middleware.ResponseError(c, 30004, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.HostGetError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, out)

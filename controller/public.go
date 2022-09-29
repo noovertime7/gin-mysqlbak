@@ -8,8 +8,8 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
-	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -62,7 +62,7 @@ func (p *PublicController) BakFileExists(ctx *gin.Context) {
 	}
 	filepath := resBakHistory.FileName
 	if ok, _ := public.HasDir(filepath); !ok {
-		middleware.ResponseError(ctx, 20001, errors.New("本地文件不存在"))
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ServerError, err))
 		return
 	}
 	clusterUrl := conf.GetStringConf("base", "download_url")

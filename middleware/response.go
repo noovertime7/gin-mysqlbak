@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -13,14 +15,6 @@ type ResponseCode int
 //1000以下为通用码，1000以上为用户自定义码
 const (
 	SuccessCode ResponseCode = iota
-	UndefErrorCode
-	ValidErrorCode
-	InternalErrorCode
-
-	InvalidRequestErrorCode ResponseCode = 401
-	CustomizeCode           ResponseCode = 1000
-
-	GROUPALL_SAVE_FLOWERROR ResponseCode = 2001
 )
 
 type Response struct {
@@ -31,7 +25,14 @@ type Response struct {
 	Stack     interface{}  `json:"stack"`
 }
 
-func ResponseError(c *gin.Context, code ResponseCode, err error) {
+func ResponseError(c *gin.Context, err error) {
+	//判断错误类型
+	// As - 获取错误的具体实现
+	var code ResponseCode
+	var myError = new(globalError.GlobalError)
+	if errors.As(err, &myError) {
+		code = ResponseCode(myError.Code)
+	}
 	trace, _ := c.Get("trace")
 	traceContext, _ := trace.(*lib.TraceContext)
 	traceId := ""
@@ -40,7 +41,7 @@ func ResponseError(c *gin.Context, code ResponseCode, err error) {
 	}
 
 	stack := ""
-	if c.Query("is_debug") == "1" || lib.GetConfEnv() == "dev" {
+	if c.Query("is_debug") == "1" {
 		stack = strings.Replace(fmt.Sprintf("%+v", err), err.Error()+"\n", "", -1)
 	}
 

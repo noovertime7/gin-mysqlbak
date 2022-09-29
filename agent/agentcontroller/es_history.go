@@ -7,7 +7,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/esbak"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
-	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
@@ -22,13 +22,13 @@ func EsHistoryRegister(group *gin.RouterGroup) {
 func (e *EsHistoryController) DeleteEsHistory(ctx *gin.Context) {
 	params := &agentdto.EsHistoryIDInput{}
 	if err := params.BindValidParam(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	EsHistoryService, addr, err := pkg.GetESHistoryService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -37,7 +37,7 @@ func (e *EsHistoryController) DeleteEsHistory(ctx *gin.Context) {
 	data, err := EsHistoryService.DeleteESHistory(ctx, &esbak.ESHistoryIDInput{ID: params.ID}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("es删除历史记录失败", err)
-		middleware.ResponseError(ctx, 20001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryDeleteError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data.Message)
@@ -47,13 +47,13 @@ func (e *EsHistoryController) DeleteEsHistory(ctx *gin.Context) {
 func (e *EsHistoryController) GetEsHistoryList(ctx *gin.Context) {
 	params := &agentdto.ESHistoryListInput{}
 	if err := params.BindValidParam(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	EsHistoryService, addr, err := pkg.GetESHistoryService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -69,7 +69,7 @@ func (e *EsHistoryController) GetEsHistoryList(ctx *gin.Context) {
 	}, ops)
 	if err != nil {
 		log.Logger.Error("获取es_task历史记录失败")
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryGetError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data)

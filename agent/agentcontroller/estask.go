@@ -7,7 +7,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/esbak"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
-	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
@@ -25,13 +25,13 @@ func EsTaskRegister(group *gin.RouterGroup) {
 func (e *EsTaskController) AddEsTask(ctx *gin.Context) {
 	params := &agentdto.ESBakTaskAddInput{}
 	if err := params.BindValidParam(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -46,7 +46,7 @@ func (e *EsTaskController) AddEsTask(ctx *gin.Context) {
 	}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("es添加任务失败", err)
-		middleware.ResponseError(ctx, 20001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskAddError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data.Message)
@@ -56,13 +56,13 @@ func (e *EsTaskController) AddEsTask(ctx *gin.Context) {
 func (e *EsTaskController) DeleteEsTask(ctx *gin.Context) {
 	params := &agentdto.ESBakTaskIDInput{}
 	if err := params.BindValidParam(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -71,7 +71,7 @@ func (e *EsTaskController) DeleteEsTask(ctx *gin.Context) {
 	data, err := EsTaskService.TaskDelete(ctx, &esbak.EsTaskIDInput{ID: params.ID}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("es删除任务失败", err)
-		middleware.ResponseError(ctx, 20001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskDeleteError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data.Message)
@@ -81,13 +81,13 @@ func (e *EsTaskController) DeleteEsTask(ctx *gin.Context) {
 func (e *EsTaskController) UpdateEsTask(ctx *gin.Context) {
 	params := &agentdto.ESBakTaskUpdateInput{}
 	if err := params.BindValidParam(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -103,7 +103,7 @@ func (e *EsTaskController) UpdateEsTask(ctx *gin.Context) {
 	}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("es修改任务失败", err)
-		middleware.ResponseError(ctx, 20001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskUpdateError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data.Message)
@@ -113,13 +113,13 @@ func (e *EsTaskController) UpdateEsTask(ctx *gin.Context) {
 func (e *EsTaskController) GetEsTaskList(ctx *gin.Context) {
 	params := &agentdto.ESBakTaskListInput{}
 	if err := params.BindValidParam(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -132,7 +132,7 @@ func (e *EsTaskController) GetEsTaskList(ctx *gin.Context) {
 	}, ops)
 	if err != nil {
 		log.Logger.Error("获取es_task列表失败")
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskGetError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data)
@@ -140,13 +140,13 @@ func (e *EsTaskController) GetEsTaskList(ctx *gin.Context) {
 func (e *EsTaskController) GetEsTaskDetail(ctx *gin.Context) {
 	params := &agentdto.ESBakTaskIDInput{}
 	if err := params.BindValidParam(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -155,7 +155,7 @@ func (e *EsTaskController) GetEsTaskDetail(ctx *gin.Context) {
 	data, err := EsTaskService.GetTaskDetail(ctx, &esbak.EsTaskIDInput{ID: params.ID}, ops)
 	if err != nil {
 		log.Logger.Error("获取Agent详情失败", err)
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskGetError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data)

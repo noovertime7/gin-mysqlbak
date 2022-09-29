@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/pkg/errors"
 )
 
@@ -16,7 +17,7 @@ func JWTAuth() gin.HandlerFunc {
 		// 处理验证逻辑
 		token := context.Request.Header.Get("Access-Token")
 		if token == "" {
-			ResponseError(context, 11000, errors.New("请求未携带token,无权限访问"))
+			ResponseError(context, globalError.NewGlobalError(globalError.AuthorizationError, errors.New("UnAuthorization")))
 			context.Abort()
 			return
 		}
@@ -25,12 +26,12 @@ func JWTAuth() gin.HandlerFunc {
 		if err != nil {
 			// token过期错误
 			if err.Error() == "TokenExpired" {
-				ResponseError(context, 11001, errors.New("token过期"))
+				ResponseError(context, globalError.NewGlobalError(globalError.AuthorizationError, err))
 				context.Abort()
 				return
 			}
 			// 解析其他错误
-			ResponseError(context, 11002, errors.New("token无效或已过期"))
+			ResponseError(context, globalError.NewGlobalError(globalError.AuthorizationError, err))
 			context.Abort()
 			return
 		}

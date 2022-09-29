@@ -6,11 +6,10 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
-	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/database"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/gin-mysqlbak/services/local"
 	"github.com/noovertime7/mysqlbak/pkg/log"
-	"github.com/pkg/errors"
 )
 
 type BakController struct{}
@@ -29,13 +28,13 @@ func (bak *BakController) StartBak(c *gin.Context) {
 	params := &dto.Bak{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	service := local.GetBakBakService()
 	if err := service.Start(c, params); err != nil {
 		log.Logger.Error("启动任务失败", err)
-		middleware.ResponseError(c, 10002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.BakStartError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, "启动任务成功")
@@ -46,13 +45,13 @@ func (bak *BakController) StartBakAll(c *gin.Context) {
 	result, err := taskinfo.FindAllTask(c, database.GetDB(), nil)
 	if err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, 2002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskGetError, err))
 		return
 	}
 	log.Logger.Debug("StartBakAll 任务查询结果", result)
 	if len(result) == 0 {
 		log.Logger.Info("当前主机备份任务为空")
-		middleware.ResponseError(c, 2003, errors.New("当前主机备份任务为空"))
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskNodeFound, err))
 		return
 	}
 	tx := database.GetDB()
@@ -91,13 +90,13 @@ func (bak *BakController) StartBakAllByHost(c *gin.Context) {
 	params := &dto.HostIDInput{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	service := local.GetBakBakService()
 	if err := service.StartTaskByHost(c, params); err != nil {
 		log.Logger.Error("启动主机下所有任务失败")
-		middleware.ResponseError(c, 20001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.BakStartAllError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, "批量启动任务成功")
@@ -107,13 +106,13 @@ func (bak *BakController) StopBak(c *gin.Context) {
 	params := &dto.Bak{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error("BakHandleController 解析参数失败")
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	service := local.GetBakBakService()
 	if err := service.Stop(c, params); err != nil {
 		log.Logger.Error("停止失败", err)
-		middleware.ResponseError(c, 10002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.BakStopAllError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, "任务停止成功")
@@ -124,17 +123,17 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 	result, err := taskinfo.FindAllTask(c, database.GetDB(), nil)
 	if err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, 2002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.BakStopAllError, err))
 		return
 	}
 	if len(result) == 0 {
 		log.Logger.Info("备份任务为空")
-		middleware.ResponseError(c, 2003, errors.New("备份任务为空"))
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskNodeFound, err))
 		return
 	}
 	if len(core.CronJob) == 0 {
 		log.Logger.Info("运行任务为空")
-		middleware.ResponseError(c, 2003, errors.New("没有任务在运行"))
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskNodeFound, err))
 		return
 	}
 	for _, task := range result {
@@ -146,7 +145,7 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 		err = bakhandler.StopBak(task.Id)
 		if err != nil {
 			log.Logger.Warning(err)
-			middleware.ResponseError(c, 2004, err)
+			middleware.ResponseError(c, globalError.NewGlobalError(globalError.BakStopError, err))
 			return
 		}
 		// 修改任务启动状态为关闭
@@ -154,7 +153,7 @@ func (bak *BakController) StopBakAll(c *gin.Context) {
 		taskinfo.Status = 0
 		if err = taskinfo.UpdatesStatus(database.GetDB()); err != nil {
 			log.Logger.Error(err)
-			middleware.ResponseError(c, 2005, err)
+			middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskUpdateError, err))
 			return
 		}
 	}
@@ -165,13 +164,13 @@ func (bak *BakController) StopBakAllByHost(c *gin.Context) {
 	params := &dto.HostIDInput{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	service := local.GetBakBakService()
 	if err := service.StopTaskByHost(c, params); err != nil {
 		log.Logger.Error("根据主机停止任务失败")
-		middleware.ResponseError(c, 20003, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.BakStopAllError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, "批量停止任务成功")

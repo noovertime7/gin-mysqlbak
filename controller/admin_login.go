@@ -5,6 +5,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/gin-mysqlbak/services"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
@@ -31,21 +32,21 @@ func AdminLoginRegister(group *gin.RouterGroup) {
 func (a *AdminLoginController) AdminLogin(ctx *gin.Context) {
 	params := &dto.AdminLoginInput{}
 	if err := params.BindValidParams(ctx); err != nil {
-		middleware.ResponseError(ctx, 2000, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	var err error
 	params.Password, err = public.RsaDecode(params.Password)
 	if err != nil {
 		log.Logger.Error("rsa解密失败", err)
-		middleware.ResponseError(ctx, 2001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ServerError, err))
 		return
 	}
 	//log.Logger.Debug("解密后密码:", params.Password)
 	token, err := services.UserService.Login(ctx, params)
 	if err != nil {
 		log.Logger.Error("登录失败", err)
-		middleware.ResponseError(ctx, 2001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AdminLoginError, err))
 		return
 	}
 	out := &dto.AdminLoginOut{Token: token, Message: "登录成功"}
@@ -55,7 +56,7 @@ func (a *AdminLoginController) AdminLogin(ctx *gin.Context) {
 func (a *AdminLoginController) AdminLoginOut(ctx *gin.Context) {
 	if err := services.UserService.LoginOut(ctx); err != nil {
 		log.Logger.Error("推出登录失败:", err)
-		middleware.ResponseError(ctx, 2002, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AdminLogOutError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, "退出成功")

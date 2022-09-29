@@ -7,7 +7,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/host"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
-	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
@@ -24,13 +24,13 @@ func AgentHostRegister(group *gin.RouterGroup) {
 func (a *AgentHostController) AddHost(c *gin.Context) {
 	params := &agentdto.HostAddInput{}
 	if err := params.BindValidParams(c); err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	hostService, addr, err := pkg.GetHostService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(c, 30001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -44,7 +44,7 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 	}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent添加主机失败", err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, data.Message)
@@ -54,13 +54,13 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 func (a *AgentHostController) DeleteHost(c *gin.Context) {
 	params := &agentdto.HostDeleteInput{}
 	if err := params.BindValidParams(c); err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	hostService, addr, err := pkg.GetHostService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(c, 30001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -71,7 +71,7 @@ func (a *AgentHostController) DeleteHost(c *gin.Context) {
 	}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent删除主机失败", err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, data.Message)
@@ -81,13 +81,13 @@ func (a *AgentHostController) DeleteHost(c *gin.Context) {
 func (a *AgentHostController) UpdateHost(c *gin.Context) {
 	params := &agentdto.HostUpdateInput{}
 	if err := params.BindValidParams(c); err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	hostService, addr, err := pkg.GetHostService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(c, 30001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -102,7 +102,7 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 	}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent更新主机失败", err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, data.Message)
@@ -112,13 +112,13 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 func (a *AgentHostController) HostList(c *gin.Context) {
 	params := &agentdto.HostListInput{}
 	if err := params.BindValidParams(c); err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	hostService, addr, err := pkg.GetHostService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(c, 30001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
 		return
 	}
 	var ops client.CallOption = func(options *client.CallOptions) {
@@ -130,7 +130,7 @@ func (a *AgentHostController) HostList(c *gin.Context) {
 		PageSize: int64(params.PageSize),
 	}, ops)
 	if err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, out)

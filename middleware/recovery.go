@@ -6,6 +6,7 @@ import (
 	"github.com/e421083458/gin_scaffold/public"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"runtime/debug"
 )
 
@@ -22,10 +23,10 @@ func RecoveryMiddleware() gin.HandlerFunc {
 				})
 
 				if lib.ConfBase.DebugMode != "debug" {
-					ResponseError(c, 500, errors.New("内部错误"))
+					ResponseError(c, globalError.NewGlobalError(globalError.ServerError, errors.New("")))
 					return
 				} else {
-					ResponseError(c, 500, errors.New(fmt.Sprint(err)))
+					ResponseError(c, globalError.NewGlobalError(globalError.AuthorizationError, errors.New("")))
 					return
 				}
 			}

@@ -31,7 +31,7 @@ require (
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/yuchenfw/gocrypt v0.0.0-20201117020417-b36b23ab462e
-	golang.org/x/tools v0.1.11 // indirect
+	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/go-playground/validator.v9 v9.29.0
 	gopkg.in/ini.v1 v1.67.0

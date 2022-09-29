@@ -5,11 +5,10 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
-	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/database"
+	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/gin-mysqlbak/services/local"
 	"github.com/noovertime7/mysqlbak/pkg/log"
-	"github.com/pkg/errors"
 )
 
 type TaskController struct {
@@ -29,15 +28,10 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 	params := &dto.TaskAddInput{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	tx := database.GetDB()
-	//if err := TaskPingCheck(params, tx, c); err != nil {
-	//	log.Logger.Error(err)
-	//	middleware.ResponseError(c, 10000, err)
-	//	return
-	//}
 	//开启事务
 	tx = tx.Begin()
 	taskinfo := &dao.TaskInfo{
@@ -52,7 +46,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 	if err := taskinfo.Save(c, tx); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err)
-		middleware.ResponseError(c, 10001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskAddError, err))
 		return
 	}
 	ossdb := &dao.OssDatabase{
@@ -68,7 +62,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 	if err := ossdb.Save(c, tx); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err)
-		middleware.ResponseError(c, 10002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskAddError, err))
 		return
 	}
 	dingdb := &dao.DingDatabase{
@@ -80,7 +74,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 	if err := dingdb.Save(c, tx); err != nil {
 		tx.Rollback()
 		log.Logger.Error(err)
-		middleware.ResponseError(c, 10002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskAddError, err))
 		return
 	}
 	tx.Commit()
@@ -90,7 +84,7 @@ func (t *TaskController) TaskAdd(c *gin.Context) {
 func (s *TaskController) TaskDelete(ctx *gin.Context) {
 	params := &dto.TaskDeleteInput{}
 	if err := params.BindValidParams(ctx); err != nil {
-		middleware.ResponseError(ctx, 30001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskDeleteError, err))
 		return
 	}
 	tx := database.GetDB()
@@ -98,16 +92,16 @@ func (s *TaskController) TaskDelete(ctx *gin.Context) {
 	taskinfo := &dao.TaskInfo{Id: params.ID}
 	taskinfo, err := taskinfo.Find(ctx, tx, taskinfo)
 	if err != nil {
-		middleware.ResponseError(ctx, 30003, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskGetError, err))
 		return
 	}
 	if taskinfo.Id == 0 {
-		middleware.ResponseError(ctx, 30003, errors.New("任务不存在,请检查id是否正确"))
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskNodeFound, err))
 		return
 	}
 	taskinfo.IsDelete = 1
 	if err := taskinfo.Save(ctx, tx); err != nil {
-		middleware.ResponseError(ctx, 30004, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskUpdateError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, "删除成功")
@@ -116,7 +110,7 @@ func (s *TaskController) TaskDelete(ctx *gin.Context) {
 func (t *TaskController) TaskUpdate(c *gin.Context) {
 	params := &dto.TaskUpdateInput{}
 	if err := params.BindValidParams(c); err != nil {
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	tx := database.GetDB()
@@ -131,7 +125,7 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 	}
 	if err := taskinfo.Updates(c, tx); err != nil {
 		tx.Rollback()
-		middleware.ResponseError(c, 30002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskUpdateError, err))
 		return
 	}
 	ding := &dao.DingDatabase{
@@ -141,7 +135,7 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 		IsDingSend:      params.IsDingSend}
 	if err := ding.Updates(c, tx); err != nil {
 		tx.Rollback()
-		middleware.ResponseError(c, 30002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskUpdateError, err))
 		return
 	}
 
@@ -157,7 +151,7 @@ func (t *TaskController) TaskUpdate(c *gin.Context) {
 	}
 	if err := oss.Updates(c, tx); err != nil {
 		tx.Rollback()
-		middleware.ResponseError(c, 30002, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskUpdateError, err))
 		return
 	}
 	tx.Commit()
@@ -168,13 +162,13 @@ func (t *TaskController) TaskList(c *gin.Context) {
 	params := &dto.TaskListInput{}
 	if err := params.BindValidParams(c); err != nil {
 		log.Logger.Error(err)
-		middleware.ResponseError(c, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	out, err := t.service.GetTaskList(c, params)
 	if err != nil {
 		log.Logger.Error("获取任务列表失败", err)
-		middleware.ResponseError(c, 20001, err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.TaskGetError, err))
 		return
 	}
 	middleware.ResponseSuccess(c, out)
@@ -183,13 +177,13 @@ func (t *TaskController) TaskList(c *gin.Context) {
 func (s *TaskController) TaskDetail(ctx *gin.Context) {
 	params := &dto.TaskDeleteInput{}
 	if err := params.BindValidParams(ctx); err != nil {
-		middleware.ResponseError(ctx, public.ParamsBindErrorCode, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	detail, err := s.service.GetTaskDetail(ctx, params)
 	if err != nil {
 		log.Logger.Error("获取任务详情失败", err)
-		middleware.ResponseError(ctx, 20001, err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskGetError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, detail)
