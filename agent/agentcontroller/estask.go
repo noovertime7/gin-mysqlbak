@@ -38,9 +38,7 @@ func (e *EsTaskController) AddEsTask(ctx *gin.Context) {
 		options.Address = []string{addr}
 	}
 	data, err := EsTaskService.TaskAdd(ctx, &esbak.EsBakTaskADDInput{
-		EsHost:      params.Host,
-		EsUser:      params.User,
-		EsPassword:  params.Password,
+		HostID:      params.HostID,
 		BackupCycle: params.BackupCycle,
 		KeepNumber:  params.KeepNumber,
 	}, ops)
@@ -95,9 +93,7 @@ func (e *EsTaskController) UpdateEsTask(ctx *gin.Context) {
 	}
 	data, err := EsTaskService.TaskUpdate(ctx, &esbak.EsBakTaskUpdateInput{
 		ID:          params.ID,
-		EsHost:      params.Host,
-		EsUser:      params.User,
-		EsPassword:  params.Password,
+		HostID:      params.HostID,
 		BackupCycle: params.BackupCycle,
 		KeepNumber:  params.KeepNumber,
 	}, ops)

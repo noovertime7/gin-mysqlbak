@@ -41,6 +41,7 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 		UserName: params.User,
 		Password: params.Password,
 		Content:  params.Content,
+		Type:     params.Type,
 	}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent添加主机失败", err)
@@ -99,6 +100,7 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 		UserName: params.User,
 		Password: params.Password,
 		Content:  params.Content,
+		Type:     params.Type,
 	}, ops)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent更新主机失败", err)

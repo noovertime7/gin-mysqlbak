@@ -17,6 +17,7 @@ func EsHistoryRegister(group *gin.RouterGroup) {
 	esHistory := &EsHistoryController{}
 	group.DELETE("/historydelete", esHistory.DeleteEsHistory)
 	group.GET("/historylist", esHistory.GetEsHistoryList)
+	group.GET("/es_history_detail", esHistory.GetEsHistoryDetail)
 }
 
 func (e *EsHistoryController) DeleteEsHistory(ctx *gin.Context) {
@@ -42,6 +43,31 @@ func (e *EsHistoryController) DeleteEsHistory(ctx *gin.Context) {
 	}
 	middleware.ResponseSuccess(ctx, data.Message)
 	log.Logger.Info("es删除历史记录成功", data.Message)
+}
+
+func (e *EsHistoryController) GetEsHistoryDetail(ctx *gin.Context) {
+	params := &agentdto.EsHistoryIDInput{}
+	if err := params.BindValidParam(ctx); err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	EsHistoryService, addr, err := pkg.GetESHistoryService(params.ServiceName)
+	if err != nil {
+		log.Logger.Error("获取Agent地址失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
+		return
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+	data, err := EsHistoryService.GetEsHistoryDetail(ctx, &esbak.ESHistoryIDInput{ID: params.ID}, ops)
+	if err != nil {
+		log.Logger.Error("获取es_task历史详情失败")
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryGetError, err))
+		return
+	}
+	middleware.ResponseSuccess(ctx, data)
 }
 
 func (e *EsHistoryController) GetEsHistoryList(ctx *gin.Context) {

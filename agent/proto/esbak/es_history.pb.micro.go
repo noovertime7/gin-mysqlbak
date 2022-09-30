@@ -44,6 +44,7 @@ func NewEsHistoryServiceEndpoints() []*api.Endpoint {
 type EsHistoryService interface {
 	GetEsHistoryList(ctx context.Context, in *GetEsHistoryListInput, opts ...client.CallOption) (*ESHistoryListOutput, error)
 	DeleteESHistory(ctx context.Context, in *ESHistoryIDInput, opts ...client.CallOption) (*ESHistoryOneMessage, error)
+	GetEsHistoryDetail(ctx context.Context, in *ESHistoryIDInput, opts ...client.CallOption) (*EsHistoryDetailOut, error)
 }
 
 type esHistoryService struct {
@@ -78,17 +79,29 @@ func (c *esHistoryService) DeleteESHistory(ctx context.Context, in *ESHistoryIDI
 	return out, nil
 }
 
+func (c *esHistoryService) GetEsHistoryDetail(ctx context.Context, in *ESHistoryIDInput, opts ...client.CallOption) (*EsHistoryDetailOut, error) {
+	req := c.c.NewRequest(c.name, "EsHistoryService.GetEsHistoryDetail", in)
+	out := new(EsHistoryDetailOut)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for EsHistoryService service
 
 type EsHistoryServiceHandler interface {
 	GetEsHistoryList(context.Context, *GetEsHistoryListInput, *ESHistoryListOutput) error
 	DeleteESHistory(context.Context, *ESHistoryIDInput, *ESHistoryOneMessage) error
+	GetEsHistoryDetail(context.Context, *ESHistoryIDInput, *EsHistoryDetailOut) error
 }
 
 func RegisterEsHistoryServiceHandler(s server.Server, hdlr EsHistoryServiceHandler, opts ...server.HandlerOption) error {
 	type esHistoryService interface {
 		GetEsHistoryList(ctx context.Context, in *GetEsHistoryListInput, out *ESHistoryListOutput) error
 		DeleteESHistory(ctx context.Context, in *ESHistoryIDInput, out *ESHistoryOneMessage) error
+		GetEsHistoryDetail(ctx context.Context, in *ESHistoryIDInput, out *EsHistoryDetailOut) error
 	}
 	type EsHistoryService struct {
 		esHistoryService
@@ -107,4 +120,8 @@ func (h *esHistoryServiceHandler) GetEsHistoryList(ctx context.Context, in *GetE
 
 func (h *esHistoryServiceHandler) DeleteESHistory(ctx context.Context, in *ESHistoryIDInput, out *ESHistoryOneMessage) error {
 	return h.EsHistoryServiceHandler.DeleteESHistory(ctx, in, out)
+}
+
+func (h *esHistoryServiceHandler) GetEsHistoryDetail(ctx context.Context, in *ESHistoryIDInput, out *EsHistoryDetailOut) error {
+	return h.EsHistoryServiceHandler.GetEsHistoryDetail(ctx, in, out)
 }

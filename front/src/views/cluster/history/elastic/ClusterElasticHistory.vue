@@ -16,8 +16,15 @@
     <a-card
       style="margin-top: 24px"
       :bordered="false"
-      title="本地备份历史">
+      title="Es快照历史">
       <div slot="extra">
+        服务名：
+        <a-select v-model="select_service" style="width: 230px" @change="handleSelectChange">
+          <a-select-option :value="item.service_name" v-for="(item,key) in service_list" :key="key">
+            {{ item.service_name }}
+          </a-select-option>
+        </a-select>
+        &ensp;&ensp;
         <a-radio-group v-model="radioStatus" @change="handleRadioClick">
           <a-radio-button value="all">全部</a-radio-button>
           <a-radio-button value="success">成功</a-radio-button>
@@ -38,19 +45,7 @@
         <span slot="action" slot-scope="text, record">
           <a @click="deleteHistory(record)">删除</a>
           <a-divider type="vertical"/>
-          <a-dropdown>
-            <a class="ant-dropdown-link">
-              更多 <a-icon type="down"/>
-            </a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="handleDownLoad">下载文件</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="handleRestore">还原文件</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
+          <a @click="deleteHistory(record)">详情</a>
         </span>
         <p slot="expandedRowRender" slot-scope="record" style="margin: 0">
           备份文件：{{ record.file_name }}
@@ -63,7 +58,9 @@
 <script>
 import { STable } from '@/components'
 import Info from './components/Info'
-import { deleteLocalHistory, getHistoryNumInfo, getLocalHistoryList } from '@/api/bak'
+import { GetAgentNumInfo } from '@/api/agent-history'
+import { GetServiceList } from '@/api/agent'
+import { deleteEsHistory, getEsHistoryList } from '@/api/elastic'
 const statusMap = {
   0: {
     status: 'default',
@@ -93,40 +90,35 @@ export default {
         {
           title: 'ID',
           dataIndex: 'id',
-          sorter: true
+          sorter: true,
+          width: '80px'
         },
         {
           title: '应用主机',
-          dataIndex: 'host'
+          dataIndex: 'host',
+          width: '200px'
         },
         {
-          title: '库名',
-          dataIndex: 'db_name'
+          title: '快照名',
+          dataIndex: 'snapshot'
         },
         {
-          title: '文件大小',
-          dataIndex: 'file_size',
-          sorter: true,
-          customRender: (text) => text + ' KB'
+          title: '备份仓库',
+          dataIndex: 'repository'
         },
         {
           title: '备份状态',
-          dataIndex: 'message',
-          ellipsis: true
-        },
-        {
-          title: '存储状态',
-          dataIndex: 'oss_status',
+          dataIndex: 'status',
           scopedSlots: { customRender: 'status' }
         },
         {
-          title: '通知状态',
-          dataIndex: 'ding_status',
-          scopedSlots: { customRender: 'status' }
+          title: '备注',
+          dataIndex: 'message'
         },
         {
           title: '备份时间',
-          dataIndex: 'bak_time'
+          dataIndex: 'start_time',
+          width: '300px'
         },
         {
           title: '操作',
@@ -137,8 +129,11 @@ export default {
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        this.queryParam = { 'status': this.radioStatus, 'info': this.searchData }
-        return getLocalHistoryList(Object.assign(parameter, this.queryParam))
+        if (this.select_service === '') {
+          return
+        }
+        this.queryParam = { 'status': this.radioStatus, 'info': this.searchData, 'service_name': this.select_service }
+        return getEsHistoryList(Object.assign(parameter, this.queryParam))
           .then(res => {
             return res.data
           })
@@ -146,7 +141,10 @@ export default {
       // 数量信息
       week_nums: '',
       all_nums: '',
-      all_filesize: ''
+      all_filesize: '',
+      // 服务相关
+      service_list: [],
+      select_service: ''
     }
   },
   filters: {
@@ -158,18 +156,38 @@ export default {
     }
   },
   created () {
-    getHistoryNumInfo().then((res) => {
-      this.week_nums = res.data.week_nums.toString()
-      this.all_nums = res.data.all_nums.toString()
-      this.all_filesize = res.data.all_filesize
-    })
+    this.getServiceList()
   },
   methods: {
+    getMysqlHistoryNunInfo () {
+      const query = { 'service_name': this.select_service }
+      GetAgentNumInfo(query).then((res) => {
+        this.week_nums = res.data.week_nums.toString()
+        this.all_nums = res.data.all_nums.toString()
+        this.all_filesize = res.data.all_filesize
+      })
+    },
+    getServiceList () {
+      GetServiceList().then((res) => {
+        if (res.data.list.length === 0) {
+          this.$message.error('当前没有服务注册，页面加载失败!')
+        }
+        this.service_list = res.data.list
+        this.select_service = this.service_list[0].service_name
+        this.getMysqlHistoryNunInfo()
+        this.$refs.table.refresh(true)
+      })
+    },
+    handleSelectChange (value) {
+      this.getMysqlHistoryNunInfo()
+      this.$refs.table.refresh(true)
+    },
     deleteHistory (record) {
       const deleteQuery = {
-        'id': record.id
+        'id': record.id,
+        'service_name': this.select_service
       }
-      deleteLocalHistory(deleteQuery).then((res) => {
+      deleteEsHistory(deleteQuery).then((res) => {
         this.$message.success(res.data)
         this.$refs.table.refresh(true)
       })

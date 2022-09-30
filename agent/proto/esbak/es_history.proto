@@ -1,21 +1,22 @@
 syntax = "proto3";
 package go.micro.service.backupAgent;
-option go_package="./;esbak";
+option go_package = "./;esbak";
 
 
 
 service EsHistoryService {
   rpc GetEsHistoryList(GetEsHistoryListInput) returns (ESHistoryListOutput) {}
   rpc DeleteESHistory(ESHistoryIDInput) returns(ESHistoryOneMessage) {}
+  rpc GetEsHistoryDetail(ESHistoryIDInput) returns(EsHistoryDetailOut) {}
 }
 
 message GetEsHistoryListInput {
-  string Info =1 ;
-  int64 PageNo =2;
-  int64 PageSize =3 ;
+  string Info = 1 ;
+  int64 PageNo = 2;
+  int64 PageSize = 3 ;
   string SortField = 5;
   string SortOrder = 6;
-  string Status =7;
+  string Status = 7;
 }
 
 
@@ -24,15 +25,15 @@ message ESHistoryIDInput{
 }
 
 message ESHistoryOneMessage {
-  string Message  =1;
-  bool OK =2;
+  string Message = 1;
+  bool OK = 2;
 }
 
 message ESHistoryListOutput {
   // @inject_tag: json:"total"
-  int64 Total =1;
+  int64 Total = 1;
   // @inject_tag: json:"list"
-  repeated ESHistoryListOutItem esHistoryListOutItem =2 ;
+  repeated ESHistoryListOutItem esHistoryListOutItem = 2 ;
   // @inject_tag: json:"page_no"
   int64 PageNo = 3;
   // @inject_tag: json:"page_size"
@@ -41,27 +42,61 @@ message ESHistoryListOutput {
 
 message ESHistoryListOutItem {
   // @inject_tag: json:"id"
-  int64 ID =1 ;
+  int64 ID = 1 ;
   // @inject_tag: json:"task_id"
-  int64 TaskID =9;
+  int64 TaskID = 9;
   // @inject_tag: json:"uuid"
-  string UUID =10;
+  string UUID = 10;
   // @inject_tag: json:"duration_in_millis"
-  int64 DurationInMillis =11;
+  int64 DurationInMillis = 11;
   // @inject_tag: json:"host"
-  string Host =12;
+  string Host = 12;
   // @inject_tag: json:"snapshot"
-  string Snapshot =2;
+  string Snapshot = 2;
   // @inject_tag: json:"repository"
-  string Repository =3;
+  string Repository = 3;
   // @inject_tag: json:"indices"
-  string Indices =4;
+  string Indices = 4;
   // @inject_tag: json:"state"
-  string State =5;
+  string State = 5;
   // @inject_tag: json:"start_time"
-  string StartTime =6;
+  string StartTime = 6;
   // @inject_tag: json:"end_time"
-  string  EndTime =7;
+  string  EndTime = 7;
   // @inject_tag: json:"message"
-  string Message =8;
+  string Message = 8;
+  // @inject_tag: json:"status"
+  int64 Status = 13;
+}
+
+
+message EsHostDetail {
+  // @inject_tag: json:"host_id"
+  int64 HostID = 4;
+  // @inject_tag: json:"host"
+  string Host = 1;
+  // @inject_tag: json:"create_at"
+  string CreateAt = 2;
+  // @inject_tag: json:"update_at"
+  string UpdateAt = 3;
+}
+
+message ESTaskDetail {
+  // @inject_tag: json:"backup_cycle"
+  string BackupCycle = 1;
+  // @inject_tag: json:"keep_number"
+  int64 KeepNumber = 2;
+  // @inject_tag: json:"status"
+  bool Status = 3;
+  // @inject_tag: json:"create_at"
+  string CreateAt = 4;
+}
+
+message EsHistoryDetailOut {
+  // @inject_tag: json:"es_host_detail"
+  EsHostDetail EsHostDetail = 1;
+  // @inject_tag: json:"es_task_detail"
+  ESTaskDetail ESTaskDetail = 2;
+  // @inject_tag: json:"es_history_detail"
+  ESHistoryListOutItem  EsHistoryDetail = 3 ;
 }

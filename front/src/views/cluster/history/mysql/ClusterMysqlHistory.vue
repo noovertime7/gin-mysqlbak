@@ -16,21 +16,20 @@
     <a-card
       style="margin-top: 24px"
       :bordered="false"
-      title="本地备份历史">
+      title="Mysql备份历史">
       <div slot="extra">
         服务名：
-        <a-radio-group v-model="radioStatus" @change="handleRadioClick">
-          <a-radio-button value="all">全部</a-radio-button>
-          <a-radio-button value="success">成功</a-radio-button>
-          <a-radio-button value="fail">失败</a-radio-button>
-        </a-radio-group>
-        &ensp;
-        &ensp;
         <a-select v-model="select_service" style="width: 230px" @change="handleSelectChange">
           <a-select-option :value="item.service_name" v-for="(item,key) in service_list" :key="key">
             {{ item.service_name }}
           </a-select-option>
         </a-select>
+        &ensp;&ensp;
+        <a-radio-group v-model="radioStatus" @change="handleRadioClick">
+          <a-radio-button value="all">全部</a-radio-button>
+          <a-radio-button value="success">成功</a-radio-button>
+          <a-radio-button value="fail">失败</a-radio-button>
+        </a-radio-group>
         <a-input-search @search="handlerSearch" v-model="searchData" style="margin-left: 16px; width: 272px;" placeholder="主机名/库名"/>
       </div>
       <s-table

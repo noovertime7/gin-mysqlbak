@@ -12,6 +12,7 @@ type HostAddInput struct {
 	User        string `form:"username" json:"username" comment:"用户"   validate:"required" example:"123456"`
 	Content     string `form:"content" json:"content" comment:"备注"   validate:"" example:"123456"`
 	Password    string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
+	Type        int64  `form:"type" json:"type"  validate:"required"`
 }
 
 func (d *HostAddInput) BindValidParams(ctx *gin.Context) error {
@@ -36,6 +37,7 @@ type HostUpdateInput struct {
 	User        string `form:"username" json:"username" comment:"用户"   validate:"required" example:"123456"`
 	Content     string `form:"content" json:"content" comment:"备注"   validate:"" example:"123456"`
 	Password    string `form:"password" json:"password" comment:"数据库密码"   validate:"required" example:"123456"`
+	Type        int64  `form:"type" json:"type"  validate:"required"`
 }
 
 func (d *HostUpdateInput) BindValidParams(ctx *gin.Context) error {

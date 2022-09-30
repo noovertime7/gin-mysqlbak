@@ -7,9 +7,7 @@ import (
 
 type ESBakTaskAddInput struct {
 	ServiceName string `json:"service_name" form:"service_name" comment:"服务名"  validate:"required"`
-	Host        string `json:"host" form:"host" comment:"主机"  validate:"required"`
-	User        string `json:"user" form:"user" comment:"用户名"  validate:"required"`
-	Password    string `json:"password" form:"password" comment:"密码"  validate:"required"`
+	HostID      int64  `json:"host_id" form:"host_id" comment:"host_id"  validate:"required"`
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle" comment:"备份周期"  validate:"required"`
 	KeepNumber  int64  `json:"keep_number" form:"keep_number" comment:"保存时间"  validate:""`
 }
@@ -17,9 +15,7 @@ type ESBakTaskAddInput struct {
 type ESBakTaskUpdateInput struct {
 	ID          int64  `json:"id" form:"id" comment:"ID"  validate:"required"`
 	ServiceName string `json:"service_name" form:"service_name" comment:"服务名"  validate:"required"`
-	Host        string `json:"host" form:"host" comment:"主机"  validate:"required"`
-	User        string `json:"user" form:"user" comment:"用户名"  validate:"required"`
-	Password    string `json:"password" form:"password" comment:"密码"  validate:"required"`
+	HostID      int64  `json:"host_id" form:"host_id" comment:"host_id"  validate:"required"`
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle" comment:"备份周期"  validate:"required"`
 	KeepNumber  int64  `json:"keep_number" form:"keep_number" comment:"保存时间"  validate:""`
 }

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package go.micro.service.backupAgent;
-option go_package="./;EsBak";
+option go_package = "./;esbak";
 
 
 service  EsService {
@@ -12,20 +12,16 @@ service  EsService {
 }
 
 message EsBakTaskADDInput {
- string EsHost =1 ;
- string EsUser =2;
- string EsPassword = 3;
- string BackupCycle =4;
- int64 KeepNumber =5;
+  int64 HostID = 1;
+  string BackupCycle = 2;
+  int64 KeepNumber = 3;
 }
 
 message EsBakTaskUpdateInput {
-  int64 ID = 9;
-  string EsHost =1 ;
-  string EsUser =2;
-  string EsPassword = 3;
-  string BackupCycle =4;
-  int64 KeepNumber =5;
+  int64 ID = 1;
+  int64 HostID = 2;
+  string BackupCycle = 3;
+  int64 KeepNumber = 4;
 }
 
 
@@ -34,42 +30,55 @@ message EsTaskIDInput {
 }
 
 message EsOneMessage {
-  string Message  =1;
-  bool OK =2;
+  string Message = 1;
+  bool OK = 2;
 }
 
 message EsTaskListInput {
-  string Info =1 ;
-  int64 PageNo =2;
-  int64 PageSize =3 ;
+  int64 HostID = 1;
+  string Info = 2 ;
+  int64 PageNo = 3;
+  int64 PageSize = 4 ;
 }
 
 
 message EsTaskListOutPut {
-  int64 Total =1;
-  repeated EsTaskListOutPutItem esTaskListOutPutItem =2;
+  // @inject_tag: json:"total"
+  int64 Total = 1;
+  // @inject_tag: json:"list"
+  repeated EsTaskListOutPutItem esTaskListOutPutItem = 2;
+  // @inject_tag: json:"page_no"
+  int64 PageNo = 3;
+  // @inject_tag: json:"page_size"
+  int64 PageSize = 4 ;
 }
 
 message EsTaskListOutPutItem {
+  // @inject_tag: json:"id"
   int64 ID = 1;
-  string EsHost =2 ;
-  string BackupCycle =5;
-  int64 KeepNumber =6;
-  bool Status =7;
-  string CreateAt =8;
+  // @inject_tag: json:"es_host"
+  string EsHost = 2 ;
+  // @inject_tag: json:"backup_cycle"
+  string BackupCycle = 5;
+  // @inject_tag: json:"keep_number"
+  int64 KeepNumber = 6;
+  // @inject_tag: json:"status"
+  bool Status = 7;
+  // @inject_tag: json:"create_at"
+  string CreateAt = 8;
 }
 
 message EsTaskDetailOutPut {
-    EsTaskInfo esTaskInfo =1;
+  EsTaskInfo esTaskInfo = 1;
 }
 
 
 message EsTaskInfo {
-  string EsHost =1 ;
-  string EsUser =2;
+  string EsHost = 1 ;
+  string EsUser = 2;
   string EsPassword = 3;
-  string BackupCycle =4;
-  int64 KeepNumber =5;
-  bool Status =7;
-  string CreateAt =8;
+  string BackupCycle = 4;
+  int64 KeepNumber = 5;
+  bool Status = 7;
+  string CreateAt = 8;
 }

@@ -27,7 +27,6 @@ type TaskService struct{}
 
 // GetTaskList 获取任务列表
 func (t *TaskService) GetTaskList(ctx *gin.Context, info *dto.TaskListInput) (*dto.TaskListOutput, error) {
-	return nil, errors.New("测试测试")
 	tx := database.GetDB()
 	taskDB := &dao.TaskInfo{}
 	list, total, err := taskDB.PageList(ctx, tx, info)
