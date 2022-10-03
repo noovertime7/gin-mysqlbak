@@ -101,40 +101,48 @@ export default {
         {
           title: 'ID',
           dataIndex: 'id',
-          sorter: true
+          sorter: true,
+          align: 'center'
         },
         {
           title: '应用主机',
-          dataIndex: 'host'
+          dataIndex: 'host',
+          align: 'center'
         },
         {
           title: '库名',
-          dataIndex: 'db_name'
+          dataIndex: 'db_name',
+          align: 'center'
         },
         {
           title: '文件大小',
           dataIndex: 'file_size',
           sorter: true,
-          customRender: (text) => text + ' KB'
+          customRender: (text) => text + ' KB',
+          align: 'center'
         },
         {
           title: '备份状态',
           dataIndex: 'message',
-          ellipsis: true
+          ellipsis: true,
+          align: 'center'
         },
         {
           title: '存储状态',
           dataIndex: 'oss_status',
-          scopedSlots: { customRender: 'status' }
+          scopedSlots: { customRender: 'status' },
+          align: 'center'
         },
         {
           title: '通知状态',
           dataIndex: 'ding_status',
-          scopedSlots: { customRender: 'status' }
+          scopedSlots: { customRender: 'status' },
+          align: 'center'
         },
         {
           title: '备份时间',
-          dataIndex: 'bak_time'
+          dataIndex: 'bak_time',
+          align: 'center'
         },
         {
           title: '操作',
