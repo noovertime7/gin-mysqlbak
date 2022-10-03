@@ -74,43 +74,52 @@ export default {
       columns: [
         {
           title: '服务名',
-          dataIndex: 'service_name'
+          dataIndex: 'service_name',
+          align: 'center'
         },
         {
           title: '地址',
-          dataIndex: 'address'
+          dataIndex: 'address',
+          align: 'center'
         },
         {
           title: '任务数',
           dataIndex: 'task_num',
-          customRender: (text) => text + ' 个'
+          customRender: (text) => text + ' 个',
+          align: 'center'
         },
         {
           title: '完成数',
           dataIndex: 'finish_num',
-          customRender: (text) => text + ' 个'
+          customRender: (text) => text + ' 个',
+          align: 'center'
         },
         {
           title: '上次注册时间',
-          dataIndex: 'last_time'
+          dataIndex: 'last_time',
+          align: 'center'
         },
         {
           title: '创建时间',
-          dataIndex: 'create_at'
+          dataIndex: 'create_at',
+          align: 'center'
         },
         {
           title: '状态',
           dataIndex: 'agent_status',
-          scopedSlots: { customRender: 'status' }
+          scopedSlots: { customRender: 'status' },
+          align: 'center'
         },
         {
           title: '备注',
-          dataIndex: 'content'
+          dataIndex: 'content',
+          align: 'center'
         },
         {
           title: '操作',
           dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
+          scopedSlots: { customRender: 'action' },
+          align: 'center'
         }
       ],
       // 任务数信息相关
