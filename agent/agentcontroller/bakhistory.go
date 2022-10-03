@@ -27,7 +27,6 @@ func (b *BakHistoryController) HistoryList(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-
 	historyService, addr, err := pkg.GetHistoryService(params.ServiceName)
 	if err != nil {
 		log.Logger.Error("获取Agent地址失败", err)

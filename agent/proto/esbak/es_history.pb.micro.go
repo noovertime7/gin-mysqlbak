@@ -45,6 +45,7 @@ type EsHistoryService interface {
 	GetEsHistoryList(ctx context.Context, in *GetEsHistoryListInput, opts ...client.CallOption) (*ESHistoryListOutput, error)
 	DeleteESHistory(ctx context.Context, in *ESHistoryIDInput, opts ...client.CallOption) (*ESHistoryOneMessage, error)
 	GetEsHistoryDetail(ctx context.Context, in *ESHistoryIDInput, opts ...client.CallOption) (*EsHistoryDetailOut, error)
+	GetEsHistoryNumInfo(ctx context.Context, in *EsHistoryEmpty, opts ...client.CallOption) (*EsHistoryNumInfoOut, error)
 }
 
 type esHistoryService struct {
@@ -89,12 +90,23 @@ func (c *esHistoryService) GetEsHistoryDetail(ctx context.Context, in *ESHistory
 	return out, nil
 }
 
+func (c *esHistoryService) GetEsHistoryNumInfo(ctx context.Context, in *EsHistoryEmpty, opts ...client.CallOption) (*EsHistoryNumInfoOut, error) {
+	req := c.c.NewRequest(c.name, "EsHistoryService.GetEsHistoryNumInfo", in)
+	out := new(EsHistoryNumInfoOut)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for EsHistoryService service
 
 type EsHistoryServiceHandler interface {
 	GetEsHistoryList(context.Context, *GetEsHistoryListInput, *ESHistoryListOutput) error
 	DeleteESHistory(context.Context, *ESHistoryIDInput, *ESHistoryOneMessage) error
 	GetEsHistoryDetail(context.Context, *ESHistoryIDInput, *EsHistoryDetailOut) error
+	GetEsHistoryNumInfo(context.Context, *EsHistoryEmpty, *EsHistoryNumInfoOut) error
 }
 
 func RegisterEsHistoryServiceHandler(s server.Server, hdlr EsHistoryServiceHandler, opts ...server.HandlerOption) error {
@@ -102,6 +114,7 @@ func RegisterEsHistoryServiceHandler(s server.Server, hdlr EsHistoryServiceHandl
 		GetEsHistoryList(ctx context.Context, in *GetEsHistoryListInput, out *ESHistoryListOutput) error
 		DeleteESHistory(ctx context.Context, in *ESHistoryIDInput, out *ESHistoryOneMessage) error
 		GetEsHistoryDetail(ctx context.Context, in *ESHistoryIDInput, out *EsHistoryDetailOut) error
+		GetEsHistoryNumInfo(ctx context.Context, in *EsHistoryEmpty, out *EsHistoryNumInfoOut) error
 	}
 	type EsHistoryService struct {
 		esHistoryService
@@ -124,4 +137,8 @@ func (h *esHistoryServiceHandler) DeleteESHistory(ctx context.Context, in *ESHis
 
 func (h *esHistoryServiceHandler) GetEsHistoryDetail(ctx context.Context, in *ESHistoryIDInput, out *EsHistoryDetailOut) error {
 	return h.EsHistoryServiceHandler.GetEsHistoryDetail(ctx, in, out)
+}
+
+func (h *esHistoryServiceHandler) GetEsHistoryNumInfo(ctx context.Context, in *EsHistoryEmpty, out *EsHistoryNumInfoOut) error {
+	return h.EsHistoryServiceHandler.GetEsHistoryNumInfo(ctx, in, out)
 }

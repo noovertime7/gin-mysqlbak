@@ -10,6 +10,10 @@ type EsHistoryIDInput struct {
 	ID          int64  `json:"id" form:"id" validate:"required"`
 }
 
+type EsHistorySvcName struct {
+	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"test.local"`
+}
+
 type ESHistoryListInput struct {
 	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"test.local"`
 	Info        string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
@@ -25,5 +29,9 @@ func (d *ESHistoryListInput) BindValidParam(ctx *gin.Context) error {
 }
 
 func (d *EsHistoryIDInput) BindValidParam(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
+}
+
+func (d *EsHistorySvcName) BindValidParam(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }

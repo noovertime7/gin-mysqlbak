@@ -228,6 +228,13 @@ export const asyncRouterMap = [
             name: '历史记录',
             component: () => import('@/views/cluster/history/model'),
             meta: { title: '备份历史', permission: ['cluster'] }
+          },
+          {
+            path: '/cluster/history/detail/:id(\\d+)/:service_name',
+            name: '详情',
+            hidden: true,
+            component: () => import('@/views/cluster/history/elastic/detail/esHistoryDetail'),
+            meta: { title: '详情', permission: ['cluster'] }
           }
         ]
       },
@@ -327,12 +334,12 @@ export const asyncRouterMap = [
         ]
       }
     ]
-  },
-  {
-    path: '*',
-    redirect: '/404',
-    hidden: true
   }
+  // {
+  //   path: '*',
+  //   redirect: '/404',
+  //   hidden: true
+  // }
 ]
 
 /**

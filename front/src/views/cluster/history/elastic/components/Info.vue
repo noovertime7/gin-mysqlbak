@@ -1,7 +1,7 @@
 <template>
   <div class="header-info">
-    <span>{{ title }}</span>
-    <p>{{ value }}</p>
+    <span >{{ title }}</span>
+    <p :class="{'frontColor':redColor}">{{ value }}</p>
     <em v-if="bordered" />
   </div>
 </template>
@@ -19,6 +19,10 @@ export default {
       default: ''
     },
     bordered: {
+      type: Boolean,
+      default: false
+    },
+    redColor: {
       type: Boolean,
       default: false
     }
@@ -52,6 +56,9 @@ export default {
     width: 1px;
     height: 56px;
     background-color: @border-color-split;
+  }
+  .frontColor {
+    color: red;
   }
 }
 </style>

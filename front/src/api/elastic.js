@@ -71,3 +71,19 @@ export function deleteEsHistory (query) {
     params: query
   })
 }
+
+export function getEsHistoryInfo (query) {
+  return request({
+    url: 'agent/es/es_history_num_info',
+    method: 'get',
+    params: query
+  })
+}
+
+export function getEsHistoryDetail (query) {
+  return request({
+    url: 'agent/es/es_history_detail',
+    method: 'get',
+    params: query
+  })
+}

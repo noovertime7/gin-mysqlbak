@@ -18,6 +18,7 @@ func EsHistoryRegister(group *gin.RouterGroup) {
 	group.DELETE("/historydelete", esHistory.DeleteEsHistory)
 	group.GET("/historylist", esHistory.GetEsHistoryList)
 	group.GET("/es_history_detail", esHistory.GetEsHistoryDetail)
+	group.GET("/es_history_num_info", esHistory.GetEsHistoryNumInfo)
 }
 
 func (e *EsHistoryController) DeleteEsHistory(ctx *gin.Context) {
@@ -63,7 +64,7 @@ func (e *EsHistoryController) GetEsHistoryDetail(ctx *gin.Context) {
 	}
 	data, err := EsHistoryService.GetEsHistoryDetail(ctx, &esbak.ESHistoryIDInput{ID: params.ID}, ops)
 	if err != nil {
-		log.Logger.Error("获取es_task历史详情失败")
+		log.Logger.Error("获取es_task历史详情失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryGetError, err))
 		return
 	}
@@ -94,7 +95,31 @@ func (e *EsHistoryController) GetEsHistoryList(ctx *gin.Context) {
 		Status:    params.Status,
 	}, ops)
 	if err != nil {
-		log.Logger.Error("获取es_task历史记录失败")
+		log.Logger.Error("获取es_task历史记录失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryGetError, err))
+		return
+	}
+	middleware.ResponseSuccess(ctx, data)
+}
+
+func (e *EsHistoryController) GetEsHistoryNumInfo(ctx *gin.Context) {
+	params := &agentdto.EsHistorySvcName{}
+	if err := params.BindValidParam(ctx); err != nil {
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	EsHistoryService, addr, err := pkg.GetESHistoryService(params.ServiceName)
+	if err != nil {
+		log.Logger.Error("获取Agent地址失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
+		return
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+	data, err := EsHistoryService.GetEsHistoryNumInfo(ctx, &esbak.EsHistoryEmpty{}, ops)
+	if err != nil {
+		log.Logger.Error("获取es_task历史记录失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryGetError, err))
 		return
 	}

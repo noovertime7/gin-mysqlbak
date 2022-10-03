@@ -8,7 +8,10 @@ service EsHistoryService {
   rpc GetEsHistoryList(GetEsHistoryListInput) returns (ESHistoryListOutput) {}
   rpc DeleteESHistory(ESHistoryIDInput) returns(ESHistoryOneMessage) {}
   rpc GetEsHistoryDetail(ESHistoryIDInput) returns(EsHistoryDetailOut) {}
+  rpc GetEsHistoryNumInfo(EsHistoryEmpty) returns (EsHistoryNumInfoOut) {}
 }
+
+message EsHistoryEmpty {}
 
 message GetEsHistoryListInput {
   string Info = 1 ;
@@ -69,7 +72,19 @@ message ESHistoryListOutItem {
   int64 Status = 13;
 }
 
+// 获取历史记录顶部数量信息
+message  EsHistoryNumInfoOut {
+  // @inject_tag: json:"all_nums"
+  int64 AllNums = 1;
+  // @inject_tag: json:"week_nums"
+  int64 WeekNums = 2;
+  // @inject_tag: json:"fail_nums"
+  int64 FailNums = 3;
+}
 
+
+
+// 查看历史记录详情
 message EsHostDetail {
   // @inject_tag: json:"host_id"
   int64 HostID = 4;
@@ -79,6 +94,8 @@ message EsHostDetail {
   string CreateAt = 2;
   // @inject_tag: json:"update_at"
   string UpdateAt = 3;
+  // @inject_tag: json:"status"
+  int64 Status = 5;
 }
 
 message ESTaskDetail {
@@ -87,7 +104,7 @@ message ESTaskDetail {
   // @inject_tag: json:"keep_number"
   int64 KeepNumber = 2;
   // @inject_tag: json:"status"
-  bool Status = 3;
+  int64 Status = 3;
   // @inject_tag: json:"create_at"
   string CreateAt = 4;
 }

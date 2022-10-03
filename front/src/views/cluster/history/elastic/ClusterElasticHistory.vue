@@ -9,7 +9,7 @@
           <info title="本周完成任务数" :value="week_nums" :bordered="true" />
         </a-col>
         <a-col :sm="8" :xs="24">
-          <info title="备份文件大小" :value="all_filesize" />
+          <info title="失败任务数" :value="fail_nums" :redColor="fail_nums !== '0'" />
         </a-col>
       </a-row>
     </a-card>
@@ -45,10 +45,10 @@
         <span slot="action" slot-scope="text, record">
           <a @click="deleteHistory(record)">删除</a>
           <a-divider type="vertical"/>
-          <a @click="deleteHistory(record)">详情</a>
+          <a @click="handleDetail(record)">详情</a>
         </span>
         <p slot="expandedRowRender" slot-scope="record" style="margin: 0">
-          备份文件：{{ record.file_name }}
+          UUID: {{ record.uuid }}
         </p>
       </s-table>
     </a-card>
@@ -58,9 +58,8 @@
 <script>
 import { STable } from '@/components'
 import Info from './components/Info'
-import { GetAgentNumInfo } from '@/api/agent-history'
 import { GetServiceList } from '@/api/agent'
-import { deleteEsHistory, getEsHistoryList } from '@/api/elastic'
+import { deleteEsHistory, getEsHistoryInfo, getEsHistoryList } from '@/api/elastic'
 const statusMap = {
   0: {
     status: 'default',
@@ -91,40 +90,48 @@ export default {
           title: 'ID',
           dataIndex: 'id',
           sorter: true,
-          width: '80px'
+          width: '80px',
+          align: 'center'
         },
         {
           title: '应用主机',
           dataIndex: 'host',
-          width: '200px'
-        },
-        {
-          title: '快照名',
-          dataIndex: 'snapshot'
+          width: '200px',
+          align: 'center'
         },
         {
           title: '备份仓库',
-          dataIndex: 'repository'
+          dataIndex: 'repository',
+          align: 'center'
+        },
+        {
+          title: '快照名',
+          dataIndex: 'snapshot',
+          align: 'center'
         },
         {
           title: '备份状态',
           dataIndex: 'status',
-          scopedSlots: { customRender: 'status' }
+          scopedSlots: { customRender: 'status' },
+          align: 'center'
         },
         {
           title: '备注',
-          dataIndex: 'message'
+          dataIndex: 'message',
+          align: 'center'
         },
         {
           title: '备份时间',
           dataIndex: 'start_time',
-          width: '300px'
+          width: '250px',
+          align: 'center'
         },
         {
           title: '操作',
           width: '150px',
           dataIndex: 'action',
-          scopedSlots: { customRender: 'action' }
+          scopedSlots: { customRender: 'action' },
+          align: 'center'
         }
       ],
       // 加载数据方法 必须为 Promise 对象
@@ -141,7 +148,7 @@ export default {
       // 数量信息
       week_nums: '',
       all_nums: '',
-      all_filesize: '',
+      fail_nums: '',
       // 服务相关
       service_list: [],
       select_service: ''
@@ -161,10 +168,11 @@ export default {
   methods: {
     getMysqlHistoryNunInfo () {
       const query = { 'service_name': this.select_service }
-      GetAgentNumInfo(query).then((res) => {
+      getEsHistoryInfo(query).then((res) => {
         this.week_nums = res.data.week_nums.toString()
         this.all_nums = res.data.all_nums.toString()
-        this.all_filesize = res.data.all_filesize
+        this.fail_nums = res.data.fail_nums.toString()
+        this.$refs.table.refresh(true)
       })
     },
     getServiceList () {
@@ -175,12 +183,14 @@ export default {
         this.service_list = res.data.list
         this.select_service = this.service_list[0].service_name
         this.getMysqlHistoryNunInfo()
-        this.$refs.table.refresh(true)
       })
     },
     handleSelectChange (value) {
       this.getMysqlHistoryNunInfo()
       this.$refs.table.refresh(true)
+    },
+    handleDetail (value) {
+      this.$router.push('/cluster/history/detail/' + value.id + '/' + this.select_service)
     },
     deleteHistory (record) {
       const deleteQuery = {
