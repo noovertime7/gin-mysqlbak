@@ -81,6 +81,15 @@ type TaskDeleteInput struct {
 	ID          int64  `json:"id" form:"id" validate:"required"`
 }
 
+type TaskIDInput struct {
+	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
+	ID          int64  `json:"id" form:"id" validate:"required"`
+}
+
+func (d *TaskIDInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
+}
+
 func (d *TaskDeleteInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
