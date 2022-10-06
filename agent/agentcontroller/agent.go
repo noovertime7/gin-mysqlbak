@@ -3,7 +3,7 @@ package agentcontroller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
-	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
+	"github.com/noovertime7/gin-mysqlbak/agent/repository"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
@@ -13,7 +13,7 @@ import (
 type AgentController struct {
 }
 
-var AgentService *agentservice.AgentService
+var AgentService *repository.AgentService
 
 func AgentRegister(group *gin.RouterGroup) {
 	agent := &AgentController{}

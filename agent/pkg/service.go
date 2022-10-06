@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"github.com/micro/go-micro/v2"
 	"github.com/micro/go-plugins/wrapper/trace/opentracing/v2"
-	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/agent/pkg/trace"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/bak"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/bakhistory"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/esbak"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/host"
 	"github.com/noovertime7/gin-mysqlbak/agent/proto/task"
+	"github.com/noovertime7/gin-mysqlbak/agent/repository"
 	"github.com/noovertime7/gin-mysqlbak/conf"
 	"log"
 )
@@ -20,7 +20,7 @@ var s micro.Service
 
 var JaegerAddr = conf.GetStringConf("jaeger", "addr")
 
-var AgentService *agentservice.AgentService
+var AgentService *repository.AgentService
 
 func GetHostService(serviceName string) (host.HostService, string, error) {
 	//配置jaeger连接
