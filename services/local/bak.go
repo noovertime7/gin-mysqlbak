@@ -25,7 +25,6 @@ func GetBakBakService() *bakBakService {
 }
 
 type bakBakService struct {
-	AfterBakChan chan *core.BakHandler
 }
 
 func (bak *bakBakService) Start(c *gin.Context, info *dto.Bak) error {
@@ -35,7 +34,6 @@ func (bak *bakBakService) Start(c *gin.Context, info *dto.Bak) error {
 	if err != nil {
 		return err
 	}
-	bak.AfterBakChan = make(chan *core.BakHandler, 10)
 	bakHandler, err := core.NewBakHandler(taskDetail)
 	if err != nil {
 		return err
