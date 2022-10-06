@@ -5,9 +5,11 @@ option go_package = "./;host";
 
 service Host {
   rpc AddHost(HostAddInput) returns (HostOneMessage) {}
-  rpc DeleteHost(HostDeleteInput) returns (HostOneMessage) {}
+  rpc DeleteHost(HostIDInput) returns (HostOneMessage) {}
   rpc UpdateHost(HostUpdateInput) returns (HostOneMessage) {}
   rpc GetHostList(HostListInput) returns (HostListOutPut) {}
+  rpc TestHost(HostIDInput) returns (HostOneMessage) {}
+  rpc GetHostNames(HostNamesInput) returns (HostNames) {}
 }
 
 
@@ -25,8 +27,7 @@ message HostAddInput{
 }
 
 
-
-message HostDeleteInput {
+message HostIDInput {
   // @inject_tag: json:"id" form:"id" uri:"id"
   int64 ID = 1 ;
 }
@@ -47,52 +48,71 @@ message HostUpdateInput{
 }
 
 message ListItem {
-  // @inject_tag: json:"id" form:"info" uri:"info"
+  // @inject_tag: json:"id"
   int64 ID = 3 ;
-  // @inject_tag: json:"host" form:"host" uri:"host"
+  // @inject_tag: json:"host"
   string Host = 4 ;
-  // @inject_tag: json:"username" form:"username" uri:"username"
+  // @inject_tag: json:"username"
   string UserName = 5 ;
-  // @inject_tag: json:"password" form:"password" uri:"password"
+  // @inject_tag: json:"password"
   string Password = 6 ;
-  // @inject_tag: json:"host_status" form:"host_status" uri:"host_status"
+  // @inject_tag: json:"host_status"
   int64 HostStatus = 7 ;
-  // @inject_tag: json:"content" form:"content" uri:"content"
+  // @inject_tag: json:"content"
   string Content = 8 ;
-  // @inject_tag: json:"task_num" form:"task_num" uri:"task_num"
+  // @inject_tag: json:"task_num"
   int64  TaskNum = 9;
-  // @inject_tag: json:"type" form:"type" uri:"type"
+  // @inject_tag: json:"type"
   int64 Type = 10;
-  // @inject_tag: json:"type" form:"type" uri:"create_at"
+  // @inject_tag: json:"create_at"
   string CreateAt = 11;
-  // @inject_tag: json:"type" form:"type" uri:"update_at"
+  // @inject_tag: json:"update_at"
   string  UpdateAt = 12;
 }
 
+message HostNamesInput {
+  int64  Type =1;
+}
+
+message HostNames {
+  // @inject_tag: json:"list"
+  repeated HostNameInfo HostNameInfo =1;
+}
+
+message HostNameInfo {
+  // @inject_tag: json:"host_id"
+  int64 HostID  =1;
+  // @inject_tag: json:"host"
+  string Host =2;
+}
 
 
 message HostOneMessage {
-  // @inject_tag: json:"message" form:"message" uri:"message"
+  // @inject_tag: json:"message"
   string Message = 1;
-  // @inject_tag: json:"content" form:"content" uri:"content"
+  // @inject_tag: json:"content"
   bool OK = 2;
 }
 
 
 message HostListInput {
-  // @inject_tag: json:"info" form:"info" uri:"info"
+  // @inject_tag: json:"info"
   string Info = 1 ;
-  // @inject_tag: json:"page_no" form:"page_no" uri:"page_no"
+  // @inject_tag: json:"page_no"
   int64 PageNo = 2;
-  // @inject_tag: json:"page_size" form:"page_size" uri:"page_size"
+  // @inject_tag: json:"page_size"
   int64 PageSize = 3 ;
 }
 
 message HostListOutPut {
-  // @inject_tag: json:"total" form:"total" uri:"total"
+  // @inject_tag: json:"total"
   int64 Total = 1 ;
-  // @inject_tag: json:"list_item" form:"list_item" uri:"list_item"
+  // @inject_tag: json:"list"
   repeated ListItem listItem = 2 ;
+  // @inject_tag: json:"page_no"
+  int64 PageNo = 3;
+  // @inject_tag: json:"page_size"
+  int64 PageSize = 4 ;
 }
 
 

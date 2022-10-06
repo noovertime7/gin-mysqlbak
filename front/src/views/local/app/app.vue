@@ -17,7 +17,7 @@
         <a-list-item :key="index" v-for="(item, index) in data">
           <a-list-item-meta :description="item.content">
             <a-avatar slot="avatar" size="large" shape="square" :src="item.avatar"/>
-            <a slot="title">{{ item.host }}</a>
+            <a slot="title" @click="handleTaskList(item)">{{ item.host }}</a>
           </a-list-item-meta>
           <div slot="actions">
             <a @click="edit(item)">编辑</a>
@@ -150,6 +150,7 @@ export default {
           on: {
             ok: () => {
               return new Promise((resolve, reject) => {
+                self.getListData()
                 self.getListData()
                 resolve()
               })

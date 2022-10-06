@@ -224,6 +224,20 @@ export const asyncRouterMap = [
             meta: { title: '服务列表', permission: ['cluster'] }
           },
           {
+            path: '/cluster/app',
+            name: '集群应用',
+            component: () => import('@/views/cluster/app/appList'),
+            meta: { title: '应用管理', permission: ['cluster'] }
+          },
+          {
+            path: '/cluster/app/task-list/:service_name',
+            hidden: true,
+            name: '集群任务列表',
+            hideChildrenInMenu: true, // 强制显示 MenuItem 而不是 SubMenu
+            component: () => import('@/views/cluster/task/model'),
+            meta: { title: '集群任务列表', keepAlive: false, hiddenHeaderContent: true, permission: ['cluster'] }
+          },
+          {
             path: '/cluster/history',
             name: '历史记录',
             component: () => import('@/views/cluster/history/model'),

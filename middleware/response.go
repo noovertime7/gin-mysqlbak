@@ -20,6 +20,7 @@ const (
 type Response struct {
 	ErrorCode ResponseCode `json:"errno"`
 	ErrorMsg  string       `json:"errmsg"`
+	RealErr   string       `json:"real_err"`
 	Data      interface{}  `json:"data"`
 	TraceId   interface{}  `json:"trace_id"`
 	Stack     interface{}  `json:"stack"`
@@ -45,7 +46,7 @@ func ResponseError(c *gin.Context, err error) {
 		stack = strings.Replace(fmt.Sprintf("%+v", err), err.Error()+"\n", "", -1)
 	}
 
-	resp := &Response{ErrorCode: code, ErrorMsg: err.Error(), Data: "", TraceId: traceId, Stack: stack}
+	resp := &Response{ErrorCode: code, ErrorMsg: err.Error(), RealErr: myError.RealErrorMessage, Data: "", TraceId: traceId, Stack: stack}
 	c.JSON(200, resp)
 	response, _ := json.Marshal(resp)
 	c.Set("response", string(response))

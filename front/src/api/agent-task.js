@@ -1,6 +1,6 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
 
-export function GetAgentTaskList(query) {
+export function GetAgentTaskList (query) {
   return request({
     url: '/agent/tasklist',
     method: 'get',
@@ -8,7 +8,7 @@ export function GetAgentTaskList(query) {
   })
 }
 
-export function GetAgentTaskDetail(query) {
+export function GetAgentTaskDetail (query) {
   return request({
     url: '/agent/taskdetail',
     method: 'get',
@@ -16,8 +16,7 @@ export function GetAgentTaskDetail(query) {
   })
 }
 
-
-export function DeleteAgentTask(query) {
+export function DeleteAgentTask (query) {
   return request({
     url: '/agent/taskdelete',
     method: 'delete',
@@ -25,8 +24,7 @@ export function DeleteAgentTask(query) {
   })
 }
 
-
-export function AddAgentTask(data) {
+export function AddAgentTask (data) {
   return request({
     url: '/agent/taskadd',
     method: 'post',
@@ -34,9 +32,7 @@ export function AddAgentTask(data) {
   })
 }
 
-
-
-export function UpdateAgentTask(query) {
+export function UpdateAgentTask (query) {
   return request({
     url: '/agent/taskupdate',
     method: 'put',
@@ -44,8 +40,7 @@ export function UpdateAgentTask(query) {
   })
 }
 
-
-export function StartAgentTask(query) {
+export function StartAgentTask (query) {
   return request({
     url: '/agent/bakstart',
     method: 'put',
@@ -53,7 +48,7 @@ export function StartAgentTask(query) {
   })
 }
 
-export function StopAgentTask(query) {
+export function StopAgentTask (query) {
   return request({
     url: '/agent/bakstop',
     method: 'put',
@@ -61,7 +56,7 @@ export function StopAgentTask(query) {
   })
 }
 
-export function StartAgentHostTask(query) {
+export function StartAgentHostTask (query) {
   return request({
     url: '/agent/bakhoststart',
     method: 'put',
@@ -69,12 +64,10 @@ export function StartAgentHostTask(query) {
   })
 }
 
-export function StopAgentHostTask(query) {
+export function StopAgentHostTask (query) {
   return request({
     url: '/agent/bakhoststop',
     method: 'put',
     params: query
   })
 }
-
-

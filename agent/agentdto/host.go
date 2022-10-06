@@ -15,18 +15,10 @@ type HostAddInput struct {
 	Type        int64  `form:"type" json:"type"  validate:"required"`
 }
 
-func (d *HostAddInput) BindValidParams(ctx *gin.Context) error {
-	return public.DefaultGetValidParams(ctx, d)
-}
-
 // HostDeleteInput  删除
 type HostDeleteInput struct {
 	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"123456"`
 	ID          int    `json:"id" form:"id" validate:"required"`
-}
-
-func (d *HostDeleteInput) BindValidParams(ctx *gin.Context) error {
-	return public.DefaultGetValidParams(ctx, d)
 }
 
 // HostUpdateInput 修改
@@ -40,39 +32,42 @@ type HostUpdateInput struct {
 	Type        int64  `form:"type" json:"type"  validate:"required"`
 }
 
-func (d *HostUpdateInput) BindValidParams(ctx *gin.Context) error {
+// HostListInput 查询
+type HostListInput struct {
+	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"test5.local"`
+	Info        string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
+	PageNo      int64  `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
+	PageSize    int64  `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+}
+
+type HostIDInput struct {
+	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"test5.local"`
+	HostID      int64  `json:"host_id" form:"host_id" validate:"required"`
+}
+
+type HostNamesInput struct {
+	Type        int64  `form:"type" json:"type" comment:"服务类型"  validate:"required"`
+	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"test5.local"`
+}
+
+func (d *HostNamesInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
-// HostListInput 查询
-type HostListInput struct {
-	ServiceName string `form:"service_name" json:"service_name" comment:"服务名"   validate:"required" example:"123456"`
-	Info        string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
-	PageNo      int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
-	PageSize    int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+func (d *HostUpdateInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
 }
 
 func (d *HostListInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }
 
-type HostListOutput struct {
-	Total int               `form:"total" json:"total" comment:"总数"   validate:"" example:""`
-	List  []HostListOutItem `json:"list" form:"list" comment:"列表" example:"" validate:""` //列表
+func (d *HostAddInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
 }
 
-type HostListOutItem struct {
-	ID         int    `json:"id" form:"id"`
-	Host       string `json:"host" form:"host"`
-	User       string `json:"username" comment:"用户"`
-	Password   string `json:"password" comment:"数据库密码"`
-	HostStatus int    `json:"host_status"`
-	Content    string `json:"content"`
-	TaskNum    int    `json:"task_num"`
-}
-
-type HostIDInput struct {
-	HostID int `json:"host_id" form:"host_id"`
+func (d *HostDeleteInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
 }
 
 func (d *HostIDInput) BindValidParams(ctx *gin.Context) error {

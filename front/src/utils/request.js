@@ -24,7 +24,7 @@ const errorHandler = (error) => {
         description: data.message
       })
     }
-    if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
+    if (error.response.status === 10103 && !(data.result && data.result.isLogin)) {
       notification.error({
         message: 'Unauthorized',
         description: 'Authorization verification failed'
@@ -58,8 +58,15 @@ request.interceptors.response.use((response) => {
   if (res.errno !== 0) {
     notification.error({
       message: res.errmsg || 'Error',
-      description: 'error'
+      description: res.real_err
     })
+    if (res.errno === 10103) {
+      store.dispatch('Logout').then(() => {
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      })
+    }
   } else {
     return response.data
   }

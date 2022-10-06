@@ -107,6 +107,7 @@ export default {
         {
           title: '应用主机',
           dataIndex: 'host',
+          width: '150px',
           align: 'center'
         },
         {

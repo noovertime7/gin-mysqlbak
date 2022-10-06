@@ -24,12 +24,12 @@ type Admin struct {
 	LoginTime time.Time     `gorm:"column:login_time;type:datetime" json:"login_time"`
 }
 
-func (t *Admin) TableName() string {
+func (a *Admin) TableName() string {
 	return "t_admin"
 }
 
-func (t *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.AdminLoginInput) (*Admin, error) {
-	admininfo, err := t.Find(c, tx, &Admin{UserName: param.UserName, IsDelete: sql.NullInt32{0, true}})
+func (a *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.AdminLoginInput) (*Admin, error) {
+	admininfo, err := a.Find(c, tx, &Admin{UserName: param.UserName, IsDelete: sql.NullInt32{0, true}})
 	if err == gorm.ErrRecordNotFound || admininfo.Id == 0 {
 		return nil, errors.New("用户信息不存在")
 	}
@@ -40,20 +40,20 @@ func (t *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.AdminLoginInp
 	return admininfo, nil
 }
 
-func (t *Admin) Find(c *gin.Context, tx *gorm.DB, search *Admin) (*Admin, error) {
+func (a *Admin) Find(c *gin.Context, tx *gorm.DB, search *Admin) (*Admin, error) {
 	out := &Admin{}
 	return out, tx.WithContext(c).Where(search).Find(out).Error
 }
 
-func (t *Admin) Save(c *gin.Context, tx *gorm.DB) error {
-	return tx.WithContext(c).Save(t).Error
+func (a *Admin) Save(c *gin.Context, tx *gorm.DB) error {
+	return tx.WithContext(c).Save(a).Error
 }
 
-func (t *Admin) UpdateStatus(ctx *gin.Context, tx *gorm.DB, info *Admin) error {
+func (a *Admin) UpdateStatus(ctx *gin.Context, tx *gorm.DB, info *Admin) error {
 	if info.Id == 0 {
 		return errors.New("ID 为 0")
 	}
-	return tx.WithContext(ctx).Table(t.TableName()).Where("id = ?", info.Id).Updates(map[string]interface{}{
+	return tx.WithContext(ctx).Table(a.TableName()).Where("id = ?", info.Id).Updates(map[string]interface{}{
 		"status":     info.Status,
 		"login_time": info.LoginTime,
 	}).Error
@@ -63,15 +63,15 @@ func (a *Admin) Updates(ctx *gin.Context, tx *gorm.DB) error {
 	return tx.WithContext(ctx).Table(a.TableName()).Updates(a).Error
 }
 
-func (u *Admin) PageList(c *gin.Context, tx *gorm.DB, params *dto.GroupUserListInput, groupId int) ([]*Admin, int, error) {
+func (a *Admin) PageList(c *gin.Context, tx *gorm.DB, params *dto.GroupUserListInput, groupId int) ([]*Admin, int, error) {
 	var total int64 = 0
 	var list []*Admin
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
 	if groupId == 0 {
-		query = query.Table(u.TableName()).Where("is_delete = 0")
+		query = query.Table(a.TableName()).Where("is_delete = 0")
 	} else {
-		query = query.Table(u.TableName()).Where("is_delete = 0 and group_id = ?", groupId)
+		query = query.Table(a.TableName()).Where("is_delete = 0 and group_id = ?", groupId)
 	}
 	query.Find(&list).Count(&total)
 	if params.Info != "" {

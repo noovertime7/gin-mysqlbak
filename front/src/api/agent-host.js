@@ -1,6 +1,6 @@
-import request from "@/utils/request";
+import request from '@/utils/request'
 
-export function GetAgentHostList(query) {
+export function GetAgentHostList (query) {
   return request({
     url: '/agent/hostlist',
     method: 'get',
@@ -8,8 +8,23 @@ export function GetAgentHostList(query) {
   })
 }
 
+export function TestAgentHost (query) {
+  return request({
+    url: '/agent/host_test',
+    method: 'get',
+    params: query
+  })
+}
 
-export function CreateAgentHost(data) {
+export function GetHostNames (query) {
+  return request({
+    url: '/agent/host_names',
+    method: 'get',
+    params: query
+  })
+}
+
+export function CreateAgentHost (data) {
   return request({
     url: '/agent/hostadd',
     method: 'post',
@@ -17,7 +32,7 @@ export function CreateAgentHost(data) {
   })
 }
 
-export function UpdateAgentHost(query) {
+export function UpdateAgentHost (query) {
   return request({
     url: '/agent/hostupdate',
     method: 'put',
@@ -25,7 +40,7 @@ export function UpdateAgentHost(query) {
   })
 }
 
-export function DeleteAgentHost(query) {
+export function DeleteAgentHost (query) {
   return request({
     url: '/agent/hostdelete',
     method: 'delete',

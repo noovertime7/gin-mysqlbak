@@ -102,17 +102,20 @@ export default {
         {
           title: '备份仓库',
           dataIndex: 'repository',
-          align: 'center'
+          align: 'center',
+          width: '100px'
         },
         {
           title: '快照名',
           dataIndex: 'snapshot',
+          width: '180px',
           align: 'center'
         },
         {
           title: '备份状态',
           dataIndex: 'status',
           scopedSlots: { customRender: 'status' },
+          width: '100px',
           align: 'center'
         },
         {

@@ -24,7 +24,7 @@
           <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
         </span>
         <span slot="action" slot-scope="text, record">
-          <a @click="taskManage(record)">任务</a>
+          <a @click="handleTask(record)">任务</a>
           <a-divider type="vertical"/>
           <a-dropdown>
             <a class="ant-dropdown-link">
@@ -85,13 +85,13 @@ export default {
         {
           title: '任务数',
           dataIndex: 'task_num',
-          customRender: (text) => text + ' 个',
+          // customRender: (text) => text + ' 个',
           align: 'center'
         },
         {
           title: '完成数',
           dataIndex: 'finish_num',
-          customRender: (text) => text + ' 个',
+          // customRender: (text) => text + ' 个',
           align: 'center'
         },
         {
@@ -155,6 +155,9 @@ export default {
       setTimeout(() => {
         this.$refs.table.refresh() // refresh() 不传参默认值 false 不刷新到分页第一页
       }, 1500)
+    },
+    handleTask (record) {
+      this.$router.push('/cluster/app/task-list/' + record.service_name)
     },
     handleDownload () {
       this.$message.warn('功能开发中...')
