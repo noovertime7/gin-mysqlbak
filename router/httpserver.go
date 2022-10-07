@@ -5,8 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/controller"
-	"github.com/noovertime7/gin-mysqlbak/public"
-	"github.com/noovertime7/gin-mysqlbak/services"
+	"github.com/noovertime7/gin-mysqlbak/server"
 	"log"
 	"net/http"
 	"time"
@@ -17,8 +16,7 @@ var (
 )
 
 func HttpServerRun() {
-	//打印logo
-	public.PrintLogo()
+	server.Start()
 	gin.SetMode(conf.GetStringConf("base", "debug_mode"))
 	r := InitRouter()
 	HttpSrvHandler = &http.Server{
@@ -41,7 +39,7 @@ func HttpServerRun() {
 }
 
 func HttpServerStop() {
-	services.StopAllUpTask()
+	server.Stop()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := HttpSrvHandler.Shutdown(ctx); err != nil {

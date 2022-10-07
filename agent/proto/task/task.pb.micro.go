@@ -46,6 +46,7 @@ type TaskService interface {
 	TaskDelete(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskOneMessage, error)
 	TaskUpdate(ctx context.Context, in *TaskUpdateInput, opts ...client.CallOption) (*TaskOneMessage, error)
 	TaskList(ctx context.Context, in *TaskListInput, opts ...client.CallOption) (*TaskListOutPut, error)
+	GetTaskUnscopedList(ctx context.Context, in *TaskListInput, opts ...client.CallOption) (*TaskListOutPut, error)
 	TaskDetail(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskDetailOutPut, error)
 }
 
@@ -101,6 +102,16 @@ func (c *taskService) TaskList(ctx context.Context, in *TaskListInput, opts ...c
 	return out, nil
 }
 
+func (c *taskService) GetTaskUnscopedList(ctx context.Context, in *TaskListInput, opts ...client.CallOption) (*TaskListOutPut, error) {
+	req := c.c.NewRequest(c.name, "Task.GetTaskUnscopedList", in)
+	out := new(TaskListOutPut)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *taskService) TaskDetail(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskDetailOutPut, error) {
 	req := c.c.NewRequest(c.name, "Task.TaskDetail", in)
 	out := new(TaskDetailOutPut)
@@ -118,6 +129,7 @@ type TaskHandler interface {
 	TaskDelete(context.Context, *TaskIDInput, *TaskOneMessage) error
 	TaskUpdate(context.Context, *TaskUpdateInput, *TaskOneMessage) error
 	TaskList(context.Context, *TaskListInput, *TaskListOutPut) error
+	GetTaskUnscopedList(context.Context, *TaskListInput, *TaskListOutPut) error
 	TaskDetail(context.Context, *TaskIDInput, *TaskDetailOutPut) error
 }
 
@@ -127,6 +139,7 @@ func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.Handl
 		TaskDelete(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error
 		TaskUpdate(ctx context.Context, in *TaskUpdateInput, out *TaskOneMessage) error
 		TaskList(ctx context.Context, in *TaskListInput, out *TaskListOutPut) error
+		GetTaskUnscopedList(ctx context.Context, in *TaskListInput, out *TaskListOutPut) error
 		TaskDetail(ctx context.Context, in *TaskIDInput, out *TaskDetailOutPut) error
 	}
 	type Task struct {
@@ -154,6 +167,10 @@ func (h *taskHandler) TaskUpdate(ctx context.Context, in *TaskUpdateInput, out *
 
 func (h *taskHandler) TaskList(ctx context.Context, in *TaskListInput, out *TaskListOutPut) error {
 	return h.TaskHandler.TaskList(ctx, in, out)
+}
+
+func (h *taskHandler) GetTaskUnscopedList(ctx context.Context, in *TaskListInput, out *TaskListOutPut) error {
+	return h.TaskHandler.GetTaskUnscopedList(ctx, in, out)
 }
 
 func (h *taskHandler) TaskDetail(ctx context.Context, in *TaskIDInput, out *TaskDetailOutPut) error {

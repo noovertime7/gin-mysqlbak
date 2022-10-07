@@ -1,6 +1,7 @@
 package agentservice
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2/client"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
@@ -57,7 +58,7 @@ func (t *TaskService) TaskAdd(ctx *gin.Context, params *agentdto.TaskAddInput) e
 	return nil
 }
 
-func (t *TaskService) TaskList(ctx *gin.Context, params *agentdto.TaskListInput) (*task.TaskListOutPut, error) {
+func (t *TaskService) TaskList(ctx context.Context, params *agentdto.TaskListInput) (*task.TaskListOutPut, error) {
 	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
 	if err != nil {
 		return nil, err
@@ -72,6 +73,23 @@ func (t *TaskService) TaskList(ctx *gin.Context, params *agentdto.TaskListInput)
 		HostID:   params.HostId,
 	}
 	return taskService.TaskList(ctx, taskListInput, ops)
+}
+
+func (t *TaskService) GetTaskUnscopedList(ctx context.Context, params *agentdto.TaskListInput) (*task.TaskListOutPut, error) {
+	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
+	if err != nil {
+		return nil, err
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+	taskListInput := &task.TaskListInput{
+		Info:     params.Info,
+		PageNo:   params.PageNo,
+		PageSize: params.PageSize,
+		HostID:   params.HostId,
+	}
+	return taskService.GetTaskUnscopedList(ctx, taskListInput, ops)
 }
 
 func (t *TaskService) TaskDetail(ctx *gin.Context, params *agentdto.TaskIDInput) (*task.TaskDetailOutPut, error) {

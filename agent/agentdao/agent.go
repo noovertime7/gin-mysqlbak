@@ -62,7 +62,7 @@ func (a *AgentDB) UpdateStatus(c *gin.Context, tx *gorm.DB) error {
 	}).Error
 }
 
-func (s *AgentDB) PageList(c *gin.Context, tx *gorm.DB, params *agentdto.AgentListInput) ([]AgentDB, int, error) {
+func (s *AgentDB) PageList(c context.Context, tx *gorm.DB, params *agentdto.AgentListInput) ([]AgentDB, int, error) {
 	var total int64 = 0
 	var list []AgentDB
 	offset := (params.PageNo - 1) * params.PageSize

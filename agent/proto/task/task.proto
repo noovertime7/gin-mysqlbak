@@ -8,6 +8,7 @@ service Task {
   rpc TaskDelete(TaskIDInput) returns (TaskOneMessage) {}
   rpc TaskUpdate(TaskUpdateInput) returns (TaskOneMessage) {}
   rpc TaskList(TaskListInput) returns (TaskListOutPut) {}
+  rpc GetTaskUnscopedList(TaskListInput) returns (TaskListOutPut) {}
   rpc TaskDetail(TaskIDInput) returns (TaskDetailOutPut) {}
 }
 
@@ -100,6 +101,12 @@ message TaskListItem {
   int64 Status = 8;
   // @inject_tag: json:"create_at"
   string CreateAt = 9;
+  // @inject_tag: json:"update_at"
+  string UpdateAt = 10;
+  // @inject_tag: json:"deleted_at"
+  string DeletedAt = 11;
+  // @inject_tag: json:"is_deleted"
+  int64  IsDeleted = 12;
 }
 
 message TaskDetailOutPut {

@@ -35,7 +35,7 @@ func GetFileSize(fileanme string) int {
 	return tmp
 }
 
-//创建文件夹
+// CreateDir 创建文件夹
 func CreateDir(path string) {
 	_exist, _err := HasDir(path)
 	if _err != nil {
@@ -85,4 +85,15 @@ func StatusConversion(a int) string {
 		return "未启用"
 	}
 	return "unknown"
+}
+
+func StringToTime(receiveTime string) time.Time {
+	timeLayOut := "2006年01月02日15:04"
+	loc, _ := time.LoadLocation("Local")
+	t, err := time.ParseInLocation(timeLayOut, receiveTime, loc)
+	if err != nil {
+		log.Logger.Error("转换时间失败", err)
+		return time.Time{}
+	}
+	return t
 }

@@ -1,6 +1,7 @@
 package agentservice
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/v2/client"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
@@ -80,7 +81,7 @@ func (h *HostService) UpdateHost(c *gin.Context, params *agentdto.HostUpdateInpu
 	}, ops)
 }
 
-func (h *HostService) HostList(c *gin.Context, params *agentdto.HostListInput) (*host.HostListOutPut, error) {
+func (h *HostService) HostList(c context.Context, params *agentdto.HostListInput) (*host.HostListOutPut, error) {
 	hostService, addr, err := pkg.GetHostService(params.ServiceName)
 	if err != nil {
 		return nil, err
