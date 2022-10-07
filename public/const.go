@@ -3,10 +3,14 @@ package public
 const (
 	ValidatorKey         = "ValidatorKey"
 	TranslatorKey        = "TranslatorKey"
-	ParamsBindErrorCode  = 23333
 	HistoryStatusAll     = "all"
 	HistoryStatusSuccess = "success"
 	HistoryStatusFail    = "fail"
+)
+
+const (
+	MysqlHost   int64 = 1
+	ElasticHost int64 = 2
 )
 
 //加解密相关

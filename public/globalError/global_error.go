@@ -24,11 +24,12 @@ const (
 	HostGetError    = 20104 // 请勿重复提交
 	HostCheckError  = 20105
 
-	TaskAddError    = 20201 // 请勿重复提交
-	TaskDeleteError = 20202 // 请勿重复提交
-	TaskUpdateError = 20203 // 请勿重复提交
-	TaskGetError    = 20204 // 请勿重复提交
-	TaskNodeFound   = 20205
+	TaskAddError         = 20201 // 请勿重复提交
+	TaskDeleteError      = 20202 // 请勿重复提交
+	TaskUpdateError      = 20203 // 请勿重复提交
+	TaskGetError         = 20204 // 请勿重复提交
+	TaskNodeFound        = 20205
+	TaskOverViewGetError = 20206
 
 	HistoryAddError    = 20301 // 请勿重复提交
 	HistoryDeleteError = 20302 // 请勿重复提交
@@ -72,6 +73,7 @@ var codeTag = map[int]string{
 	TaskUpdateError:              "任务更新失败，请联系管理员",
 	TaskGetError:                 "任务查询失败，请联系管理员",
 	TaskNodeFound:                "备份任务为空",
+	TaskOverViewGetError:         "获取任务总览失败",
 	HistoryAddError:              "历史记录添加失败，请联系管理员",
 	HistoryDeleteError:           "历史记录删除失败，请联系管理员",
 	HistoryUpdateError:           "历史记录更新失败，请联系管理员",

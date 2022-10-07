@@ -3,6 +3,7 @@ package agentservice
 import (
 	"context"
 	"database/sql"
+	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdao"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/repository"
@@ -112,4 +113,35 @@ func (t *TaskOverViewService) Store(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func (t *TaskOverViewService) GetTaskOverViewList(ctx *gin.Context, info *agentdto.TaskOverViewListInput) (*agentdto.TaskOverViewListOut, error) {
+	taskDB := &agentdao.TaskOverview{}
+	list, total, err := taskDB.PageList(ctx, t.DB, info)
+	if err != nil {
+		return nil, err
+	}
+	var out []*agentdto.TaskOverViewListOutItem
+	for _, task := range list {
+		outItem := &agentdto.TaskOverViewListOutItem{
+			ID:          task.ID,
+			ServiceName: task.ServiceName,
+			HostID:      task.HostId,
+			Host:        task.Host,
+			TaskID:      task.TaskId,
+			DBName:      task.DbName,
+			BackupCycle: task.BackupCycle,
+			KeepNumber:  task.KeepNumber,
+			Status:      task.Status.Int64,
+			Type:        task.Type,
+			IsDeleted:   task.IsDeleted.Int64,
+		}
+		out = append(out, outItem)
+	}
+	return &agentdto.TaskOverViewListOut{
+		Total:    int64(total),
+		List:     out,
+		PageNo:   info.PageNo,
+		PageSize: info.PageSize,
+	}, nil
 }

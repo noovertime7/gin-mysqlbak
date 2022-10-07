@@ -158,6 +158,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.TranslationMiddleware())
 	{
 		agentcontroller.AgentTaskRegister(AgentRouter)
+		agentcontroller.AgentOverViewTaskRegister(AgentRouter)
 		agentcontroller.AgentHostRegister(AgentRouter)
 		agentcontroller.BakHistoryRegister(AgentRouter)
 		agentcontroller.BakRegister(AgentRouter)

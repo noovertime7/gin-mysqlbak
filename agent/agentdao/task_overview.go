@@ -3,6 +3,8 @@ package agentdao
 import (
 	"context"
 	"database/sql"
+	"github.com/gin-gonic/gin"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"gorm.io/gorm"
 	"time"
 )
@@ -39,4 +41,37 @@ func (t *TaskOverview) Find(ctx context.Context, tx *gorm.DB, search *TaskOvervi
 
 func (t *TaskOverview) Updates(ctx context.Context, tx *gorm.DB, id int64) error {
 	return tx.WithContext(ctx).Where("id = ?", id).Updates(t).Error
+}
+
+func (t *TaskOverview) PageList(c *gin.Context, tx *gorm.DB, params *agentdto.TaskOverViewListInput) ([]TaskOverview, int, error) {
+	var total int64 = 0
+	var list []TaskOverview
+	offset := (params.PageNo - 1) * params.PageSize
+	query := tx.WithContext(c)
+	query = query.Table(t.TableName())
+	switch params.Status {
+	//查询关闭状态任务
+	case 1:
+		query = query.Table(t.TableName()).Where("status != 1")
+		if params.Type != 0 {
+			query = query.Table(t.TableName()).Where("status != 1 and type = ?", params.Type)
+		}
+	case 2:
+		query = query.Table(t.TableName()).Where("status = 1")
+		if params.Type != 0 {
+			query = query.Table(t.TableName()).Where("status = 1 and type = ?", params.Type)
+		}
+	default:
+		if params.Type != 0 {
+			query = query.Table(t.TableName()).Where(" type = ?", params.Type)
+		}
+	}
+	query.Find(&list).Count(&total)
+	if params.Info != "" {
+		query = query.Where("( db_name like ? or service_name = ? )", "%"+params.Info+"%", "%"+params.Info+"%")
+	}
+	if err := query.Limit(int(params.PageSize)).Offset(int(offset)).Order("id desc").Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
+		return nil, 0, err
+	}
+	return list, int(total), nil
 }
