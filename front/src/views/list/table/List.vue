@@ -148,7 +148,7 @@ export default {
         {
           title: '服务调用次数',
           dataIndex: 'callNo',
-          sorter: true,
+          TaskOverViewer: true,
           needTotal: true,
           customRender: (text) => text + ' 次'
         },

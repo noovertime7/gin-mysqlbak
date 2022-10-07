@@ -33,6 +33,9 @@ func startSyncClusterTask() error {
 	if period == 0 {
 		period = defaultPeriod
 	}
+	if period < 10 {
+		log.Logger.Warn("当前同步周期小于10分钟,同步遍历占用资源,请谨慎设置同步周期，建议10-20分钟左右")
+	}
 	log.Logger.Infof("启动集群任务同步定时器，当前同步周期%d/min", period)
 	return s.Run(time.Duration(period) * time.Minute)
 }

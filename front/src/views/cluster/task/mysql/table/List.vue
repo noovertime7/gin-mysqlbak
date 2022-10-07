@@ -72,7 +72,7 @@
           </a>
           <a-menu slot="overlay">
             <a-menu-item>
-              <a href="javascript:;">详情</a>
+              <a @click="handleDetail">详情</a>
             </a-menu-item>
             <a-menu-item>
               <a @click="handleDelete(record)">删除</a>
@@ -279,6 +279,9 @@ clear: () => {
     },
     handleOk () {
 
+    },
+    handleDetail (value) {
+      this.$message.warn('正在开发中...')
     },
     handleSelectChange (value) {
       this.$refs.table.refresh(true)

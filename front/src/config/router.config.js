@@ -230,6 +230,12 @@ export const asyncRouterMap = [
             meta: { title: '应用管理', permission: ['cluster'] }
           },
           {
+            path: '/cluster/task_overview',
+            name: '任务总览',
+            component: () => import('@/views/cluster/taskoverview/taskOverview'),
+            meta: { title: '任务总览', permission: ['cluster'] }
+          },
+          {
             path: '/cluster/app/task-list/:service_name',
             hidden: true,
             name: '集群任务列表',

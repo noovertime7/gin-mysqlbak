@@ -6,11 +6,13 @@ import (
 )
 
 type TaskOverViewListInput struct {
-	Info     string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
-	PageNo   int64  `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
-	PageSize int64  `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
-	Type     int64  `form:"type" json:"type"`
-	Status   int64  `form:"status" json:"status"`
+	Info      string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
+	PageNo    int64  `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
+	PageSize  int64  `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+	Type      int64  `form:"type" json:"type"`
+	Status    int64  `form:"status" json:"status"`
+	SortField string `form:"sortField" json:"sortField" comment:"排序字段" `
+	SortOrder string `json:"sortOrder" form:"sortOrder" comment:"排序规则"`
 }
 
 type TaskOverViewListOut struct {
