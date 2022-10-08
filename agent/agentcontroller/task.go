@@ -19,6 +19,7 @@ func AgentTaskRegister(group *gin.RouterGroup) {
 	group.GET("/tasklist", task.TaskList)
 	group.GET("/taskdetail", task.TaskDetail)
 	group.DELETE("/taskdelete", task.TaskDelete)
+	group.GET("/task_restore", task.TaskRestore)
 	group.PUT("/taskupdate", task.TaskUpdate)
 }
 
@@ -84,6 +85,21 @@ func (a *AgentTaskController) TaskDelete(ctx *gin.Context) {
 	}
 	middleware.ResponseSuccess(ctx, "删除成功")
 	log.Logger.Info("agent删除主机成功")
+}
+
+func (a *AgentTaskController) TaskRestore(ctx *gin.Context) {
+	params := &agentdto.TaskDeleteInput{}
+	if err := params.BindValidParams(ctx); err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	if err := a.service.TaskRestore(ctx, params); err != nil {
+		log.Logger.Error("还原失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskDeleteError, err))
+	}
+	middleware.ResponseSuccess(ctx, "还原成功")
+	log.Logger.Info("agent还原删除成功")
 }
 
 func (a *AgentTaskController) TaskUpdate(ctx *gin.Context) {

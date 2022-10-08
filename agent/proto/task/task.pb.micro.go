@@ -48,6 +48,7 @@ type TaskService interface {
 	TaskList(ctx context.Context, in *TaskListInput, opts ...client.CallOption) (*TaskListOutPut, error)
 	GetTaskUnscopedList(ctx context.Context, in *TaskListInput, opts ...client.CallOption) (*TaskListOutPut, error)
 	TaskDetail(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskDetailOutPut, error)
+	RestoreTask(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskOneMessage, error)
 }
 
 type taskService struct {
@@ -122,6 +123,16 @@ func (c *taskService) TaskDetail(ctx context.Context, in *TaskIDInput, opts ...c
 	return out, nil
 }
 
+func (c *taskService) RestoreTask(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskOneMessage, error) {
+	req := c.c.NewRequest(c.name, "Task.RestoreTask", in)
+	out := new(TaskOneMessage)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Task service
 
 type TaskHandler interface {
@@ -131,6 +142,7 @@ type TaskHandler interface {
 	TaskList(context.Context, *TaskListInput, *TaskListOutPut) error
 	GetTaskUnscopedList(context.Context, *TaskListInput, *TaskListOutPut) error
 	TaskDetail(context.Context, *TaskIDInput, *TaskDetailOutPut) error
+	RestoreTask(context.Context, *TaskIDInput, *TaskOneMessage) error
 }
 
 func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.HandlerOption) error {
@@ -141,6 +153,7 @@ func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.Handl
 		TaskList(ctx context.Context, in *TaskListInput, out *TaskListOutPut) error
 		GetTaskUnscopedList(ctx context.Context, in *TaskListInput, out *TaskListOutPut) error
 		TaskDetail(ctx context.Context, in *TaskIDInput, out *TaskDetailOutPut) error
+		RestoreTask(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error
 	}
 	type Task struct {
 		task
@@ -175,4 +188,8 @@ func (h *taskHandler) GetTaskUnscopedList(ctx context.Context, in *TaskListInput
 
 func (h *taskHandler) TaskDetail(ctx context.Context, in *TaskIDInput, out *TaskDetailOutPut) error {
 	return h.TaskHandler.TaskDetail(ctx, in, out)
+}
+
+func (h *taskHandler) RestoreTask(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error {
+	return h.TaskHandler.RestoreTask(ctx, in, out)
 }

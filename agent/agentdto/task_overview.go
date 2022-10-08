@@ -23,26 +23,41 @@ type TaskOverViewListOut struct {
 }
 
 type TaskOverViewListOutItem struct {
-	ID          int64  `json:"id" form:"db_name"`
-	ServiceName string `json:"service_name" form:"db_name"`
-	HostID      int64  `json:"host_id" form:"db_name"`
-	Host        string `json:"host" form:"db_name"`
-	TaskID      int64  `json:"task_id" form:"db_name"`
+	ID          int64  `json:"id" form:"id"`
+	ServiceName string `json:"service_name" form:"service_name"`
+	HostID      int64  `json:"host_id" form:"host_id"`
+	Host        string `json:"host" form:"host"`
+	TaskID      int64  `json:"task_id" form:"task_id"`
 	DBName      string `json:"db_name" form:"db_name"`
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle"`
-	KeepNumber  int64  `json:"keep_number" form:"db_name"`
-	Status      int64  `json:"status" form:"db_name"`
+	KeepNumber  int64  `json:"keep_number" form:"keep_number"`
+	Status      int64  `json:"status" form:"status"`
 	Type        int64  `json:"type"`
 	IsDeleted   int64  `json:"is_deleted"`
 }
 
 type StartOverViewBakInput struct {
+	ID          int64  `json:"id" form:"id" validate:"required"`
 	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
 	TaskID      int64  `json:"task_id" form:"task_id" validate:"required"`
+	Type        int64  `json:"type" form:"type" validate:"required"`
 }
 type StopOverViewBakInput struct {
+	ID          int64  `json:"id" form:"id" validate:"required"`
 	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
 	TaskID      int64  `json:"task_id" form:"task_id" validate:"required"`
+	Type        int64  `json:"type" form:"type" validate:"required"`
+}
+
+type DeleteOverViewTaskInput struct {
+	ID          int64  `json:"id" form:"id" validate:"required"`
+	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
+	TaskID      int64  `json:"task_id" form:"task_id" validate:"required"`
+	Type        int64  `json:"type" form:"type" validate:"required"`
+}
+
+func (d *DeleteOverViewTaskInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, d)
 }
 
 func (d *TaskOverViewListInput) BindValidParams(ctx *gin.Context) error {

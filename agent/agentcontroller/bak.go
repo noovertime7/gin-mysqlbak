@@ -2,19 +2,20 @@ package agentcontroller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/v2/client"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
-	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
-	"github.com/noovertime7/gin-mysqlbak/agent/proto/bak"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
-	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
-type BakController struct{}
+type BakController struct {
+	bakService *agentservice.BakService
+}
 
 func BakRegister(group *gin.RouterGroup) {
-	bak := &BakController{}
+	bak := &BakController{
+		bakService: agentservice.GetClusterBakService(),
+	}
 	group.PUT("/bakstart", bak.StartBak)
 	group.PUT("/bakstop", bak.StopBak)
 	group.PUT("/bakhoststart", bak.StartBakByHost)
@@ -27,21 +28,7 @@ func (b *BakController) StartBak(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	bakService, addr, err := pkg.GetBakService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	bakStartInput := &bak.StartBakInput{
-		TaskID:      params.TaskID,
-		ServiceName: params.ServiceName,
-	}
-	log.Logger.Info("agent开始启动任务", bakStartInput)
-	data, err := bakService.StartBak(ctx, bakStartInput, ops)
+	data, err := b.bakService.StartBak(ctx, params)
 	if err != nil || !data.OK {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStartError, err))
 		return
@@ -54,21 +41,7 @@ func (b *BakController) StopBak(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	bakService, addr, err := pkg.GetBakService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	bakStartInput := &bak.StopBakInput{
-		TaskID:      params.TaskID,
-		ServiceName: params.ServiceName,
-	}
-	log.Logger.Info("agent开始停止任务", bakStartInput, addr)
-	data, err := bakService.StopBak(ctx, bakStartInput, ops)
+	data, err := b.bakService.StopBak(ctx, params)
 	if err != nil || !data.OK {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStopError, err))
 		return
@@ -81,21 +54,7 @@ func (b *BakController) StartBakByHost(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	bakService, addr, err := pkg.GetBakService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	bakStartInput := &bak.StartBakByHostInput{
-		HostID:      params.HostID,
-		ServiceName: params.ServiceName,
-	}
-	log.Logger.Info("agent开始启动所有Host任务", bakStartInput)
-	data, err := bakService.StartBakByHost(ctx, bakStartInput, ops)
+	data, err := b.bakService.StartBakByHost(ctx, params)
 	if err != nil || !data.OK {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStartAllError, err))
 		return
@@ -108,21 +67,7 @@ func (b *BakController) StopBakByHost(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	bakService, addr, err := pkg.GetBakService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	bakStartInput := &bak.StopBakByHostInput{
-		HostID:      params.HostID,
-		ServiceName: params.ServiceName,
-	}
-	log.Logger.Info("agent开始停止所有Host任务", bakStartInput)
-	data, err := bakService.StopBakByHost(ctx, bakStartInput, ops)
+	data, err := b.bakService.StopBakByHost(ctx, params)
 	if err != nil || !data.OK {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStopAllError, err))
 		return

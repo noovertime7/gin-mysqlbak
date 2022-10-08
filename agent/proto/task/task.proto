@@ -10,6 +10,7 @@ service Task {
   rpc TaskList(TaskListInput) returns (TaskListOutPut) {}
   rpc GetTaskUnscopedList(TaskListInput) returns (TaskListOutPut) {}
   rpc TaskDetail(TaskIDInput) returns (TaskDetailOutPut) {}
+  rpc RestoreTask(TaskIDInput) returns (TaskOneMessage) {}
 }
 
 message TaskOneMessage {

@@ -6,6 +6,7 @@ option go_package = "./;esbak";
 service  EsService {
   rpc TaskAdd(EsBakTaskADDInput)  returns (EsOneMessage) {}
   rpc TaskDelete(EsTaskIDInput) returns (EsOneMessage) {}
+  rpc TaskRestore(EsTaskIDInput) returns (EsOneMessage) {}
   rpc TaskUpdate(EsBakTaskUpdateInput) returns (EsOneMessage) {}
   rpc GetTaskList(EsTaskListInput) returns (EsTaskListOutPut) {}
   rpc GetTaskDetail(EsTaskIDInput) returns(EsTaskDetailOutPut) {}

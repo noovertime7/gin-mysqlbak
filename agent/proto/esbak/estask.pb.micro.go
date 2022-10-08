@@ -44,6 +44,7 @@ func NewEsServiceEndpoints() []*api.Endpoint {
 type EsService interface {
 	TaskAdd(ctx context.Context, in *EsBakTaskADDInput, opts ...client.CallOption) (*EsOneMessage, error)
 	TaskDelete(ctx context.Context, in *EsTaskIDInput, opts ...client.CallOption) (*EsOneMessage, error)
+	TaskRestore(ctx context.Context, in *EsTaskIDInput, opts ...client.CallOption) (*EsOneMessage, error)
 	TaskUpdate(ctx context.Context, in *EsBakTaskUpdateInput, opts ...client.CallOption) (*EsOneMessage, error)
 	GetTaskList(ctx context.Context, in *EsTaskListInput, opts ...client.CallOption) (*EsTaskListOutPut, error)
 	GetTaskDetail(ctx context.Context, in *EsTaskIDInput, opts ...client.CallOption) (*EsTaskDetailOutPut, error)
@@ -73,6 +74,16 @@ func (c *esService) TaskAdd(ctx context.Context, in *EsBakTaskADDInput, opts ...
 
 func (c *esService) TaskDelete(ctx context.Context, in *EsTaskIDInput, opts ...client.CallOption) (*EsOneMessage, error) {
 	req := c.c.NewRequest(c.name, "EsService.TaskDelete", in)
+	out := new(EsOneMessage)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *esService) TaskRestore(ctx context.Context, in *EsTaskIDInput, opts ...client.CallOption) (*EsOneMessage, error) {
+	req := c.c.NewRequest(c.name, "EsService.TaskRestore", in)
 	out := new(EsOneMessage)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -116,6 +127,7 @@ func (c *esService) GetTaskDetail(ctx context.Context, in *EsTaskIDInput, opts .
 type EsServiceHandler interface {
 	TaskAdd(context.Context, *EsBakTaskADDInput, *EsOneMessage) error
 	TaskDelete(context.Context, *EsTaskIDInput, *EsOneMessage) error
+	TaskRestore(context.Context, *EsTaskIDInput, *EsOneMessage) error
 	TaskUpdate(context.Context, *EsBakTaskUpdateInput, *EsOneMessage) error
 	GetTaskList(context.Context, *EsTaskListInput, *EsTaskListOutPut) error
 	GetTaskDetail(context.Context, *EsTaskIDInput, *EsTaskDetailOutPut) error
@@ -125,6 +137,7 @@ func RegisterEsServiceHandler(s server.Server, hdlr EsServiceHandler, opts ...se
 	type esService interface {
 		TaskAdd(ctx context.Context, in *EsBakTaskADDInput, out *EsOneMessage) error
 		TaskDelete(ctx context.Context, in *EsTaskIDInput, out *EsOneMessage) error
+		TaskRestore(ctx context.Context, in *EsTaskIDInput, out *EsOneMessage) error
 		TaskUpdate(ctx context.Context, in *EsBakTaskUpdateInput, out *EsOneMessage) error
 		GetTaskList(ctx context.Context, in *EsTaskListInput, out *EsTaskListOutPut) error
 		GetTaskDetail(ctx context.Context, in *EsTaskIDInput, out *EsTaskDetailOutPut) error
@@ -146,6 +159,10 @@ func (h *esServiceHandler) TaskAdd(ctx context.Context, in *EsBakTaskADDInput, o
 
 func (h *esServiceHandler) TaskDelete(ctx context.Context, in *EsTaskIDInput, out *EsOneMessage) error {
 	return h.EsServiceHandler.TaskDelete(ctx, in, out)
+}
+
+func (h *esServiceHandler) TaskRestore(ctx context.Context, in *EsTaskIDInput, out *EsOneMessage) error {
+	return h.EsServiceHandler.TaskRestore(ctx, in, out)
 }
 
 func (h *esServiceHandler) TaskUpdate(ctx context.Context, in *EsBakTaskUpdateInput, out *EsOneMessage) error {

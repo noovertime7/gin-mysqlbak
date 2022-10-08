@@ -2,19 +2,21 @@ package agentcontroller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/v2/client"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
-	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
-	"github.com/noovertime7/gin-mysqlbak/agent/proto/esbak"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
-type EsBakController struct{}
+type EsBakController struct {
+	esBakService *agentservice.EsBakService
+}
 
 func EsBakRegister(group *gin.RouterGroup) {
-	esBak := &EsBakController{}
+	esBak := &EsBakController{
+		esBakService: agentservice.GetClusterEsBakService(),
+	}
 	group.PUT("/start", esBak.Start)
 	group.PUT("/stop", esBak.Stop)
 }
@@ -25,16 +27,7 @@ func (e *EsBakController) Start(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	EsBakService, addr, err := pkg.GetESBakService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	data, err := EsBakService.Start(ctx, &esbak.StartEsBakInput{TaskID: params.ID}, ops)
+	data, err := e.esBakService.StartEsBak(ctx, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("es启动任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStartError, err))
@@ -50,16 +43,7 @@ func (e *EsBakController) Stop(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	EsBakService, addr, err := pkg.GetESBakService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	data, err := EsBakService.Stop(ctx, &esbak.StopEsBakInput{TaskID: params.ID}, ops)
+	data, err := e.esBakService.StopEsBak(ctx, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("es停止任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStopError, err))

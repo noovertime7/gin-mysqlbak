@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"time"
 )
@@ -42,6 +43,13 @@ func (t *TaskOverview) Find(ctx context.Context, tx *gorm.DB, search *TaskOvervi
 
 func (t *TaskOverview) Updates(ctx context.Context, tx *gorm.DB, id int64) error {
 	return tx.WithContext(ctx).Where("id = ?", id).Updates(t).Error
+}
+
+func (t *TaskOverview) Delete(ctx context.Context, tx *gorm.DB) error {
+	if t.ID == 0 {
+		return errors.New("ID为空")
+	}
+	return tx.WithContext(ctx).Delete(t).Error
 }
 
 func (t *TaskOverview) PageList(c *gin.Context, tx *gorm.DB, params *agentdto.TaskOverViewListInput) ([]TaskOverview, int, error) {

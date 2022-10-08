@@ -10,6 +10,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/noovertime7/mysqlbak/pkg/log"
+	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"sync"
 	"time"
@@ -23,13 +24,23 @@ var (
 // GetClusterTaskOverViewService  单例模式
 func GetClusterTaskOverViewService() *TaskOverViewService {
 	TaskOverViewServiceOnce.Do(func() {
-		clusterTaskOverViewService = &TaskOverViewService{DB: database.GetDB()}
+		clusterTaskOverViewService = &TaskOverViewService{
+			DB:            database.GetDB(),
+			taskService:   GetClusterTaskService(),
+			esTaskService: GetClusterEsTaskService(),
+			esBakService:  GetClusterEsBakService(),
+			bakService:    GetClusterBakService(),
+		}
 	})
 	return clusterTaskOverViewService
 }
 
 type TaskOverViewService struct {
-	DB *gorm.DB
+	DB            *gorm.DB
+	taskService   *TaskService
+	esTaskService *EsTaskService
+	esBakService  *EsBakService
+	bakService    *BakService
 }
 
 func (t *TaskOverViewService) Run(period time.Duration) error {
@@ -144,4 +155,143 @@ func (t *TaskOverViewService) GetTaskOverViewList(ctx *gin.Context, info *agentd
 		PageNo:   info.PageNo,
 		PageSize: info.PageSize,
 	}, nil
+}
+
+func (t *TaskOverViewService) StartTask(ctx *gin.Context, info *agentdto.StartOverViewBakInput) (string, error) {
+	switch info.Type {
+	case public.MysqlHost:
+		data, err := t.bakService.StartBak(ctx, &agentdto.StartBakInput{
+			TaskID:      info.TaskID,
+			ServiceName: info.ServiceName,
+		})
+		if err != nil || !data.OK {
+			return "", err
+		}
+		//启动成功，更新状态
+		overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
+		return data.Message, t.UpdateStatus(ctx, overviewDB, 1)
+	case public.ElasticHost:
+		data, err := t.esBakService.StartEsBak(ctx, &agentdto.ESBakStartInput{
+			ID:          info.TaskID,
+			ServiceName: info.ServiceName,
+		})
+		if err != nil || !data.OK {
+			return "", err
+		}
+		//启动成功，更新状态
+		overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
+		return data.Message, t.UpdateStatus(ctx, overviewDB, 1)
+	}
+	return "", errors.New("类型不匹配")
+}
+
+func (t *TaskOverViewService) StopTask(ctx *gin.Context, info *agentdto.StopOverViewBakInput) (string, error) {
+	switch info.Type {
+	case public.MysqlHost:
+		data, err := t.bakService.StopBak(ctx, &agentdto.StopBakInput{
+			TaskID:      info.TaskID,
+			ServiceName: info.ServiceName,
+		})
+		if err != nil || !data.OK {
+			return "", err
+		}
+		//启动成功，更新状态
+		overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
+		return data.Message, t.UpdateStatus(ctx, overviewDB, 0)
+	case public.ElasticHost:
+		data, err := t.esBakService.StopEsBak(ctx, &agentdto.ESBakStopInput{
+			ID: info.TaskID,
+		})
+		if err != nil || !data.OK {
+			return "", err
+		}
+		//启动成功，更新状态
+		overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
+		return data.Message, t.UpdateStatus(ctx, overviewDB, 0)
+	}
+	return "", errors.New("类型不匹配")
+}
+
+func (t *TaskOverViewService) DeleteTask(ctx *gin.Context, info *agentdto.DeleteOverViewTaskInput) (string, error) {
+	switch info.Type {
+	case public.MysqlHost:
+		if err := t.taskService.TaskDelete(ctx, &agentdto.TaskDeleteInput{ServiceName: info.ServiceName, ID: info.TaskID}); err != nil {
+			return "", err
+		}
+		//启动成功，更新状态
+		overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
+		if err := overviewDB.Delete(ctx, t.DB); err != nil {
+			return "", err
+		}
+		return "删除成功", nil
+	case public.ElasticHost:
+		data, err := t.esTaskService.DeleteEsTask(ctx, &agentdto.ESBakTaskIDInput{
+			ID:          info.TaskID,
+			ServiceName: info.ServiceName,
+		})
+		if err != nil || !data.OK {
+			return "", err
+		}
+		//启动成功，更新状态
+		overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
+		if err := overviewDB.Delete(ctx, t.DB); err != nil {
+			return "", err
+		}
+		return data.Message, nil
+	}
+	return "", errors.New("类型不匹配")
+}
+
+func (t *TaskOverViewService) RestoreTask(ctx *gin.Context, info *agentdto.DeleteOverViewTaskInput) (string, error) {
+	switch info.Type {
+	case public.MysqlHost:
+		if err := t.taskService.TaskRestore(ctx, &agentdto.TaskDeleteInput{
+			ServiceName: info.ServiceName,
+			ID:          info.TaskID,
+		}); err != nil {
+			return "", err
+		}
+		//还原成功，更新状态
+		taskOveDB := &agentdao.TaskOverview{ID: info.ID, TaskId: info.TaskID}
+		if err := t.UpdateDeleteStatus(ctx, taskOveDB, 0); err != nil {
+			return "", err
+		}
+		return "还原成功", nil
+	case public.ElasticHost:
+		data, err := t.esTaskService.RestoreEsTask(ctx, &agentdto.ESBakTaskIDInput{ID: info.TaskID, ServiceName: info.ServiceName})
+		if err != nil || !data.OK {
+			return "", err
+		}
+		//启动成功，更新状态
+		taskOveDB := &agentdao.TaskOverview{ID: info.ID, TaskId: info.TaskID}
+		if err := t.UpdateDeleteStatus(ctx, taskOveDB, 0); err != nil {
+			return "", err
+		}
+		return "还原成功", nil
+	}
+	return "", errors.New("类型不匹配")
+}
+
+func (t *TaskOverViewService) UpdateDeleteStatus(ctx *gin.Context, info *agentdao.TaskOverview, status int64) error {
+	taskOverView, err := info.Find(ctx, t.DB, info)
+	if err != nil {
+		return err
+	}
+	taskOverView.IsDeleted = sql.NullInt64{Int64: status, Valid: true}
+	if err := taskOverView.Updates(ctx, t.DB, info.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *TaskOverViewService) UpdateStatus(ctx *gin.Context, info *agentdao.TaskOverview, status int64) error {
+	taskOverView, err := info.Find(ctx, t.DB, info)
+	if err != nil {
+		return err
+	}
+	taskOverView.Status = sql.NullInt64{Int64: status, Valid: true}
+	if err := taskOverView.Updates(ctx, t.DB, info.ID); err != nil {
+		return err
+	}
+	return nil
 }

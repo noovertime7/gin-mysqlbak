@@ -349,7 +349,7 @@ clear: () => {
             }
             DeleteAgentTask(query).then((res) => {
               self.$message.success(res.data)
-              self.$refs.table.refresh(true)
+              self.$refs.table.refresh()
               resolve()
             })
           })

@@ -1,6 +1,6 @@
 <template>
   <page-header-wrapper
-    content="任务总览: 定时同步集群内所有服务任务，可以方便快捷的启动停止任务。"
+    content="任务总览: 定时同步集群内所有服务任务，可以方便快捷的启动停止任务，也可以还原被删除任务。"
   >
     <template v-slot:extraContent>
       <div style="width: 120px; margin-top: -20px;"><img style="width: 100%" :src="extraImage" /></div>
@@ -25,11 +25,16 @@
           style="margin-left: 16px; width: 272px;"
           placeholder="主机名/数据库/服务名" />
       </div>
+      <div class="table-operator">
+        <a-button type="primary" ghost="ghost" icon="sync" @click="handleSync">手动同步</a-button>
+      </div>
       <s-table
         ref="table"
         size="default"
         :columns="columns"
         :data="loadData"
+        :alert="options.alert"
+        :rowSelection="options.rowSelection"
       >
         <span slot="host_status" slot-scope="text">
           <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
@@ -45,9 +50,9 @@
           </a-tag>
         </span>
         <span slot="action" slot-scope="text, record">
-          <a @click="edit(record)">启动</a>
+          <a @click="handleStart(record)">启动</a>
           <a-divider type="vertical"/>
-          <a @click="edit(record)">停止</a>
+          <a @click="handleStop(record)">停止</a>
           <a-divider type="vertical"/>
           <a-dropdown>
             <a class="ant-dropdown-link">
@@ -55,7 +60,10 @@
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a href="javascript:;">还原</a>
+                <a @click="handleRestore(record)">还原</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleDelete(record)">删除</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -67,7 +75,13 @@
 
 <script>
 import { STable } from '@/components'
-import { GetAgentTaskOverViewList } from '@/api/agent-task_overview'
+import overViewImg from '@/assets/overview.png'
+import {
+  deleteOverviewBak,
+  GetAgentTaskOverViewList, restoreOverviewBak,
+  startOverviewBak,
+  stopOverviewBak, syncOverviewBak
+} from '@/api/agent-task_overview'
 
 const statusMap = {
   0: {
@@ -127,7 +141,19 @@ export default {
   },
   data () {
     return {
-      extraImage: 'https://gw.alipayobjects.com/zos/rmsportal/RzwpdLnhmvDJToTdfDPe.png',
+      selectedRowKeys: [],
+      selectedRows: [],
+
+      // custom table alert & rowSelection
+      options: {
+        alert: { show: true, clear: () => { this.selectedRowKeys = [] } },
+        rowSelection: {
+          selectedRowKeys: this.selectedRowKeys,
+          onChange: this.onSelectChange
+        }
+      },
+      optionAlertShow: false,
+      extraImage: overViewImg,
       select_type: 0,
       searchData: '',
       radioStatus: 0,
@@ -136,8 +162,7 @@ export default {
           title: 'ID',
           dataIndex: 'id',
           align: 'center',
-          sorter: true,
-          needTotal: true
+          sorter: true
         },
         {
           title: '服务名',
@@ -165,13 +190,15 @@ export default {
           dataIndex: 'keep_number',
           customRender: (text) => text + ' 天',
           align: 'center',
-          sorter: true
+          sorter: true,
+          needTotal: true
         },
         {
           title: '任务状态',
           dataIndex: 'is_deleted',
           scopedSlots: { customRender: 'deleted_status' },
-          align: 'center'
+          align: 'center',
+          sorter: true
         },
         {
           title: '运行状态',
@@ -204,13 +231,28 @@ export default {
     }
   },
   methods: {
-    edit (row) {
-      // axios 发送数据到后端 修改数据成功后
-      // 调用 refresh() 重新加载列表数据
-      // 这里 setTimeout 模拟发起请求的网络延迟..
-      setTimeout(() => {
-        this.$refs.table.refresh() // refresh() 不传参默认值 false 不刷新到分页第一页
-      }, 1500)
+    tableOption () {
+      if (!this.optionAlertShow) {
+        this.options = {
+          alert: { show: true, clear: () => { this.selectedRowKeys = [] } },
+          rowSelection: {
+            selectedRowKeys: this.selectedRowKeys,
+            onChange: this.onSelectChange
+          }
+        }
+        this.optionAlertShow = true
+      } else {
+        this.options = {
+          alert: false,
+          rowSelection: null
+        }
+        this.optionAlertShow = false
+      }
+    },
+    onSelectChange (selectedRowKeys, selectedRows) {
+      this.selectedRowKeys = selectedRowKeys
+      this.selectedRows = selectedRows
+      console.log('selectedRows = ', this.selectedRows)
     },
     handlerSearch () {
       this.$refs.table.refresh(true)
@@ -220,6 +262,87 @@ export default {
     },
     handleRadioClick () {
       this.$refs.table.refresh(true)
+    },
+    handleRestore (record) {
+      const query = {
+        'id': record.id,
+        'service_name': record.service_name,
+        'task_id': record.task_id,
+        'type': record.type
+      }
+      restoreOverviewBak(query).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
+    },
+    handleStart (record) {
+      const query = {
+        'id': record.id,
+        'service_name': record.service_name,
+        'task_id': record.task_id,
+        'type': record.type
+      }
+      startOverviewBak(query).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
+    },
+    handleStop (record) {
+      const query = {
+        'id': record.id,
+        'service_name': record.service_name,
+        'task_id': record.task_id,
+        'type': record.type
+      }
+      stopOverviewBak(query).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
+    },
+    handleDelete (record) {
+      const self = this
+      this.$confirm({
+        title: '您确认要删除此任务吗?',
+        content: '删除前请手动停止任务',
+        destroyOnClose: true,
+        onOk () {
+          return new Promise((resolve, reject) => {
+            if (record.status === 1) {
+              self.$message.warn('任务运行中，请停止后重试')
+              resolve()
+              return
+            }
+            const query = {
+              'id': record.id,
+              'service_name': record.service_name,
+              'task_id': record.task_id,
+              'type': record.type
+            }
+            deleteOverviewBak(query).then((res) => {
+              if (res) {
+                self.$message.success(res.data)
+                self.$refs.table.refresh(true)
+                resolve()
+              }
+            })
+          })
+        },
+        onCancel () {}
+      })
+    },
+    handleSync () {
+      syncOverviewBak().then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
     }
   }
 }

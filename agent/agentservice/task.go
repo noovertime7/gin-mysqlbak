@@ -120,6 +120,22 @@ func (t *TaskService) TaskDelete(ctx *gin.Context, params *agentdto.TaskDeleteIn
 	return nil
 }
 
+func (t *TaskService) TaskRestore(ctx *gin.Context, params *agentdto.TaskDeleteInput) error {
+	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
+	if err != nil {
+		return err
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+	taskDeleteInput := &task.TaskIDInput{ID: params.ID}
+	data, err := taskService.RestoreTask(ctx, taskDeleteInput, ops)
+	if err != nil || !data.OK {
+		return err
+	}
+	return nil
+}
+
 func (t *TaskService) TaskUpdate(ctx *gin.Context, params *agentdto.TaskUpdateInput) error {
 	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
 	if err != nil {

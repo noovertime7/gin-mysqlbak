@@ -2,24 +2,25 @@ package agentcontroller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/v2/client"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
-	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
-	"github.com/noovertime7/gin-mysqlbak/agent/proto/esbak"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
-type EsTaskController struct{}
+type EsTaskController struct {
+	service *agentservice.EsTaskService
+}
 
 func EsTaskRegister(group *gin.RouterGroup) {
-	esTask := &EsTaskController{}
+	esTask := &EsTaskController{service: agentservice.GetClusterEsTaskService()}
 	group.POST("/taskadd", esTask.AddEsTask)
 	group.DELETE("/taskdelete", esTask.DeleteEsTask)
 	group.PUT("/taskupdate", esTask.UpdateEsTask)
 	group.GET("/tasklist", esTask.GetEsTaskList)
 	group.GET("/taskdetail", esTask.GetEsTaskDetail)
+	group.GET("/task_restore", esTask.RestoreEsTask)
 }
 
 func (e *EsTaskController) AddEsTask(ctx *gin.Context) {
@@ -28,20 +29,7 @@ func (e *EsTaskController) AddEsTask(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	data, err := EsTaskService.TaskAdd(ctx, &esbak.EsBakTaskADDInput{
-		HostID:      params.HostID,
-		BackupCycle: params.BackupCycle,
-		KeepNumber:  params.KeepNumber,
-	}, ops)
+	data, err := e.service.AddEsTask(ctx, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("es添加任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskAddError, err))
@@ -57,16 +45,23 @@ func (e *EsTaskController) DeleteEsTask(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
+	data, err := e.service.DeleteEsTask(ctx, params)
+	if err != nil || !data.OK {
+		log.Logger.Error("es删除任务失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskDeleteError, err))
 		return
 	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
+	middleware.ResponseSuccess(ctx, data.Message)
+	log.Logger.Info("es删除任务成功", data.Message)
+}
+
+func (e *EsTaskController) RestoreEsTask(ctx *gin.Context) {
+	params := &agentdto.ESBakTaskIDInput{}
+	if err := params.BindValidParam(ctx); err != nil {
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
 	}
-	data, err := EsTaskService.TaskDelete(ctx, &esbak.EsTaskIDInput{ID: params.ID}, ops)
+	data, err := e.service.RestoreEsTask(ctx, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("es删除任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskDeleteError, err))
@@ -82,21 +77,7 @@ func (e *EsTaskController) UpdateEsTask(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	data, err := EsTaskService.TaskUpdate(ctx, &esbak.EsBakTaskUpdateInput{
-		ID:          params.ID,
-		HostID:      params.HostID,
-		BackupCycle: params.BackupCycle,
-		KeepNumber:  params.KeepNumber,
-	}, ops)
+	data, err := e.service.UpdateEsTask(ctx, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("es修改任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskUpdateError, err))
@@ -112,20 +93,7 @@ func (e *EsTaskController) GetEsTaskList(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	data, err := EsTaskService.GetTaskList(ctx, &esbak.EsTaskListInput{
-		Info:     params.Info,
-		PageNo:   params.PageNo,
-		PageSize: params.PageSize,
-	}, ops)
+	data, err := e.service.GetEsTaskList(ctx, params)
 	if err != nil {
 		log.Logger.Error("获取es_task列表失败")
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskGetError, err))
@@ -139,16 +107,7 @@ func (e *EsTaskController) GetEsTaskDetail(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	EsTaskService, addr, err := pkg.GetESTaskService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	data, err := EsTaskService.GetTaskDetail(ctx, &esbak.EsTaskIDInput{ID: params.ID}, ops)
+	data, err := e.service.GetEsTaskDetail(ctx, params)
 	if err != nil {
 		log.Logger.Error("获取Agent详情失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskGetError, err))

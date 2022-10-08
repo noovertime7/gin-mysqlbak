@@ -30,6 +30,7 @@ const (
 	TaskGetError         = 20204 // 请勿重复提交
 	TaskNodeFound        = 20205
 	TaskOverViewGetError = 20206
+	TaskRestoreError     = 20207
 
 	HistoryAddError    = 20301 // 请勿重复提交
 	HistoryDeleteError = 20302 // 请勿重复提交
@@ -74,6 +75,7 @@ var codeTag = map[int]string{
 	TaskGetError:                 "任务查询失败，请联系管理员",
 	TaskNodeFound:                "备份任务为空",
 	TaskOverViewGetError:         "获取任务总览失败",
+	TaskRestoreError:             "还原任务失败",
 	HistoryAddError:              "历史记录添加失败，请联系管理员",
 	HistoryDeleteError:           "历史记录删除失败，请联系管理员",
 	HistoryUpdateError:           "历史记录更新失败，请联系管理员",
@@ -93,10 +95,10 @@ var codeTag = map[int]string{
 	AgentGetError:        "客户端查询失败，请联系管理员",
 	AgentGetAddressError: "客户端获取地址失败",
 
-	BakStartError:    "启动备份失败",
-	BakStopError:     "停止备份失败",
-	BakStartAllError: "批量启动备份失败",
-	BakStopAllError:  "批量停止备份失败",
+	BakStartError:    "启动备份任务失败",
+	BakStopError:     "停止备份任务失败",
+	BakStartAllError: "批量启动备份任务失败",
+	BakStopAllError:  "批量停止备份任务失败",
 }
 
 // NewGlobalError 4、新建自定义error实例化
