@@ -27,6 +27,8 @@
       </div>
       <div class="table-operator">
         <a-button type="primary" ghost="ghost" icon="sync" @click="handleSync">手动同步</a-button>
+        <a-button type="primary" ghost="ghost" icon="sync" :disabled="getSelectStatus" @click="handleSync">批量启动</a-button>
+        <a-button type="primary" ghost="ghost" icon="sync" :disabled="getSelectStatus" @click="handleSync">批量停止</a-button>
       </div>
       <s-table
         ref="table"
@@ -139,6 +141,12 @@ export default {
       return typeMap[type].color
     }
   },
+  computed: {
+    // 控制开关状态，只有选中行才会返回false
+    getSelectStatus () {
+      return this.selectedRows.length < 1
+    }
+  },
   data () {
     return {
       selectedRowKeys: [],
@@ -186,12 +194,18 @@ export default {
           sorter: true
         },
         {
+          title: '完成数',
+          dataIndex: 'finish_num',
+          align: 'center',
+          sorter: true,
+          needTotal: true
+        },
+        {
           title: '保留周期',
           dataIndex: 'keep_number',
           customRender: (text) => text + ' 天',
           align: 'center',
-          sorter: true,
-          needTotal: true
+          sorter: true
         },
         {
           title: '任务状态',
@@ -252,7 +266,6 @@ export default {
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
-      console.log('selectedRows = ', this.selectedRows)
     },
     handlerSearch () {
       this.$refs.table.refresh(true)

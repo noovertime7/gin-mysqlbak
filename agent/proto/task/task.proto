@@ -108,6 +108,8 @@ message TaskListItem {
   string DeletedAt = 11;
   // @inject_tag: json:"is_deleted"
   int64  IsDeleted = 12;
+  // @inject_tag: json:"finish_num"
+  int64 FinishNum = 13;
 }
 
 message TaskDetailOutPut {

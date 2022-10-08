@@ -32,6 +32,7 @@ type TaskOverViewListOutItem struct {
 	BackupCycle string `json:"backup_cycle" form:"backup_cycle"`
 	KeepNumber  int64  `json:"keep_number" form:"keep_number"`
 	Status      int64  `json:"status" form:"status"`
+	FinishNum   int64  `json:"finish_num"`
 	Type        int64  `json:"type"`
 	IsDeleted   int64  `json:"is_deleted"`
 }
