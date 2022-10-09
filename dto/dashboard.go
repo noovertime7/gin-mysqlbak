@@ -17,3 +17,8 @@ type DashServiceStatItemOutput struct {
 	Name   string `json:"name"`
 	Value  int64  `json:"value"`
 }
+
+type ServiceTaskOutPut struct {
+	ServiceName string `json:"item"`
+	TaskNum     int64  `json:"count"`
+}

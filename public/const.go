@@ -6,6 +6,7 @@ const (
 	HistoryStatusAll     = "all"
 	HistoryStatusSuccess = "success"
 	HistoryStatusFail    = "fail"
+	LargePageSize        = 99999
 )
 
 const (

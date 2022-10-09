@@ -107,14 +107,6 @@
               <a class="ant-dropdown-link" href="#">
                 <a-icon type="ellipsis" />
               </a>
-              <a-menu slot="overlay">
-                <a-menu-item>
-                  <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-one') }}</a>
-                </a-menu-item>
-                <a-menu-item>
-                  <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-two') }}</a>
-                </a-menu-item>
-              </a-menu>
             </a-dropdown>
             <a-row :gutter="68">
               <a-col :xs="24" :sm="12" :style="{ marginBottom: ' 24px'}">
@@ -164,43 +156,17 @@
           </a-card>
         </a-col>
         <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
-          <a-card class="antd-pro-pages-dashboard-analysis-salesCard" :loading="loading" :bordered="false" :title="$t('dashboard.analysis.the-proportion-of-sales')" :style="{ height: '100%' }">
+          <a-card class="antd-pro-pages-dashboard-analysis-salesCard" :loading="loading" :bordered="false" title="集群服务任务占比" :style="{ height: '100%' }">
             <div slot="extra" style="height: inherit;">
               <!-- style="bottom: 12px;display: inline-block;" -->
               <span class="dashboard-analysis-iconGroup">
-                <a-dropdown :trigger="['click']" placement="bottomLeft">
-                  <a-icon type="ellipsis" class="ant-dropdown-link" />
-                  <a-menu slot="overlay">
-                    <a-menu-item>
-                      <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-one') }}</a>
-                    </a-menu-item>
-                    <a-menu-item>
-                      <a href="javascript:;">{{ $t('dashboard.analysis.dropdown-option-two') }}</a>
-                    </a-menu-item>
-                  </a-menu>
-                </a-dropdown>
               </span>
-              <div class="analysis-salesTypeRadio">
-                <a-radio-group defaultValue="a">
-                  <a-radio-button value="a">{{ $t('dashboard.analysis.channel.all') }}</a-radio-button>
-                  <a-radio-button value="b">{{ $t('dashboard.analysis.channel.online') }}</a-radio-button>
-                  <a-radio-button value="c">{{ $t('dashboard.analysis.channel.stores') }}</a-radio-button>
-                </a-radio-group>
-              </div>
-
             </div>
-            <h4>{{ $t('dashboard.analysis.sales') }}</h4>
+            <h4>任务数量</h4>
             <div>
               <!-- style="width: calc(100% - 240px);" -->
               <div>
-                <v-chart :force-fit="true" :height="405" :data="pieData" :scale="pieScale">
-                  <v-tooltip :showTitle="false" dataKey="item*percent" />
-                  <v-axis />
-                  <!-- position="right" :offsetX="-140" -->
-                  <v-legend dataKey="item"/>
-                  <v-pie position="percent" color="item" :vStyle="pieStyle" />
-                  <v-coord type="theta" :radius="0.75" :innerRadius="0.6" />
-                </v-chart>
+                <PieChart :chart-data="pieData"></PieChart>
               </div>
 
             </div>
@@ -225,6 +191,8 @@ import {
   MiniSmoothArea
 } from '@/components'
 import { baseMixin } from '@/store/app-mixin'
+import { getSvcTNum } from '@/api/dashboard'
+import PieChart from '@/views/dashboard/components/Piechart'
 
 const barData = []
 const barData2 = []
@@ -277,36 +245,11 @@ for (let i = 0; i < 50; i += 1) {
   })
 }
 
-const DataSet = require('@antv/data-set')
-
-const sourceData = [
-  { item: '家用电器', count: 32.2 },
-  { item: '食用酒水', count: 21 },
-  { item: '个护健康', count: 17 },
-  { item: '服饰箱包', count: 13 },
-  { item: '母婴产品', count: 9 },
-  { item: '其他', count: 7.8 }
-]
-
-const pieScale = [{
-  dataKey: 'percent',
-  min: 0,
-  formatter: '.0%'
-}]
-
-const dv = new DataSet.View().source(sourceData)
-dv.transform({
-  type: 'percent',
-  field: 'count',
-  dimension: 'item',
-  as: 'percent'
-})
-const pieData = dv.rows
-
 export default {
   name: 'Analysis',
   mixins: [baseMixin],
   components: {
+    PieChart,
     ChartCard,
     MiniArea,
     MiniBar,
@@ -329,15 +272,8 @@ export default {
 
       barData,
       barData2,
-
-      //
-      pieScale,
-      pieData,
-      sourceData,
-      pieStyle: {
-        stroke: '#fff',
-        lineWidth: 1
-      }
+      // 饼状图数据
+      pieData: []
     }
   },
   computed: {
@@ -367,9 +303,18 @@ export default {
     }
   },
   created () {
-    setTimeout(() => {
-      this.loading = !this.loading
-    }, 1000)
+    this.GetSvcTNum()
+    this.loading = !this.loading
+  },
+  methods: {
+    GetSvcTNum () {
+      getSvcTNum().then((res) => {
+        if (res) {
+          this.pieData = res.data
+          console.log('piedata', this.pieData)
+        }
+      })
+    }
   }
 }
 </script>
