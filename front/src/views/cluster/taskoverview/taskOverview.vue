@@ -7,7 +7,7 @@
     </template>
     <a-card :bordered="false" title="任务总览">
       <div slot="extra">
-        <span style="font-weight: bold">应用:</span>&ensp;
+        <span style="font-weight: bold">应用类型:</span>&ensp;
         <a-select v-model="select_type" style="width: 230px" @change="handleSelectChange">
           <a-select-option :value="0">全部</a-select-option>
           <a-select-option :value="1">mysql</a-select-option>
@@ -27,8 +27,8 @@
       </div>
       <div class="table-operator">
         <a-button type="primary" ghost="ghost" icon="sync" @click="handleSync">手动同步</a-button>
-        <a-button type="primary" ghost="ghost" icon="sync" :disabled="getSelectStatus" @click="handleSync">批量启动</a-button>
-        <a-button type="primary" ghost="ghost" icon="sync" :disabled="getSelectStatus" @click="handleSync">批量停止</a-button>
+        <a-button type="primary" ghost="ghost" icon="sync" :disabled="getSelectStatus" @click="handleBatchStart">批量启动</a-button>
+        <a-button type="primary" ghost="ghost" icon="sync" :disabled="getSelectStatus" @click="handleBatchStop">批量停止</a-button>
       </div>
       <s-table
         ref="table"
@@ -79,6 +79,7 @@
 import { STable } from '@/components'
 import overViewImg from '@/assets/overview.png'
 import {
+  batchStartOverviewBak, batchStopOverviewBak,
   deleteOverviewBak,
   GetAgentTaskOverViewList, restoreOverviewBak,
   startOverviewBak,
@@ -304,6 +305,22 @@ export default {
         }
       })
     },
+    handleBatchStart () {
+      batchStartOverviewBak(this.selectedRows).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
+    },
+    handleBatchStop () {
+      batchStopOverviewBak(this.selectedRows).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh(true)
+        }
+      })
+    },
     handleStop (record) {
       const query = {
         'id': record.id,
@@ -322,7 +339,7 @@ export default {
       const self = this
       this.$confirm({
         title: '您确认要删除此任务吗?',
-        content: '删除前请手动停止任务',
+        content: '此操作将会永久删除任务,删除前请先手动停止任务',
         destroyOnClose: true,
         onOk () {
           return new Promise((resolve, reject) => {

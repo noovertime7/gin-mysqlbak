@@ -52,10 +52,12 @@ const (
 	AgentGetError        = 20503
 	AgentGetAddressError = 20504
 
-	BakStartError    = 20601 // 请勿重复提交
-	BakStopError     = 20602 // 请勿重复提交
-	BakStartAllError = 20603 // 请勿重复提交
-	BakStopAllError  = 20604 // 请勿重复提交
+	BakStartError      = 20601 // 请勿重复提交
+	BakStopError       = 20602 // 请勿重复提交
+	BakStartAllError   = 20603 // 请勿重复提交
+	BakStopAllError    = 20604 // 请勿重复提交
+	BatchBakStartError = 20605
+	BatchBakStopError  = 20606
 )
 
 // 3、定义errorCode对应的文本信息
@@ -95,10 +97,12 @@ var codeTag = map[int]string{
 	AgentGetError:        "客户端查询失败，请联系管理员",
 	AgentGetAddressError: "客户端获取地址失败",
 
-	BakStartError:    "启动备份任务失败",
-	BakStopError:     "停止备份任务失败",
-	BakStartAllError: "批量启动备份任务失败",
-	BakStopAllError:  "批量停止备份任务失败",
+	BakStartError:      "启动备份任务失败",
+	BakStopError:       "停止备份任务失败",
+	BakStartAllError:   "批量启动备份任务失败",
+	BakStopAllError:    "批量停止备份任务失败",
+	BatchBakStartError: "批量任务启动失败",
+	BatchBakStopError:  "批量任务停止失败",
 }
 
 // NewGlobalError 4、新建自定义error实例化

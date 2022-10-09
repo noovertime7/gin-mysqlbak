@@ -24,6 +24,22 @@ export function startOverviewBak (query) {
   })
 }
 
+export function batchStartOverviewBak (data) {
+  return request({
+    url: '/agent/overview_task_batch_start',
+    method: 'post',
+    data
+  })
+}
+
+export function batchStopOverviewBak (data) {
+  return request({
+    url: '/agent/overview_task_batch_stop',
+    method: 'post',
+    data
+  })
+}
+
 export function deleteOverviewBak (query) {
   return request({
     url: '/agent/overview_task_delete',

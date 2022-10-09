@@ -186,6 +186,21 @@ func (t *TaskOverViewService) StartTask(ctx *gin.Context, info *agentdto.StartOv
 	//return "", errors.New("类型不匹配")
 }
 
+func (t *TaskOverViewService) BatchStartTask(ctx *gin.Context, info []*agentdto.TaskOverViewListOutItem) (string, error) {
+	for _, task := range info {
+		_, err := t.StartTask(ctx, &agentdto.StartOverViewBakInput{
+			ID:          task.ID,
+			ServiceName: task.ServiceName,
+			TaskID:      task.TaskID,
+			Type:        task.Type,
+		})
+		if err != nil {
+			return "", err
+		}
+	}
+	return "任务批量启动成功", nil
+}
+
 func (t *TaskOverViewService) StopTask(ctx *gin.Context, info *agentdto.StopOverViewBakInput) (string, error) {
 	//switch info.Type {
 	//case public.MysqlHost:
@@ -213,6 +228,21 @@ func (t *TaskOverViewService) StopTask(ctx *gin.Context, info *agentdto.StopOver
 	//return "", errors.New("类型不匹配")
 }
 
+func (t *TaskOverViewService) BatchStopTask(ctx *gin.Context, info []*agentdto.TaskOverViewListOutItem) (string, error) {
+	for _, task := range info {
+		_, err := t.StopTask(ctx, &agentdto.StopOverViewBakInput{
+			ID:          task.ID,
+			ServiceName: task.ServiceName,
+			TaskID:      task.TaskID,
+			Type:        task.Type,
+		})
+		if err != nil {
+			return "", err
+		}
+	}
+	return "任务批量停止成功", nil
+}
+
 func (t *TaskOverViewService) DeleteTask(ctx *gin.Context, info *agentdto.DeleteOverViewTaskInput) (string, error) {
 	//switch info.Type {
 	//case public.MysqlHost:
@@ -225,22 +255,20 @@ func (t *TaskOverViewService) DeleteTask(ctx *gin.Context, info *agentdto.Delete
 		return "", err
 	}
 	return "删除成功", nil
-	//case public.ElasticHost:
-	//	data, err := t.esTaskService.DeleteEsTask(ctx, &agentdto.ESBakTaskIDInput{
-	//		ID:          info.TaskID,
-	//		ServiceName: info.ServiceName,
-	//	})
-	//	if err != nil || !data.OK {
-	//		return "", err
-	//	}
-	//	//启动成功，更新状态
-	//	overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
-	//	if err := overviewDB.Delete(ctx, t.DB); err != nil {
-	//		return "", err
-	//	}
-	//	return data.Message, nil
-	//}
-	//return "", errors.New("类型不匹配")
+}
+
+func (t *TaskOverViewService) DestroyTask(ctx *gin.Context, info *agentdto.DeleteOverViewTaskInput) (string, error) {
+	//switch info.Type {
+	//case public.MysqlHost:
+	if err := t.taskService.TaskDestroy(ctx, &agentdto.TaskDeleteInput{ServiceName: info.ServiceName, ID: info.TaskID}); err != nil {
+		return "", err
+	}
+	//启动成功，更新状态
+	overviewDB := &agentdao.TaskOverview{ID: info.ID, Type: info.Type}
+	if err := overviewDB.Delete(ctx, t.DB); err != nil {
+		return "", err
+	}
+	return "删除并清理成功", nil
 }
 
 func (t *TaskOverViewService) RestoreTask(ctx *gin.Context, info *agentdto.DeleteOverViewTaskInput) (string, error) {

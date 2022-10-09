@@ -17,6 +17,8 @@ func AgentOverViewTaskRegister(group *gin.RouterGroup) {
 	group.DELETE("/overview_task_delete", task.DeleteTask)
 	group.PUT("/overview_task_restore", task.RestoreTask)
 	group.GET("/overview_task_sync", task.Sync)
+	group.POST("/overview_task_batch_start", task.BatchStartTask)
+	group.POST("/overview_task_batch_stop", task.BatchStopTask)
 }
 
 type OverViewTask struct {
@@ -48,8 +50,40 @@ func (o *OverViewTask) StartOveTask(ctx *gin.Context) {
 	}
 	data, err := o.service.StartTask(ctx, params)
 	if err != nil {
-		log.Logger.Error("agent启动任务成功", err)
+		log.Logger.Error("agent启动任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStartError, err))
+		return
+	}
+	middleware.ResponseSuccess(ctx, data)
+}
+
+func (o *OverViewTask) BatchStartTask(ctx *gin.Context) {
+	var params []*agentdto.TaskOverViewListOutItem
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	data, err := o.service.BatchStartTask(ctx, params)
+	if err != nil {
+		log.Logger.Error("agent批量启动任务失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BatchBakStartError, err))
+		return
+	}
+	middleware.ResponseSuccess(ctx, data)
+}
+
+func (o *OverViewTask) BatchStopTask(ctx *gin.Context) {
+	var params []*agentdto.TaskOverViewListOutItem
+	if err := ctx.ShouldBindJSON(&params); err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	data, err := o.service.BatchStopTask(ctx, params)
+	if err != nil {
+		log.Logger.Error("agent批量停止任务失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BatchBakStopError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data)
@@ -81,6 +115,13 @@ func (o *OverViewTask) DeleteTask(ctx *gin.Context) {
 	data, err := o.service.DeleteTask(ctx, params)
 	if err != nil {
 		log.Logger.Error("agent删除任务失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStopError, err))
+		return
+	}
+	//任务总览界面删除，需要清理任务
+	data, err = o.service.DestroyTask(ctx, params)
+	if err != nil {
+		log.Logger.Error("agent清理任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStopError, err))
 		return
 	}
