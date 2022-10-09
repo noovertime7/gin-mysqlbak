@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 import { UserLayout, BasicLayout, BlankLayout, PageView } from '@/layouts'
-import { bxAnaalyse } from '@/core/icons'
+// import { bxAnaalyse } from '@/core/icons'
 
 const RouteView = {
   name: 'RouteView',
@@ -19,28 +19,28 @@ export const asyncRouterMap = [
       {
         path: '/dashboard',
         name: 'dashboard',
-        redirect: '/dashboard/workplace',
+        redirect: '/dashboard/analysis',
         component: RouteView,
-        meta: { title: 'menu.dashboard', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
+        meta: { title: 'menu.dashboard', keepAlive: true, icon: 'dashboard', permission: ['dashboard'] },
         children: [
           {
             path: '/dashboard/analysis/:pageNo([1-9]\\d*)?',
             name: 'Analysis',
             component: () => import('@/views/dashboard/Analysis'),
             meta: { title: 'menu.dashboard.analysis', keepAlive: false, permission: ['dashboard'] }
-          },
-          // 外部链接
-          {
-            path: 'https://www.baidu.com/',
-            name: 'Monitor',
-            meta: { title: 'menu.dashboard.monitor', target: '_blank' }
-          },
-          {
-            path: '/dashboard/workplace',
-            name: 'Workplace',
-            component: () => import('@/views/dashboard/Workplace'),
-            meta: { title: 'menu.dashboard.workplace', keepAlive: true, permission: ['dashboard'] }
           }
+          // 外部链接
+          // {
+          //   path: 'https://www.baidu.com/',
+          //   name: 'Monitor',
+          //   meta: { title: 'menu.dashboard.monitor', target: '_blank' }
+          // },
+          // {
+          //   path: '/dashboard/workplace',
+          //   name: 'Workplace',
+          //   component: () => import('@/views/dashboard/Workplace'),
+          //   meta: { title: 'menu.dashboard.workplace', keepAlive: true, permission: ['dashboard'] }
+          // }
         ]
       },
       // forms
@@ -330,7 +330,7 @@ export const asyncRouterMap = [
         path: '/settings',
         name: 'settingsPage',
         component: PageView,
-        meta: { title: '系统设置', icon: 'slack', permission: ['settings'] },
+        meta: { title: '系统管理', icon: 'setting', permission: ['settings'] },
         redirect: '/settings/icon-selector',
         children: [
           {
@@ -344,22 +344,22 @@ export const asyncRouterMap = [
             name: 'UserList',
             component: () => import('@/views/settings/TreeList'),
             meta: { title: '用户管理', keepAlive: true }
-          },
-          {
-            path: '/settings/list/permission-list',
-            name: 'PermissionList',
-            component: () => import('@/views/settings/PermissionList'),
-            meta: { title: '权限列表', keepAlive: true }
           }
+          // {
+          //   path: '/settings/list/permission-list',
+          //   name: 'PermissionList',
+          //   component: () => import('@/views/settings/PermissionList'),
+          //   meta: { title: '权限列表', keepAlive: true }
+          // }
         ]
       }
     ]
+  },
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
   }
-  // {
-  //   path: '*',
-  //   redirect: '/404',
-  //   hidden: true
-  // }
 ]
 
 /**

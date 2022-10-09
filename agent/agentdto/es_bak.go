@@ -6,12 +6,12 @@ import (
 )
 
 type ESBakStartInput struct {
-	ID          int64  `json:"id" form:"id" comment:"ID"  validate:"required"`
+	ID          int64  `json:"task_id" form:"task_id" comment:"ID"  validate:"required"`
 	ServiceName string `json:"service_name" form:"service_name" comment:"服务名"  validate:"required"`
 }
 
 type ESBakStopInput struct {
-	ID          int64  `json:"id" form:"id" comment:"ID"  validate:"required"`
+	ID          int64  `json:"task_id" form:"task_id" comment:"ID"  validate:"required"`
 	ServiceName string `json:"service_name" form:"service_name" comment:"服务名"  validate:"required"`
 }
 

@@ -13,21 +13,11 @@
           placeholder="任务ID"
           v-decorator="[
             'id',
-            {rules: [{}]}
+            {rules: []}
           ]"
           :disabled="true"
         ></a-input>
       </a-form-item>
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="数据库"
-        hasFeedback
-        validateStatus="success"
-      >
-        <a-input style="width: 100%" placeholder="请输入数据库名" v-decorator="['db_name', {rules: [{ required: true, message: '请输入规则编号',whitespace: true }]}]" />
-      </a-form-item>
-
       <a-form-item
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
@@ -46,96 +36,6 @@
         validateStatus="success"
       >
         <a-input-number :min="1" style="width: 100%" placeholder="请输入数据保留周期(天)" v-decorator="['keep_number', {rules: [{ required: true }]}]" />
-      </a-form-item>
-
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="功能"
-        hasFeedback
-      >
-        <template>
-          钉钉通知:&ensp;<a-switch v-model="dingStatus" checked-children="开" un-checked-children="关" default-checked />
-        </template> &ensp;&ensp;&ensp;&ensp;&ensp;
-        <template>
-          存储设置:&ensp;<a-switch v-model="ossStatus" checked-children="开" un-checked-children="关" default-checked />
-        </template>
-      </a-form-item>
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="钉钉AccessToken"
-        v-show="dingStatus"
-      >
-        <a-input style="width: 100%" placeholder="请输入钉钉AccessToken" v-decorator="['ding_access_token', {rules: [{}]}]" />
-      </a-form-item>
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="钉钉Secret"
-        v-show="dingStatus"
-      >
-        <a-input style="width: 100%" placeholder="请输入钉钉Secret" v-decorator="['ding_secret', {rules: [{}]}]" />
-      </a-form-item>
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="存储类型"
-        v-show="ossStatus"
-      >
-        <a-select v-model="ossType" style="width: 120px">
-          <a-select-option :value="0">
-            AliOSS
-          </a-select-option>
-          <a-select-option :value="1">
-            minio
-          </a-select-option>
-          <a-select-option :value="3">
-            other
-          </a-select-option>
-        </a-select>
-      </a-form-item>
-
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="endpoint"
-        v-show="ossStatus"
-      >
-        <a-input style="width: 100%" placeholder="请输入对象存储地址" v-decorator="['endpoint', {rules: [{}]}]" />
-      </a-form-item>
-
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="oss_access"
-        v-show="ossStatus"
-      >
-        <a-input style="width: 100%" placeholder="请输入access" v-decorator="['oss_access', {rules: [{}]}]" />
-      </a-form-item>
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="oss_secret"
-        v-show="ossStatus"
-      >
-        <a-input style="width: 100%" placeholder="请输入secret" v-decorator="['oss_secret', {rules: [{}]}]" />
-      </a-form-item>
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="bucket_name"
-        v-show="ossStatus"
-      >
-        <a-input style="width: 100%" placeholder="请输入桶名" v-decorator="['bucket_name', {rules: [{}]}]" />
-      </a-form-item>
-      <a-form-item
-        :labelCol="labelCol"
-        :wrapperCol="wrapperCol"
-        label="directory"
-        v-show="ossStatus"
-      >
-        <a-input style="width: 100%" placeholder="请输入文件夹名" v-decorator="['directory', {rules: [{}]}]" />
       </a-form-item>
       <a-form-item
         v-bind="buttonCol"
@@ -157,7 +57,8 @@
 <script>
 
 import pick from 'lodash.pick'
-import { taskAdd, taskDetail, taskUpdate } from '@/api/task'
+import { addEsTask, updateEsTask } from '@/api/elastic'
+import { GetAgentTaskDetail } from '@/api/agent-task'
 
 export default {
   name: 'TableEdit',
@@ -202,6 +103,9 @@ export default {
   // beforeCreate () {
   //   this.form = this.$form.createForm(this)
   // },
+  created () {
+    this.service_name = this.$route.params && this.$route.params.service_name
+  },
   mounted () {
     this.$nextTick(() => {
       this.loadEditInfo(this.record)
@@ -219,10 +123,8 @@ export default {
            if (!err) {
              if (this.isEdit) {
                values['host_id'] = this.host
-               values['is_ding_send'] = this.BoolToInt(this.dingStatus)
-               values['is_oss_save'] = this.BoolToInt(this.ossStatus)
-               values['oss_type'] = this.ossType
-               taskUpdate(values).then((res) => {
+               values['service_name'] = this.service_name
+               updateEsTask(values).then((res) => {
                  if (res) {
                    this.$message.success(res.data)
                    this.handleGoBack()
@@ -232,10 +134,8 @@ export default {
                })
              } else {
                values['host_id'] = this.host
-               values['is_ding_send'] = this.BoolToInt(this.dingStatus)
-               values['is_oss_save'] = this.BoolToInt(this.ossStatus)
-               values['oss_type'] = this.ossType
-               taskAdd(values).then((res) => {
+               values['service_name'] = this.service_name
+               addEsTask(values).then((res) => {
                  if (res) {
                    this.$message.success(res.data)
                    this.handleGoBack()
@@ -257,13 +157,13 @@ export default {
     },
     loadEditInfo (data) {
       const { form } = this
-      if (data) {
+      if (data.id) {
         this.isEdit = true
         new Promise((resolve) => {
           resolve()
         }).then(() => {
-          const query = { 'id': data.id }
-          taskDetail(query).then((res) => {
+          const query = { 'id': data.id, 'service_name': this.service_name }
+          GetAgentTaskDetail(query).then((res) => {
             const formData = pick(res.data, ['host', 'host_id', 'backup_cycle', 'db_name', 'status', 'keep_number', 'id',
               'is_ding_send', 'ding_access_token', 'ding_secret',
             'is_oss_save', 'oss_type', 'endpoint', 'oss_access', 'oss_secret', 'bucket_name', 'directory'

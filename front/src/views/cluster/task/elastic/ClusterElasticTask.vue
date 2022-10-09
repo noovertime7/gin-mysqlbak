@@ -24,16 +24,15 @@ export default {
     return {
       currentComponet: 'List',
       record: '',
-      HostID: 0
+      HostID: 0,
+      hostByEdit: ''
     }
-  },
-  mounted () {
-    const temp = this.$route.params && this.$route.params.hostID
-    this.HostID = Number(temp)
   },
   methods: {
     handleEdit (record) {
       this.record = record || ''
+      this.HostID = record.host_id_by_list
+      this.hostByEdit = record.host
       this.currentComponet = 'Edit'
     },
     handleGoBack () {

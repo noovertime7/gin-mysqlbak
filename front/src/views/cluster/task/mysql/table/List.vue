@@ -126,10 +126,8 @@ export default {
       select_host: '',
       ghost: true,
       mdl: {},
-      // 当亲服务名
+      // 当前服务名
       service_name: '',
-      // 高级搜索 展开/关闭
-      advanced: false,
       // 查询参数
       queryParam: {},
       // 存储主机ID与name的对应关系
