@@ -97,3 +97,13 @@ func StringToTime(receiveTime string) time.Time {
 	}
 	return t
 }
+
+// GetBeforeDates 生成日期
+func GetBeforeDates(day int) []string {
+	var out []string
+	for i := 0; i < day; i++ {
+		t := time.Now().AddDate(0, 0, -i)
+		out = append(out, t.Format("2006-01-02"))
+	}
+	return out
+}

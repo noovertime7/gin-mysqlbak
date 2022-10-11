@@ -27,7 +27,8 @@
           <div>
             <mini-area />
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.day-visits') }}<span> {{ '1234' | NumberFormat }}</span></template>
+          <template slot="footer">{{ $t('dashboard.analysis.day-visits') }}<span> {{ '1234' | NumberFormat }}</span>
+          </template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
@@ -81,7 +82,7 @@
                 <bar :data="barData" :title="$t('dashboard.analysis.sales-trend')" />
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
-                <rank-list :title="$t('dashboard.analysis.sales-ranking')" :list="rankList"/>
+                <rank-list :title="$t('dashboard.analysis.sales-ranking')" :list="rankList" />
               </a-col>
             </a-row>
           </a-tab-pane>
@@ -91,7 +92,7 @@
                 <bar :data="barData2" :title="$t('dashboard.analysis.visits-trend')" />
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
-                <rank-list :title="$t('dashboard.analysis.visits-ranking')" :list="rankList"/>
+                <rank-list :title="$t('dashboard.analysis.visits-ranking')" :list="rankList" />
               </a-col>
             </a-row>
           </a-tab-pane>
@@ -102,31 +103,36 @@
     <div class="antd-pro-pages-dashboard-analysis-twoColLayout" :class="!isMobile && 'desktop'">
       <a-row :gutter="24" type="flex" :style="{ marginTop: '24px' }">
         <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
-          <a-card :loading="loading" :bordered="false" :title="$t('dashboard.analysis.online-top-search')" :style="{ height: '100%' }">
-            <a-dropdown :trigger="['click']" placement="bottomLeft" slot="extra">
-              <a class="ant-dropdown-link" href="#">
-                <a-icon type="ellipsis" />
-              </a>
-            </a-dropdown>
+          <a-card :loading="loading" :bordered="false" title="集群服务统计" :style="{ height: '100%' }">
             <a-row :gutter="68">
               <a-col :xs="24" :sm="12" :style="{ marginBottom: ' 24px'}">
-                <number-info :total="12321" :sub-total="17.1">
+                <number-info
+                  :total="serviceNums.task_total"
+                  message="七天前: "
+                  :sub-total="serviceNums.task_increase_num"
+                  status="down"
+                  :decreaseTotal="serviceNums.task_decrease_num">
                   <span slot="subtitle">
-                    <span>{{ $t('dashboard.analysis.search-users') }}</span>
-                    <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+                    <span>任务完成数</span>
+                    <a-tooltip title="每天的任务完成数" slot="action">
                       <a-icon type="info-circle-o" :style="{ marginLeft: '8px' }" />
                     </a-tooltip>
                   </span>
                 </number-info>
                 <!-- miniChart -->
                 <div>
-                  <mini-smooth-area :style="{ height: '45px' }" :dataSource="searchUserData" :scale="searchUserScale" />
+                  <cluster-task-num-chart :dataSource="dataSource" :style="{ height: '45px' }" />
                 </div>
               </a-col>
               <a-col :xs="24" :sm="12" :style="{ marginBottom: ' 24px'}">
-                <number-info :total="2.7" :sub-total="26.2" status="down">
+                <number-info
+                  :total="serviceNums.finish_total"
+                  :sub-total="serviceNums.finish_increase_num"
+                  status="down"
+                  message="七天前: "
+                  :decreaseTotal="serviceNums.finish_decrease_num">>
                   <span slot="subtitle">
-                    <span>{{ $t('dashboard.analysis.per-capita-search') }}</span>
+                    <span>完成数量</span>
                     <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
                       <a-icon type="info-circle-o" :style="{ marginLeft: '8px' }" />
                     </a-tooltip>
@@ -134,7 +140,7 @@
                 </number-info>
                 <!-- miniChart -->
                 <div>
-                  <mini-smooth-area :style="{ height: '45px' }" :dataSource="searchUserData" :scale="searchUserScale" />
+                  <cluster-finish-num-chart :dataSource="dataSource" :style="{ height: '45px' }"/>
                 </div>
               </a-col>
             </a-row>
@@ -143,20 +149,23 @@
                 row-key="index"
                 size="small"
                 :columns="searchTableColumns"
-                :dataSource="searchData"
+                :dataSource="serviceListData"
                 :pagination="{ pageSize: 5 }"
               >
-                <span slot="range" slot-scope="text, record">
-                  <trend :flag="record.status === 0 ? 'up' : 'down'">
-                    {{ text }}%
-                  </trend>
+                <span slot="status" slot-scope="text">
+                  <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
                 </span>
               </a-table>
             </div>
           </a-card>
         </a-col>
         <a-col :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
-          <a-card class="antd-pro-pages-dashboard-analysis-salesCard" :loading="loading" :bordered="false" title="集群服务任务占比" :style="{ height: '100%' }">
+          <a-card
+            class="antd-pro-pages-dashboard-analysis-salesCard"
+            :loading="loading"
+            :bordered="false"
+            title="集群服务任务占比"
+            :style="{ height: '100%' }">
             <div slot="extra" style="height: inherit;">
               <!-- style="bottom: 12px;display: inline-block;" -->
               <span class="dashboard-analysis-iconGroup">
@@ -191,8 +200,11 @@ import {
   MiniSmoothArea
 } from '@/components'
 import { baseMixin } from '@/store/app-mixin'
-import { getSvcTNum } from '@/api/dashboard'
+import { clusterDataByDate, getSvcTNum } from '@/api/dashboard'
 import PieChart from '@/views/dashboard/components/Piechart'
+import { GetServiceList } from '@/api/agent'
+import ClusterTaskNumChart from '@/components/Charts/ClusterTaskNumChart'
+import ClusterFinishNumChart from '@/components/Charts/ClusterFinishNumChart'
 
 const barData = []
 const barData2 = []
@@ -222,33 +234,22 @@ for (let i = 0; i < 7; i++) {
     y: Math.ceil(Math.random() * 10)
   })
 }
-const searchUserScale = [
-  {
-    dataKey: 'x',
-    alias: '时间'
+const statusMap = {
+  0: {
+    status: 'error',
+    text: '离线'
   },
-  {
-    dataKey: 'y',
-    alias: '用户数',
-    min: 0,
-    max: 10
-  }]
-
-const searchData = []
-for (let i = 0; i < 50; i += 1) {
-  searchData.push({
-    index: i + 1,
-    keyword: `搜索关键词-${i}`,
-    count: Math.floor(Math.random() * 1000),
-    range: Math.floor(Math.random() * 100),
-    status: Math.floor((Math.random() * 10) % 2)
-  })
+  1: {
+    status: 'success',
+    text: '在线'
+  }
 }
-
 export default {
   name: 'Analysis',
   mixins: [baseMixin],
   components: {
+    ClusterTaskNumChart,
+    ClusterFinishNumChart,
     PieChart,
     ChartCard,
     MiniArea,
@@ -260,6 +261,14 @@ export default {
     NumberInfo,
     MiniSmoothArea
   },
+  filters: {
+    statusFilter (type) {
+      return statusMap[type].text
+    },
+    statusTypeFilter (type) {
+      return statusMap[type].status
+    }
+  },
   data () {
     return {
       loading: true,
@@ -267,51 +276,105 @@ export default {
 
       // 搜索用户数
       searchUserData,
-      searchUserScale,
-      searchData,
-
+      serviceListData: [],
+      // 左下角集群服务统计相关
+      dataSource: [],
+      serviceNums: {},
       barData,
       barData2,
       // 饼状图数据
-      pieData: []
+      pieData: [],
+      // 集群服务统计
+      clusterTaskDataByDate: [],
+      clusterTaskDataByDateScale: [
+        {
+          dataKey: 'date',
+          alias: '时间'
+        },
+        {
+          dataKey: 'task_num',
+          alias: '任务数',
+          min: 0,
+          max: 10
+        }],
+      searchUserScale: [
+        {
+          dataKey: 'x',
+          alias: '时间'
+        },
+        {
+          dataKey: 'y',
+          alias: '任务数',
+          min: 0,
+          max: 10
+        }]
     }
   },
   computed: {
     searchTableColumns () {
-        return [
-      {
-        dataIndex: 'index',
-        title: this.$t('dashboard.analysis.table.rank'),
-        width: 90
-      },
-      {
-        dataIndex: 'keyword',
-        title: this.$t('dashboard.analysis.table.search-keyword')
-      },
-      {
-        dataIndex: 'count',
-        title: this.$t('dashboard.analysis.table.users')
-      },
-      {
-        dataIndex: 'range',
-        title: this.$t('dashboard.analysis.table.weekly-range'),
-        align: 'right',
-        sorter: (a, b) => a.range - b.range,
-        scopedSlots: { customRender: 'range' }
-      }
+      return [
+        {
+          dataIndex: 'service_name',
+          title: '服务名',
+          align: 'center'
+        },
+        {
+          dataIndex: 'content',
+          title: '备注',
+          align: 'center'
+        },
+        {
+          dataIndex: 'task_num',
+          title: '任务数',
+          sorter: (a, b) => a.task_num - b.task_num,
+          align: 'center'
+        },
+        {
+          dataIndex: 'finish_num',
+          title: '完成数',
+          sorter: (a, b) => a.finish_num - b.finish_num,
+          align: 'center'
+        },
+        {
+          dataIndex: 'agent_status',
+          title: '状态',
+          scopedSlots: { customRender: 'status' },
+          align: 'center'
+        }
       ]
     }
   },
   created () {
+    this.GetClusterDataByDate()
     this.GetSvcTNum()
+    this.getAgentServiceList()
     this.loading = !this.loading
   },
   methods: {
+      async  GetClusterDataByDate () {
+        const query = { 'day': 7 }
+        const res = await clusterDataByDate(query)
+        if (res) {
+          this.dataSource = res.data.list
+          this.serviceNums.task_total = res.data.task_total
+          this.serviceNums.finish_total = res.data.finish_total
+          this.serviceNums.task_increase_num = res.data.task_increase_num
+          this.serviceNums.task_decrease_num = res.data.task_decrease_num
+          this.serviceNums.finish_increase_num = res.data.finish_increase_num
+          this.serviceNums.finish_decrease_num = res.data.finish_decrease_num
+        }
+      },
     GetSvcTNum () {
       getSvcTNum().then((res) => {
         if (res) {
           this.pieData = res.data
-          console.log('piedata', this.pieData)
+        }
+      })
+    },
+    getAgentServiceList () {
+      GetServiceList().then((res) => {
+        if (res) {
+          this.serviceListData = res.data.list
         }
       })
     }
@@ -319,47 +382,49 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
-  .extra-wrapper {
-    line-height: 55px;
-    padding-right: 24px;
+<style lang='less' scoped>
+.extra-wrapper {
+  line-height: 55px;
+  padding-right: 24px;
 
-    .extra-item {
-      display: inline-block;
-      margin-right: 24px;
+  .extra-item {
+    display: inline-block;
+    margin-right: 24px;
 
-      a {
-        margin-left: 24px;
-      }
+    a {
+      margin-left: 24px;
     }
   }
+}
 
-  .antd-pro-pages-dashboard-analysis-twoColLayout {
+.antd-pro-pages-dashboard-analysis-twoColLayout {
+  position: relative;
+  display: flex;
+  display: block;
+  flex-flow: row wrap;
+}
+
+.antd-pro-pages-dashboard-analysis-salesCard {
+  height: calc(100% - 24px);
+
+  :deep(.ant-card-head) {
     position: relative;
-    display: flex;
-    display: block;
-    flex-flow: row wrap;
   }
+}
 
-  .antd-pro-pages-dashboard-analysis-salesCard {
-    height: calc(100% - 24px);
-    :deep(.ant-card-head) {
-      position: relative;
-    }
+.dashboard-analysis-iconGroup {
+  i {
+    margin-left: 16px;
+    color: rgba(0, 0, 0, .45);
+    cursor: pointer;
+    transition: color .32s;
+    color: black;
   }
+}
 
-  .dashboard-analysis-iconGroup {
-    i {
-      margin-left: 16px;
-      color: rgba(0,0,0,.45);
-      cursor: pointer;
-      transition: color .32s;
-      color: black;
-    }
-  }
-  .analysis-salesTypeRadio {
-    position: absolute;
-    right: 54px;
-    bottom: 12px;
-  }
+.analysis-salesTypeRadio {
+  position: absolute;
+  right: 54px;
+  bottom: 12px;
+}
 </style>

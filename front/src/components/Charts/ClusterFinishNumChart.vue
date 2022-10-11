@@ -5,27 +5,24 @@
         :force-fit="true"
         :height="100"
         :data="dataSource"
-        :scale="scale"
+        :scale="clusterTaskDataByDateScale"
         :padding="[36, 0, 18, 0]">
         <v-tooltip />
-        <v-smooth-line position="x*y" :size="2" />
-        <v-smooth-area position="x*y" />
+        <v-smooth-line position="date*finish_num" :size="2" />
+        <v-smooth-area position="date*finish_num" />
       </v-chart>
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
-  name: 'MiniSmoothArea',
+  name: 'ClusterFinishNumChart',
   props: {
     prefixCls: {
       type: String,
       default: 'ant-pro-smooth-area'
-    },
-    scale: {
-      type: [Object, Array],
-      required: true
     },
     dataSource: {
       type: Array,
@@ -34,21 +31,17 @@ export default {
   },
   data () {
     return {
-      height: 100
+      height: 100,
+      clusterTaskDataByDateScale: [
+        {
+          dataKey: 'date',
+          alias: '日期'
+        },
+        {
+          dataKey: 'finish_num',
+          alias: '完成数'
+        }]
     }
-  },
-  watch: {
-    dataSource: {
-      deep: true,
-      handler (val) {
-        console.log('dataSource = ', this.dataSource)
-        console.log('val = ', val)
-        this.$forceUpdate()
-      }
-    }
-  },
-  created () {
-    console.log('dataSource = ', this.dataSource)
   }
 }
 </script>

@@ -6,8 +6,17 @@
     <div class="number-info-value">
       <span>{{ total }}</span>
       <span class="sub-total">
+        {{ message }}
+      </span>
+      <span class="sub-total">&ensp;</span>
+      <span class="sub-total">
         {{ subTotal }}
         <icon :type="`caret-${status}`" />
+      </span>
+      <span class="sub-total">&ensp;</span>
+      <span class="sub-total">
+        {{ decreaseTotal }}
+        <icon :type="`caret-up`" />
       </span>
     </div>
   </div>
@@ -31,6 +40,10 @@ export default {
       type: Number,
       required: true
     },
+    decreaseTotal: {
+      type: Number,
+      default: 100
+    },
     subTitle: {
       type: [String, Function],
       default: ''
@@ -38,6 +51,10 @@ export default {
     status: {
       type: String,
       default: 'up'
+    },
+    message: {
+      type: String,
+      default: 'unknown'
     }
   },
   components: {

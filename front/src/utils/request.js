@@ -55,18 +55,21 @@ request.interceptors.request.use(config => {
 // response interceptor
 request.interceptors.response.use((response) => {
   const res = response.data
-  if (res.errno !== 0) {
+  if (res.errno === 10103) {
+    notification.warn({
+      message: '登录过期，请重新登陆'
+    })
+    store.dispatch('Logout').then(() => {
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
+    })
+  }
+  if (res.errno !== 0 && res.errno !== 10103) {
     notification.error({
       message: res.errmsg || 'Error',
       description: res.real_err
     })
-    if (res.errno === 10103) {
-      store.dispatch('Logout').then(() => {
-        setTimeout(() => {
-          window.location.reload()
-        }, 1500)
-      })
-    }
   } else {
     return response.data
   }

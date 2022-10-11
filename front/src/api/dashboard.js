@@ -6,3 +6,11 @@ export function getSvcTNum () {
     method: 'get'
   })
 }
+
+export function clusterDataByDate (query) {
+  return request({
+    url: '/dashboard/service_info_by_date',
+    method: 'get',
+    params: query
+  })
+}

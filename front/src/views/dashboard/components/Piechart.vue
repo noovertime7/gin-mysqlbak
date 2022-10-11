@@ -57,7 +57,6 @@ export default {
   methods: {
     GetData () {
       const sourceData = this.chartData
-      console.log('source', sourceData)
        this.scale = [{
         dataKey: 'percent',
         min: 0,
