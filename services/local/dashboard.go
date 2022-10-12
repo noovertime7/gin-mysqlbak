@@ -1,13 +1,13 @@
 package local
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdao"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/database"
+	"github.com/noovertime7/mysqlbak/pkg/log"
 	"gorm.io/gorm"
 	"sync"
 )
@@ -71,14 +71,13 @@ func (d *DashboardService) GetTaskNumByDate(ctx *gin.Context, info *dto.AgentDat
 		finishSum += date.FinishNum
 		outItem := &dto.DateInfoOutItem{
 			Date:      datetime,
-			AgentNum:  date.AgentNum,
 			TaskNum:   date.TaskNum,
 			FinishNum: date.FinishNum,
 		}
 		out = append(out, outItem)
 	}
-	fmt.Println("TaskNum out[0] = ", out[0])
-	fmt.Println("TaskNum out[len(out)-1 = ", out[len(out)-1])
+	log.Logger.Debug("TaskNum out[0] = ", out[0])
+	log.Logger.Debug("TaskNum out[len(out)-1 = ", out[len(out)-1])
 	latestInfo := out[0]
 	oldInfo := out[len(out)-1]
 	//如果最新的小于之前的任务数，代表减少了

@@ -9,9 +9,9 @@ const (
 	LargePageSize        = 99999
 )
 
-const (
-	MysqlHost   int64 = 1
-	ElasticHost int64 = 2
+var (
+	TaskSyncJob    = 1
+	DateNumInfoJob = 2
 )
 
 //加解密相关

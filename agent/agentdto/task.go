@@ -81,6 +81,11 @@ type TaskDeleteInput struct {
 	ID          int64  `json:"id" form:"id" validate:"required"`
 }
 
+type GetDateNumInfoInput struct {
+	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
+	Date        string `json:"date" form:"date" validate:"required"`
+}
+
 type TaskIDInput struct {
 	ServiceName string `json:"service_name" form:"service_name" validate:"required" comment:"服务名"`
 	ID          int64  `json:"id" form:"id" validate:"required"`

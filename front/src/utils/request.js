@@ -64,6 +64,7 @@ request.interceptors.response.use((response) => {
         window.location.reload()
       }, 1500)
     })
+    return
   }
   if (res.errno !== 0 && res.errno !== 10103) {
     notification.error({

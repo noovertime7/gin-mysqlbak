@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/conf"
+	"github.com/noovertime7/gin-mysqlbak/core/job"
+	"github.com/noovertime7/gin-mysqlbak/job/system"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/services"
 	"github.com/noovertime7/mysqlbak/pkg/log"
-	"time"
 )
 
 // Start 启动服务有关
@@ -26,16 +26,17 @@ func Stop() {
 
 // startSyncClusterTask 同步集群任务
 func startSyncClusterTask() error {
-	//默认同步时间周期为10分钟一次
-	var defaultPeriod = 10
-	s := agentservice.GetClusterTaskOverViewService()
-	period := conf.GetIntConf("cluster", "clusterSyncPeriod")
-	if period == 0 {
-		period = defaultPeriod
+	ctx := GetGlobalContext()
+	//默认同步时间周期为30分钟一次
+	period := conf.GetStringConf("cluster", "clusterSyncPeriod")
+	if period == "" {
+		period = "00 30 * * *"
 	}
-	if period < 10 {
-		log.Logger.Warn("当前同步周期小于10分钟,同步遍历占用资源,请谨慎设置同步周期，建议10-20分钟左右")
-	}
-	log.Logger.Infof("启动集群任务同步定时器，当前同步周期%d/min", period)
-	return s.Run(time.Duration(period) * time.Minute)
+	factory := job.GetJobFactory()
+	taskSync := system.NewTaskSyncJob(ctx, period)
+	//log.Logger.Infof("启动集群任务同步定时器，当前同步周期%s", period)
+	datesync := system.NewDateNumInfoSync(ctx, period)
+	factory.Register(datesync, job.JobType(public.DateNumInfoJob))
+	factory.Register(taskSync, job.JobType(public.TaskSyncJob))
+	return factory.Start()
 }

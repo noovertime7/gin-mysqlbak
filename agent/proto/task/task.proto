@@ -12,6 +12,7 @@ service Task {
   rpc TaskDetail(TaskIDInput) returns (TaskDetailOutPut) {}
   rpc RestoreTask(TaskIDInput) returns (TaskOneMessage) {}
   rpc TaskDestroy(TaskIDInput) returns (TaskOneMessage) {}
+  rpc GetDateNumInfo(DateNumInfoInput) returns (DateNumInfoOut) {}
 }
 
 message TaskOneMessage {
@@ -25,7 +26,6 @@ message TaskOneMessage {
 message TaskAddInput {
   int64 HostID = 1;
   string DBName = 2;
-  string ServiceName = 16;
   string BackupCycle = 3;
   int64 KeepNumber = 4 ;
   int64 IsAllDBBak = 5;
@@ -39,6 +39,7 @@ message TaskAddInput {
   string OssSecret = 13;
   string BucketName = 14;
   string Directory = 15;
+  string ServiceName = 16;
 }
 
 
@@ -156,4 +157,18 @@ message TaskDetailOutPut {
   string BucketName = 21;
   // @inject_tag: json:"directory"
   string Directory = 22;
+}
+
+message DateNumInfoInput {
+  // @inject_tag: json:"days"
+  string Date  =1 ;
+}
+
+message DateNumInfoOut {
+  // @inject_tag: json:"date"
+  string Date  =1 ;
+  // @inject_tag: json:"task_num"
+  int64 TaskNum =2;
+  // @inject_tag: json:"finish_num"
+  int64 FinishNum=3;
 }

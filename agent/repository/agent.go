@@ -72,6 +72,35 @@ func (a *AgentService) GetAgentList(ctx context.Context, agentInfo *agentdto.Age
 	return out, nil
 }
 
+func (a *AgentService) GetHealthAgentList(ctx context.Context, agentInfo *agentdto.AgentListInput) (*agentdto.AgentListOutPut, error) {
+	agentDB := &agentdao.AgentDB{}
+	agents, total, err := agentDB.PageList(ctx, database.GetDB(), agentInfo)
+	if err != nil {
+		return nil, err
+	}
+	var agentOutItems []*agentdto.AgentOutPutItem
+	for _, agent := range agents {
+		tempAgent := &agentdto.AgentOutPutItem{
+			ServiceName: agent.ServiceName,
+			Address:     agent.Address,
+			Content:     agent.Content,
+			LastTime:    agent.LastTime.Format("2006年01月02日15:04:01"),
+			TaskNum:     agent.TaskNum,
+			FinishNum:   agent.FinishNum,
+			AgentStatus: agent.AgentStatus,
+			CreateAt:    agent.CreateAt.Format("2006年01月02日15:04:01"),
+		}
+		if agent.AgentStatus == 1 {
+			agentOutItems = append(agentOutItems, tempAgent)
+		}
+	}
+	out := &agentdto.AgentListOutPut{
+		Total:           total,
+		AgentOutPutItem: agentOutItems,
+	}
+	return out, nil
+}
+
 func (a *AgentService) GetServiceAddr(ctx context.Context, serviceName string) (string, error) {
 	agentDb := &agentdao.AgentDB{ServiceName: serviceName}
 	agent, err := agentDb.Find(ctx, database.GetDB(), agentDb)

@@ -44,7 +44,6 @@ type DateInfoOut struct {
 
 type DateInfoOutItem struct {
 	Date      string `json:"date"`
-	AgentNum  int64  `json:"agent_num"`
 	TaskNum   int64  `json:"task_num"`
 	FinishNum int64  `json:"finish_num"`
 }

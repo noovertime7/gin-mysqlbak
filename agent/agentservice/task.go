@@ -152,6 +152,19 @@ func (t *TaskService) TaskRestore(ctx *gin.Context, params *agentdto.TaskDeleteI
 	return nil
 }
 
+func (t *TaskService) GetDateNumInfo(ctx context.Context, params *agentdto.GetDateNumInfoInput) (*task.DateNumInfoOut, error) {
+	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
+	if err != nil {
+		return nil, err
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+	taskDeleteInput := &task.DateNumInfoInput{Date: params.Date}
+	data, err := taskService.GetDateNumInfo(ctx, taskDeleteInput, ops)
+	return data, nil
+}
+
 func (t *TaskService) TaskUpdate(ctx *gin.Context, params *agentdto.TaskUpdateInput) error {
 	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
 	if err != nil {

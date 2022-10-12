@@ -10,7 +10,6 @@ type AgentDateInfo struct {
 	Id          int64  `gorm:"column:id;type:int(11);AUTO_INCREMENT;primary_key" json:"id"`
 	TaskNum     int64  `gorm:"column:task_num;type:int(11);NOT NULL" json:"task_num"`
 	FinishNum   int64  `gorm:"column:finish_num;type:int(11);NOT NULL" json:"finish_num"`
-	AgentNum    int64  `gorm:"column:agent_num;type:int(11);NOT NULL" json:"agent_num"`
 	CurrentTime string `gorm:"column:current_time;type:datetime;NOT NULL" json:"current_time"`
 }
 
@@ -20,6 +19,10 @@ func (a *AgentDateInfo) TableName() string {
 
 func (a *AgentDateInfo) Save(ctx context.Context, tx *gorm.DB) error {
 	return tx.WithContext(ctx).Save(a).Error
+}
+
+func (a *AgentDateInfo) Updates(ctx context.Context, tx *gorm.DB) error {
+	return tx.WithContext(ctx).Where("id = ?", a.Id).Updates(a).Error
 }
 
 func (a *AgentDateInfo) Find(ctx context.Context, tx *gorm.DB, search *AgentDateInfo) (*AgentDateInfo, error) {

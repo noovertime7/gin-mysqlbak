@@ -50,6 +50,7 @@ type TaskService interface {
 	TaskDetail(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskDetailOutPut, error)
 	RestoreTask(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskOneMessage, error)
 	TaskDestroy(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskOneMessage, error)
+	GetDateNumInfo(ctx context.Context, in *DateNumInfoInput, opts ...client.CallOption) (*DateNumInfoOut, error)
 }
 
 type taskService struct {
@@ -144,6 +145,16 @@ func (c *taskService) TaskDestroy(ctx context.Context, in *TaskIDInput, opts ...
 	return out, nil
 }
 
+func (c *taskService) GetDateNumInfo(ctx context.Context, in *DateNumInfoInput, opts ...client.CallOption) (*DateNumInfoOut, error) {
+	req := c.c.NewRequest(c.name, "Task.GetDateNumInfo", in)
+	out := new(DateNumInfoOut)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Task service
 
 type TaskHandler interface {
@@ -155,6 +166,7 @@ type TaskHandler interface {
 	TaskDetail(context.Context, *TaskIDInput, *TaskDetailOutPut) error
 	RestoreTask(context.Context, *TaskIDInput, *TaskOneMessage) error
 	TaskDestroy(context.Context, *TaskIDInput, *TaskOneMessage) error
+	GetDateNumInfo(context.Context, *DateNumInfoInput, *DateNumInfoOut) error
 }
 
 func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.HandlerOption) error {
@@ -167,6 +179,7 @@ func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.Handl
 		TaskDetail(ctx context.Context, in *TaskIDInput, out *TaskDetailOutPut) error
 		RestoreTask(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error
 		TaskDestroy(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error
+		GetDateNumInfo(ctx context.Context, in *DateNumInfoInput, out *DateNumInfoOut) error
 	}
 	type Task struct {
 		task
@@ -209,4 +222,8 @@ func (h *taskHandler) RestoreTask(ctx context.Context, in *TaskIDInput, out *Tas
 
 func (h *taskHandler) TaskDestroy(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error {
 	return h.TaskHandler.TaskDestroy(ctx, in, out)
+}
+
+func (h *taskHandler) GetDateNumInfo(ctx context.Context, in *DateNumInfoInput, out *DateNumInfoOut) error {
+	return h.TaskHandler.GetDateNumInfo(ctx, in, out)
 }
