@@ -2,19 +2,19 @@ package agentcontroller
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/micro/go-micro/v2/client"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
-	"github.com/noovertime7/gin-mysqlbak/agent/pkg"
-	"github.com/noovertime7/gin-mysqlbak/agent/proto/bakhistory"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
 
-type BakHistoryController struct{}
+type BakHistoryController struct {
+	historyService *agentservice.HistoryService
+}
 
 func BakHistoryRegister(group *gin.RouterGroup) {
-	history := &BakHistoryController{}
+	history := &BakHistoryController{historyService: agentservice.GetClusterHistoryService()}
 	group.GET("/historylist", history.HistoryList)
 	group.GET("/history_num_info", history.GetHistoryNumInfo)
 	group.DELETE("/historydelete", history.DeleteHistory)
@@ -27,24 +27,7 @@ func (b *BakHistoryController) HistoryList(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	historyService, addr, err := pkg.GetHistoryService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	historyListInput := &bakhistory.HistoryListInput{
-		Info:      params.Info,
-		PageNo:    params.PageNo,
-		PageSize:  params.PageSize,
-		SortField: params.SortField,
-		SortOrder: params.SortOrder,
-		Status:    params.Status,
-	}
-	data, err := historyService.GetHistoryList(ctx, historyListInput, ops)
+	data, err := b.historyService.GetHistoryList(ctx, params)
 	if err != nil {
 		log.Logger.Error("agent获取历史记录列表失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
@@ -60,16 +43,7 @@ func (b *BakHistoryController) GetHistoryNumInfo(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	historyService, addr, err := pkg.GetHistoryService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-	data, err := historyService.GetHistoryNumInfo(ctx, &bakhistory.Empty{}, ops)
+	data, err := b.historyService.GetHistoryNumInfo(ctx, params)
 	if err != nil {
 		log.Logger.Error("获取历史记录数量信息失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.HistoryGetError, err))
@@ -85,17 +59,7 @@ func (b *BakHistoryController) DeleteHistory(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
-	historyService, addr, err := pkg.GetHistoryService(params.ServiceName)
-	if err != nil {
-		log.Logger.Error("获取Agent地址失败", err)
-		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentGetAddressError, err))
-		return
-	}
-	var ops client.CallOption = func(options *client.CallOptions) {
-		options.Address = []string{addr}
-	}
-
-	data, err := historyService.DeleteHistory(ctx, &bakhistory.HistoryIDInput{ID: params.ID}, ops)
+	data, err := b.historyService.DeleteHistory(ctx, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("删除失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
