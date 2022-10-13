@@ -16,11 +16,21 @@ type DashboardController struct {
 func DashboardRegister(group *gin.RouterGroup) {
 	dashboard := &DashboardController{dashBoardService: local.GetDashboardService()}
 	group.GET("/service_task_num", dashboard.GetSvcTNum)
+	group.GET("/service_finish_num", dashboard.GetSvcFinishTNum)
 	group.GET("/service_info_by_date", dashboard.GetInfoByDate)
 }
 
 func (d *DashboardController) GetSvcTNum(ctx *gin.Context) {
 	data, err := d.dashBoardService.GetSvcTNum(ctx)
+	if err != nil {
+		log.Logger.Error("获取dashboard数据失败")
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ServerError, err))
+	}
+	middleware.ResponseSuccess(ctx, data)
+}
+
+func (d *DashboardController) GetSvcFinishTNum(ctx *gin.Context) {
+	data, err := d.dashBoardService.GetSvcFinishNum(ctx)
 	if err != nil {
 		log.Logger.Error("获取dashboard数据失败")
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ServerError, err))

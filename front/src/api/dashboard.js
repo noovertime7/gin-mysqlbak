@@ -14,3 +14,10 @@ export function clusterDataByDate (query) {
     params: query
   })
 }
+
+export function getSvcFinishNum () {
+  return request({
+    url: 'dashboard/service_finish_num',
+    method: 'get'
+  })
+}

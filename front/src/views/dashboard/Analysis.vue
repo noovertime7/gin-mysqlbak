@@ -2,62 +2,75 @@
   <div>
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.total-sales')" total="￥126,560">
-          <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+        <chart-card :loading="loading" title="服务数量" :total="serviceTotal">
+          <a-tooltip title="集群内服务数量及在线情况" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <trend flag="up" style="margin-right: 16px;">
-              <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
-              12%
+            <trend flag="down" style="margin-right: 16px;">
+              <span slot="term">在线服务</span>
+              {{ onlineService }}
             </trend>
-            <trend flag="down">
-              <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
-              21%
+            <trend flag="up">
+              <span slot="term">离线服务</span>
+              {{ offlineService }}
             </trend>
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.day-sales') }}<span>￥ 234.56</span></template>
+          <template slot="footer">服务在线率<span> {{ onlineServicePercent }} %</span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.visits')" :total="8846 | NumberFormat">
-          <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+        <chart-card :loading="loading" title="完成数量" :total="finish_total">
+          <a-tooltip title="备份完成总数" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-area />
+            <trend flag="down" style="margin-right: 16px;">
+              <span slot="term">mysql</span>
+              {{ mysql_finish }}
+            </trend>
+            <trend flag="up">
+              <span slot="term">elastic</span>
+              {{ elastic_finish }}
+            </trend>
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.day-visits') }}<span> {{ '1234' | NumberFormat }}</span>
-          </template>
+          <template slot="footer">完成占比<span> {{ finish_by_service }} </span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.payments')" :total="8888 | NumberFormat">
-          <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+        <chart-card :loading="loading" title="任务数量" :total="task_total">
+          <a-tooltip title="任务数量详情" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-bar />
+            <trend flag="down" style="margin-right: 16px;">
+              <span slot="term">mysql</span>
+              {{ mysql_task }}
+            </trend>
+            <trend flag="up">
+              <span slot="term">elastic</span>
+              {{ elastic_task }}
+            </trend>
           </div>
-          <template slot="footer">{{ $t('dashboard.analysis.conversion-rate') }} <span>60%</span></template>
+          <template slot="footer">任务占比<span> {{ task_by_service }} </span></template>
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" :title="$t('dashboard.analysis.operational-effect')" total="78%">
-          <a-tooltip :title="$t('dashboard.analysis.introduce')" slot="action">
+        <chart-card :loading="loading" title="成功占比" :total="success_persent_str">
+          <a-tooltip title="成功失败占比" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
           <div>
-            <mini-progress color="rgb(19, 194, 194)" :target="80" :percentage="78" height="8px" />
+            <mini-progress color="rgb(19, 194, 194)" :target="100" :percentage="success_persent" height="8px" />
           </div>
           <template slot="footer">
             <trend flag="down" style="margin-right: 16px;">
-              <span slot="term">{{ $t('dashboard.analysis.week') }}</span>
-              12%
+              <span slot="term">成功数量</span>
+              {{ success_total }}
             </trend>
             <trend flag="up">
-              <span slot="term">{{ $t('dashboard.analysis.day') }}</span>
-              80%
+              <span slot="term">失败数量</span>
+              {{ fail_total }}
             </trend>
           </template>
         </chart-card>
@@ -200,11 +213,12 @@ import {
   MiniSmoothArea
 } from '@/components'
 import { baseMixin } from '@/store/app-mixin'
-import { clusterDataByDate, getSvcTNum } from '@/api/dashboard'
+import { clusterDataByDate, getSvcFinishNum, getSvcTNum } from '@/api/dashboard'
 import PieChart from '@/views/dashboard/components/Piechart'
 import { GetServiceList } from '@/api/agent'
 import ClusterTaskNumChart from '@/components/Charts/ClusterTaskNumChart'
 import ClusterFinishNumChart from '@/components/Charts/ClusterFinishNumChart'
+import { GetAgentTaskOverViewList } from '@/api/agent-task_overview'
 
 const barData = []
 const barData2 = []
@@ -273,13 +287,34 @@ export default {
     return {
       loading: true,
       rankList,
-
       // 搜索用户数
       searchUserData,
       serviceListData: [],
       // 左下角集群服务统计相关
       dataSource: [],
       serviceNums: {},
+      // 左上角服务数量相关
+      serviceTotal: 0,
+      onlineService: 0,
+      offlineService: 0,
+      onlineServicePercent: 0,
+      // 顶部中左完成数量数据
+      taskList: [],
+      finish_total: 0,
+      mysql_finish: 0,
+      elastic_finish: 0,
+      finish_by_service: 0,
+      // 顶部中右任务数量数据
+      task_total: 0,
+      mysql_task: 0,
+      elastic_task: 0,
+      task_by_service: 0,
+      // 顶部最右侧成功失败占比数据
+      all_total: 0,
+      fail_total: 0,
+      success_total: 0,
+      success_persent: 0,
+      success_persent_str: '',
       barData,
       barData2,
       // 饼状图数据
@@ -348,6 +383,8 @@ export default {
     this.GetClusterDataByDate()
     this.GetSvcTNum()
     this.getAgentServiceList()
+    this.getTaskOverview()
+    this.GetSvcFinishNum()
     this.loading = !this.loading
   },
   methods: {
@@ -375,6 +412,47 @@ export default {
       GetServiceList().then((res) => {
         if (res) {
           this.serviceListData = res.data.list
+          this.serviceTotal = res.data.total
+          for (let i = 0; i < this.serviceListData.length; i++) {
+             if (this.serviceListData[i].agent_status === 1) {
+                  this.onlineService++
+             } else {
+               this.offlineService++
+             }
+          }
+          this.onlineServicePercent = Math.round(this.onlineService / this.serviceTotal * 100)
+        }
+      })
+    },
+    getTaskOverview () {
+      const queryParam = { 'type': 0 }
+      GetAgentTaskOverViewList(queryParam).then((res) => {
+          if (res) {
+            this.task_total = res.data.total
+            this.taskList = res.data.list
+            for (let i = 0; i < res.data.list.length; i++) {
+              this.finish_total += this.taskList[i].finish_num
+              if (res.data.list[i].type === 1) {
+                this.mysql_finish += this.taskList[i].finish_num
+                this.mysql_task++
+              } else {
+                this.elastic_finish += this.taskList[i].finish_num
+                this.elastic_task++
+              }
+            }
+            this.finish_by_service = Math.round(this.finish_total / this.serviceTotal)
+            this.task_by_service = Math.round(this.task_total / this.serviceTotal)
+          }
+      })
+    },
+    GetSvcFinishNum () {
+      getSvcFinishNum().then((res) => {
+        if (res) {
+          this.all_total = res.data.all_finish_total
+          this.fail_total = res.data.all_fail_total
+          this.success_total = this.all_total - this.fail_total
+          this.success_persent = Math.round(this.success_total / this.all_total * 100)
+          this.success_persent_str = this.success_persent + '%'
         }
       })
     }

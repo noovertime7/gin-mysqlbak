@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdao"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
+	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
+	"github.com/noovertime7/gin-mysqlbak/agent/repository"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/database"
@@ -48,6 +50,35 @@ func (d *DashboardService) GetSvcTNum(ctx *gin.Context) ([]*dto.ServiceTaskOutPu
 		out = append(out, outItem)
 	}
 	return out, nil
+}
+
+func (d *DashboardService) GetSvcFinishNum(ctx *gin.Context) (*dto.SvcFinishNumInfoOut, error) {
+	//1、查询当前所有服务
+	var AgentService *repository.AgentService
+	services, err := AgentService.GetAgentList(ctx, &agentdto.AgentListInput{PageNo: 1, PageSize: 9999})
+	if err != nil {
+		return nil, err
+	}
+	var (
+		allFinishTotal int64
+		failTotal      int64
+	)
+	for _, s := range services.AgentOutPutItem {
+		//获取history服务实例
+		historyService := *agentservice.GetClusterHistoryService()
+		historyNumInfo, err := historyService.GetHistoryNumInfo(ctx, &agentdto.HistoryServiceNameInput{
+			ServiceName: s.ServiceName,
+		})
+		if err != nil {
+			return nil, err
+		}
+		allFinishTotal += historyNumInfo.AllNums
+		failTotal += historyNumInfo.FailNum
+	}
+	return &dto.SvcFinishNumInfoOut{
+		AllFinishTotal: allFinishTotal,
+		AllFailTotal:   failTotal,
+	}, nil
 }
 
 func (d *DashboardService) GetTaskNumByDate(ctx *gin.Context, info *dto.AgentDateInfoInput) (*dto.DateInfoOut, error) {

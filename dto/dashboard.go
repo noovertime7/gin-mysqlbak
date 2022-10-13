@@ -48,6 +48,11 @@ type DateInfoOutItem struct {
 	FinishNum int64  `json:"finish_num"`
 }
 
+type SvcFinishNumInfoOut struct {
+	AllFinishTotal int64 `json:"all_finish_total"`
+	AllFailTotal   int64 `json:"all_fail_total"`
+}
+
 func (d *AgentDateInfoInput) BindValidParam(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, d)
 }

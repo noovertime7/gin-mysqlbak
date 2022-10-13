@@ -59,6 +59,8 @@ message HistoryListOutItem {
   string FileName = 8;
   // @inject_tag: json:"bak_time"
   string BakTime = 9;
+  // @inject_tag: json:"status"
+  int64 Status = 10;
 }
 
 message HistoryNumInfoOut {
@@ -68,4 +70,6 @@ message HistoryNumInfoOut {
   int64 AllNums = 2;
   // @inject_tag: json:"all_filesize"
   string  AllFileSize = 3;
+  // @inject_tag: json:"fail_num"
+  int64 FailNum =4;
 }
