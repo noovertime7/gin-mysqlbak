@@ -18,6 +18,6 @@ var logo = `
 func PrintLogo() {
 	fmt.Println(logo)
 	fmt.Println("项目地址: https://github.com/noovertime7/gin-mysqlbak")
-	fmt.Println("前端地址: https://github.com/noovertime7/gin-mysql-web")
-	fmt.Println("客户端地址: https://github.com/noovertime7/gin-mysqlbak-agent")
+	fmt.Println("前端地址: https://github.com/noovertime7/gin-mysqlbak/tree/main/front")
+	fmt.Println("集群Client地址: https://github.com/noovertime7/gin-mysqlbak-agent")
 }
