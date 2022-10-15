@@ -1,9 +1,10 @@
 import request from '@/utils/request'
 
-export function GetServiceList () {
+export function GetServiceList (query) {
   return request({
     url: '/public/agentlist',
-    method: 'get'
+    method: 'get',
+    params: query
   })
 }
 

@@ -81,31 +81,25 @@
       <div class="salesCard">
         <a-tabs default-active-key="1" size="large" :tab-bar-style="{marginBottom: '24px', paddingLeft: '16px'}">
           <div class="extra-wrapper" slot="tabBarExtraContent">
-            <div class="extra-item">
-              <a>{{ $t('dashboard.analysis.all-day') }}</a>
-              <a>{{ $t('dashboard.analysis.all-week') }}</a>
-              <a>{{ $t('dashboard.analysis.all-month') }}</a>
-              <a>{{ $t('dashboard.analysis.all-year') }}</a>
-            </div>
             <a-range-picker :style="{width: '256px'}" />
           </div>
-          <a-tab-pane loading="true" :tab="$t('dashboard.analysis.sales')" key="1">
+          <a-tab-pane loading="true" tab="完成数" key="1">
             <a-row>
               <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-                <bar :data="barData" :title="$t('dashboard.analysis.sales-trend')" />
+                <cluster-finish-bar :data="dataSource" title="服务完成趋势" />
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
-                <rank-list :title="$t('dashboard.analysis.sales-ranking')" :list="rankList" />
+                <cluster-finish-rank-list title="服务完成数排行" :list="finishRankList" />
               </a-col>
             </a-row>
           </a-tab-pane>
-          <a-tab-pane :tab="$t('dashboard.analysis.visits')" key="2">
+          <a-tab-pane tab="任务数" key="2">
             <a-row>
               <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-                <bar :data="barData2" :title="$t('dashboard.analysis.visits-trend')" />
+                <cluster-task-bar :data="dataSource" title="服务任务趋势" />
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
-                <rank-list :title="$t('dashboard.analysis.visits-ranking')" :list="rankList" />
+                <cluster-task-rank-list title="服务任务数排行" :list="serviceListData" />
               </a-col>
             </a-row>
           </a-tab-pane>
@@ -206,8 +200,6 @@ import {
   MiniArea,
   MiniBar,
   MiniProgress,
-  RankList,
-  Bar,
   Trend,
   NumberInfo,
   MiniSmoothArea
@@ -218,28 +210,11 @@ import PieChart from '@/views/dashboard/components/Piechart'
 import { GetServiceList } from '@/api/agent'
 import ClusterTaskNumChart from '@/components/Charts/ClusterTaskNumChart'
 import ClusterFinishNumChart from '@/components/Charts/ClusterFinishNumChart'
+import ClusterTaskBar from '@/components/Charts/ClusterTaskBar'
+import ClusterFinishBar from '@/components/Charts/ClusterFinishBar'
+import ClusterTaskRankList from '@/components/Charts/ClusterTaskRankList'
+import ClusterFinishRankList from '@/components/Charts/ClusterFinishRankList'
 import { GetAgentTaskOverViewList } from '@/api/agent-task_overview'
-
-const barData = []
-const barData2 = []
-for (let i = 0; i < 12; i += 1) {
-  barData.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-  barData2.push({
-    x: `${i + 1}月`,
-    y: Math.floor(Math.random() * 1000) + 200
-  })
-}
-
-const rankList = []
-for (let i = 0; i < 7; i++) {
-  rankList.push({
-    name: '白鹭岛 ' + (i + 1) + ' 号店',
-    total: 1234.56 - i * 100
-  })
-}
 
 const searchUserData = []
 for (let i = 0; i < 7; i++) {
@@ -269,8 +244,10 @@ export default {
     MiniArea,
     MiniBar,
     MiniProgress,
-    RankList,
-    Bar,
+    ClusterTaskBar,
+    ClusterFinishBar,
+    ClusterTaskRankList,
+    ClusterFinishRankList,
     Trend,
     NumberInfo,
     MiniSmoothArea
@@ -286,9 +263,7 @@ export default {
   data () {
     return {
       loading: true,
-      rankList,
       // 搜索用户数
-      searchUserData,
       serviceListData: [],
       // 左下角集群服务统计相关
       dataSource: [],
@@ -315,8 +290,8 @@ export default {
       success_total: 0,
       success_persent: 0,
       success_persent_str: '',
-      barData,
-      barData2,
+      // 中间排行榜数据
+      finishRankList: [],
       // 饼状图数据
       pieData: [],
       // 集群服务统计
@@ -383,6 +358,7 @@ export default {
     this.GetClusterDataByDate()
     this.GetSvcTNum()
     this.getAgentServiceList()
+    this.getAgentServiceListByFinish()
     this.getTaskOverview()
     this.GetSvcFinishNum()
     this.loading = !this.loading
@@ -409,7 +385,11 @@ export default {
       })
     },
     getAgentServiceList () {
-      GetServiceList().then((res) => {
+       const query = {
+         'sortField': 'task_num',
+         'sortOrder': 'descend'
+       }
+      GetServiceList(query).then((res) => {
         if (res) {
           this.serviceListData = res.data.list
           this.serviceTotal = res.data.total
@@ -421,6 +401,17 @@ export default {
              }
           }
           this.onlineServicePercent = Math.round(this.onlineService / this.serviceTotal * 100)
+        }
+      })
+    },
+    getAgentServiceListByFinish () {
+      const query = {
+        'sortField': 'finish_num',
+        'sortOrder': 'descend'
+      }
+      GetServiceList(query).then((res) => {
+        if (res) {
+          this.finishRankList = res.data.list
         }
       })
     },

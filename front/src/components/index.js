@@ -1,5 +1,5 @@
 // chart
-import Bar from '@/components/Charts/Bar'
+import Bar from '@/components/Charts/ClusterFinishBar'
 import ChartCard from '@/components/Charts/ChartCard'
 import Liquid from '@/components/Charts/Liquid'
 import MiniArea from '@/components/Charts/MiniArea'

@@ -333,12 +333,12 @@ export const asyncRouterMap = [
         meta: { title: '系统管理', icon: 'setting', permission: ['settings'] },
         redirect: '/settings/icon-selector',
         children: [
-          {
-            path: '/settings/icon-selector',
-            name: 'TestIconSelect',
-            component: () => import('@/views/settings/IconSelectorView'),
-            meta: { title: 'IconSelector', icon: 'tool', keepAlive: true, permission: ['settings'] }
-          },
+          // {
+          //   path: '/settings/icon-selector',
+          //   name: 'TestIconSelect',
+          //   component: () => import('@/views/settings/IconSelectorView'),
+          //   meta: { title: 'IconSelector', icon: 'tool', keepAlive: true, permission: ['settings'] }
+          // },
           {
             path: '/settings/list/user-list',
             name: 'UserList',

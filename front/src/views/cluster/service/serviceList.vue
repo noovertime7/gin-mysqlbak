@@ -86,13 +86,15 @@ export default {
           title: '任务数',
           dataIndex: 'task_num',
           // customRender: (text) => text + ' 个',
-          align: 'center'
+          align: 'center',
+          sorter: true
         },
         {
           title: '完成数',
           dataIndex: 'finish_num',
           // customRender: (text) => text + ' 个',
-          align: 'center'
+          align: 'center',
+          sorter: true
         },
         {
           title: '上次注册时间',
@@ -108,7 +110,8 @@ export default {
           title: '状态',
           dataIndex: 'agent_status',
           scopedSlots: { customRender: 'status' },
-          align: 'center'
+          align: 'center',
+          sorter: true
         },
         {
           title: '备注',

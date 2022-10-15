@@ -44,10 +44,12 @@ export default {
   },
   methods: {
     handleToCenter () {
-      this.$router.push({ path: '/account/center' })
+      this.$message.warn('正在开发中...')
+      // this.$router.push({ path: '/account/center' })
     },
     handleToSettings () {
-      this.$router.push({ path: '/account/settings' })
+      this.$message.warn('正在开发中...')
+      // this.$router.push({ path: '/account/settings' })
     },
     handleLogout (e) {
       Modal.confirm({

@@ -34,11 +34,11 @@ export default {
     },
     total: {
       type: Number,
-      required: true
+      default: 0
     },
     subTotal: {
       type: Number,
-      required: true
+      default: 0
     },
     decreaseTotal: {
       type: Number,
