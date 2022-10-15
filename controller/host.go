@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/go-xorm/xorm"
 	"github.com/noovertime7/gin-mysqlbak/conf"
@@ -11,6 +10,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/noovertime7/gin-mysqlbak/public/ding"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/gin-mysqlbak/services/local"
@@ -121,7 +121,7 @@ func HostPingCheck(user, password, host string) error {
 
 func HostPortCheck() {
 	HostOnlineMap = make(map[int]string)
-	tx, _ := lib.GetGormPool("default")
+	tx := database.GetDB()
 	hostdb := &dao.HostDatabase{}
 	for {
 		hostlists, err := hostdb.FindAllHost(tx)
@@ -142,7 +142,7 @@ func HostPortCheck() {
 }
 
 func HostPortCheckHandler(host string) {
-	tx, _ := lib.GetGormPool("default")
+	tx := database.GetDB()
 	hostdb := &dao.HostDatabase{Host: host}
 	log.Logger.Infof("主机存活端口检测程序启动:HOST:%v", host)
 	_, err := net.DialTimeout("tcp", host, 5*time.Second)

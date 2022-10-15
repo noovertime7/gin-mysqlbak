@@ -6,6 +6,7 @@ import (
 	"github.com/gorhill/cronexpr"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -101,9 +102,15 @@ func StringToTime(receiveTime string) time.Time {
 // GetBeforeDates 生成日期
 func GetBeforeDates(day int) []string {
 	var out []string
-	for i := 0; i < day; i++ {
+	for i := day; i >= 0; i-- {
 		t := time.Now().AddDate(0, 0, -i)
 		out = append(out, t.Format("2006-01-02"))
 	}
 	return out
+}
+
+// DateTran 将带年的日期转为月份
+func DateTran(date string) string {
+	list := strings.Split(date, "-")
+	return list[len(list)-2] + "-" + list[len(list)-1]
 }

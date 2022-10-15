@@ -12,7 +12,7 @@ import (
 func main() {
 	err := lib.InitModule("./conf/dev/", []string{"base", "mysql"})
 	if err != nil {
-		log.Fatal("加载配置文件失败", err)
+		log.Println("加载配置文件失败", err)
 	}
 	defer lib.Destroy()
 	router.HttpServerRun()

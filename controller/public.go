@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/conf"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dto"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
 	"github.com/noovertime7/gin-mysqlbak/public"
+	"github.com/noovertime7/gin-mysqlbak/public/database"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 	"strings"
@@ -27,7 +27,7 @@ func (p *PublicController) DownLoadBakfile(ctx *gin.Context) {
 		log.Logger.Error(err)
 		return
 	}
-	tx, _ := lib.GetGormPool("default")
+	tx := database.GetDB()
 	bakhistory := &dao.BakHistory{
 		Id: params.ID,
 	}
@@ -51,7 +51,7 @@ func (p *PublicController) BakFileExists(ctx *gin.Context) {
 		log.Logger.Error(err)
 		return
 	}
-	tx, _ := lib.GetGormPool("default")
+	tx := database.GetDB()
 	bakhistory := &dao.BakHistory{
 		Id: params.ID,
 	}

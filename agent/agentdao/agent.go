@@ -3,6 +3,7 @@ package agentdao
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"gorm.io/gorm"
@@ -71,7 +72,18 @@ func (s *AgentDB) PageList(c context.Context, tx *gorm.DB, params *agentdto.Agen
 	if params.Info != "" {
 		query = query.Where("( service_name like ?)", "%"+params.Info+"%")
 	}
-	if err := query.Limit(params.PageSize).Offset(offset).Order("id desc").Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
+	var sortRules string
+	switch params.SortOrder {
+	case "descend":
+		sortRules = "desc"
+	case "ascend":
+		sortRules = "asc"
+	}
+	if params.SortField == "" {
+		params.SortField = "id"
+		sortRules = "desc"
+	}
+	if err := query.Limit(params.PageSize).Offset(offset).Order(fmt.Sprintf("%s %s", params.SortField, sortRules)).Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
 	}
 	query.Find(&list).Count(&total)

@@ -5,9 +5,20 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/public"
 )
 
+type AgentListInput struct {
+	Info      string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
+	PageNo    int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
+	PageSize  int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
+	Status    string `form:"status" json:"status" validate:""`
+	SortField string `form:"sortField" json:"sortField" comment:"排序字段" `
+	SortOrder string `json:"sortOrder" form:"sortOrder" comment:"排序规则"`
+}
+
 type AgentListOutPut struct {
 	Total           int                `json:"total"`
 	AgentOutPutItem []*AgentOutPutItem `json:"list"`
+	PageNo          int                `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
+	PageSize        int                `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
 type AgentOutPutItem struct {
@@ -30,12 +41,6 @@ type AgentRegisterInput struct {
 }
 type AgentDeRegisterInput struct {
 	ServiceName string `json:"service_name" form:"service_name"`
-}
-
-type AgentListInput struct {
-	Info     string `form:"info" json:"info" comment:"关键词"   validate:"" example:""`
-	PageNo   int    `form:"page_no" json:"page_no" comment:"每页条数"   validate:"" example:"1"`
-	PageSize int    `form:"page_size" json:"page_size" comment:"页数"   validate:"" example:"20"`
 }
 
 type AgentServiceNumInfoOutput struct {

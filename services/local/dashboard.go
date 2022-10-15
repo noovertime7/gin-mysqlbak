@@ -98,10 +98,11 @@ func (d *DashboardService) GetTaskNumByDate(ctx *gin.Context, info *dto.AgentDat
 		if err != nil {
 			return nil, err
 		}
+		transdate := public.DateTran(datetime)
 		taskSum += date.TaskNum
 		finishSum += date.FinishNum
 		outItem := &dto.DateInfoOutItem{
-			Date:      datetime,
+			Date:      transdate,
 			TaskNum:   date.TaskNum,
 			FinishNum: date.FinishNum,
 		}

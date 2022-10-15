@@ -74,9 +74,13 @@ func (d *dateNumInfoSync) Run() {
 				d.handleErr(err)
 				return
 			}
+			log.Logger.Infof("从客户端%s获取到数据%v", service.ServiceName, info)
+			if info == nil {
+				log.Logger.Errorf("当前服务%s调用失败，调用地址:%s,请检查", service.ServiceName, service.Address)
+				return
+			}
 			taskNum += info.TaskNum
 			finNum += info.FinishNum
-			log.Logger.Infof("从客户端%s获取数据%v", service.ServiceName, info)
 		}
 		dateDB := &agentdao.AgentDateInfo{CurrentTime: date, TaskNum: taskNum, FinishNum: finNum}
 		d.StoreInfo <- dateDB

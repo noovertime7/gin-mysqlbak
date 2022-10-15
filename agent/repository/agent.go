@@ -68,6 +68,8 @@ func (a *AgentService) GetAgentList(ctx context.Context, agentInfo *agentdto.Age
 	out := &agentdto.AgentListOutPut{
 		Total:           total,
 		AgentOutPutItem: agentOutItems,
+		PageNo:          agentInfo.PageNo,
+		PageSize:        agentInfo.PageSize,
 	}
 	return out, nil
 }
