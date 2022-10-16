@@ -16,8 +16,8 @@ data:
     accessToken = "77f579efbefeefc316b55d3caea1ba1963db2f1319aa7520cbfd9626de073fdc"  ## 主机检测钉钉报警配置
     secret = "SEC72586e3f7ff6db4b2ad24eac905f308a9ddb0b1b9809af31e5623a14abb424b2"
     [dingProxyAgent]
-    enable = true    ## 用于无外网环境下发送钉钉消息
-    addr = 172.20.96.56:39999
+    enable = false    ## 用于无外网环境下发送钉钉消息
+    addr = 127.0.0.1:39999
     title = "公司测试环境备份平台"
     content = "公司测试环境备份平台"
     [swagger]
@@ -28,10 +28,21 @@ data:
     [jaeger]
     enable = false
     addr = 127.0.0.1:6831
+    [mysql]
+    host = 192.168.1.188
+    port = 3306
+    user = root
+    password = chenteng
+    dbname = gin-mysqlbak
+    [app] ## 应用相关配置
+    mysqlAvatar: http://qiniu.yunxue521.top/mysql.jpeg
+    elasticAvatar: http://qiniu.yunxue521.top/elastic.jpg
+    [cluster]
+    ## 集群任务同步周期(分钟)
+    clusterSyncPeriod = "*/1 * * * *"
 kind: ConfigMap
 metadata:
   annotations: {}
   name: mysqlbak-ini-conf
   namespace: mysqlbak
-  resourceVersion: '90333492'
 
