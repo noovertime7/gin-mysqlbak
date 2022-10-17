@@ -24,7 +24,7 @@ const isProd = process.env.NODE_ENV === 'production'
 const assetsCDN = {
   // webpack build externals
   externals: {
-    'viser-vue': 'ViserVue'
+    // 'viser-vue': 'ViserVue'
     // vue: 'Vue',
     // 'vue-router': 'VueRouter',
     // vuex: 'Vuex',
@@ -33,7 +33,7 @@ const assetsCDN = {
   css: [],
   // https://unpkg.com/browse/vue@2.6.10/
   js: [
-    '//unpkg.com/viser-vue/umd/viser-vue.min.js'
+    // '//unpkg.com/viser-vue/umd/viser-vue.min.js'
     // '//cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js',
     // '//cdn.jsdelivr.net/npm/vue-router@3.5.1/dist/vue-router.min.js',
     // '//cdn.jsdelivr.net/npm/vuex@3.1.1/dist/vuex.min.js',
@@ -86,11 +86,11 @@ const vueConfig = {
   // zh_CN: 如果是 prod 模式，则引入 CDN 依赖文件，有需要减少包大小请自行解除依赖
 
   // if (isProd) {
-    config.plugin('html').tap(args => {
-      console.log('引入cdn依赖', args, assetsCDN)
-      args[0].cdn = assetsCDN
-      return args
-    })
+  //   config.plugin('html').tap(args => {
+  //     console.log('引入cdn依赖', args, assetsCDN)
+  //     args[0].cdn = assetsCDN
+  //     return args
+  //   })
   // }
   },
 
