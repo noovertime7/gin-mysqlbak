@@ -2,3 +2,5 @@
 *.sql
 .idea
 gin_scaffold
+
+dist/
