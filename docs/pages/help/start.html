@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>TBak System</title>
+    <meta name="generator" content="VuePress 1.9.7">
+    <link rel="icon" href="/logo.png">
+    <meta name="description" content="TBak数据库备份平台">
+    
+    <link rel="preload" href="/assets/css/0.styles.27ce9106.css" as="style"><link rel="preload" href="/assets/js/app.db16fe23.js" as="script"><link rel="preload" href="/assets/js/2.67a348e6.js" as="script"><link rel="preload" href="/assets/js/16.09e93c15.js" as="script"><link rel="prefetch" href="/assets/js/10.1f2fcdc3.js"><link rel="prefetch" href="/assets/js/11.f5ea18a7.js"><link rel="prefetch" href="/assets/js/12.d1ce4c04.js"><link rel="prefetch" href="/assets/js/13.5795fe5b.js"><link rel="prefetch" href="/assets/js/14.1490aa4a.js"><link rel="prefetch" href="/assets/js/15.ffdffc54.js"><link rel="prefetch" href="/assets/js/17.0c108a67.js"><link rel="prefetch" href="/assets/js/18.0a11ca33.js"><link rel="prefetch" href="/assets/js/19.45be37f4.js"><link rel="prefetch" href="/assets/js/3.2b79ff96.js"><link rel="prefetch" href="/assets/js/4.8d406cd2.js"><link rel="prefetch" href="/assets/js/5.4b53014d.js"><link rel="prefetch" href="/assets/js/6.dfef4713.js"><link rel="prefetch" href="/assets/js/7.46e2f9d9.js"><link rel="prefetch" href="/assets/js/8.c27dcc08.js"><link rel="prefetch" href="/assets/js/9.34037bb8.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.27ce9106.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><img src="/logo.png" alt="TBak System" class="logo"> <span class="site-name can-hide">TBak System</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="分类" class="dropdown-title"><span class="title">分类</span> <span class="arrow down"></span></button> <button type="button" aria-label="分类" class="mobile-dropdown-title"><span class="title">分类</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/pages/help/start.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  帮助文档
+</a></li><li class="dropdown-item"><!----> <a href="/pages/product/product.html" class="nav-link">
+  产品介绍
+</a></li></ul></div></div><div class="nav-item"><a href="/pages/show/show.html" class="nav-link">
+  功能演示
+</a></div><div class="nav-item"><a href="https://github.com/noovertime7/gin-mysqlbak" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  首页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><button type="button" aria-label="分类" class="dropdown-title"><span class="title">分类</span> <span class="arrow down"></span></button> <button type="button" aria-label="分类" class="mobile-dropdown-title"><span class="title">分类</span> <span class="arrow right"></span></button> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/pages/help/start.html" aria-current="page" class="nav-link router-link-exact-active router-link-active">
+  帮助文档
+</a></li><li class="dropdown-item"><!----> <a href="/pages/product/product.html" class="nav-link">
+  产品介绍
+</a></li></ul></div></div><div class="nav-item"><a href="/pages/show/show.html" class="nav-link">
+  功能演示
+</a></div><div class="nav-item"><a href="https://github.com/noovertime7/gin-mysqlbak" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>现在开始</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/pages/help/start.html" aria-current="page" class="active sidebar-link">开始部署</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/pages/help/start.html#二进制部署" class="sidebar-link">二进制部署</a></li><li class="sidebar-sub-header"><a href="/pages/help/start.html#容器部署" class="sidebar-link">容器部署</a></li><li class="sidebar-sub-header"><a href="/pages/help/start.html#kubernetes部署" class="sidebar-link">Kubernetes部署</a></li></ul></li><li><a href="/pages/help/use.html" class="sidebar-link">开始使用</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>高级选项</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/pages/help/advance.html" class="sidebar-link">高级选项</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><p>集群版本需要部署Agent客户端，部署配置请参考 <a href="https://github.com/noovertime7/gin-mysqlbak-agent" target="_blank" rel="noopener noreferrer">agent部署<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p> <p>前端服务部署请参考 <a href="https://github.com/noovertime7/gin-mysqlbak/tree/main/front" target="_blank" rel="noopener noreferrer">前端部署<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></p> <h2 id="二进制部署"><a href="#二进制部署" class="header-anchor">#</a> 二进制部署</h2> <div class="custom-block warning"><p class="custom-block-title">注意</p> <p>二进制安装开始前，请确认系统中已安装go环境与git环境</p></div> <h3 id="_1、-克隆仓库"><a href="#_1、-克隆仓库" class="header-anchor">#</a> 1、 克隆仓库</h3> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code><span class="token function">git</span> clone https://github.com/noovertime7/gin-mysqlbak.git
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h3 id="_2、修改配置文件"><a href="#_2、修改配置文件" class="header-anchor">#</a> 2、修改配置文件</h3> <p>编译开始前，请先修改配置文件，需要修改的位置已进行标注</p> <p>创建conf目录，在conf目录下创建config.ini，文件内容如下</p> <div class="language-ini line-numbers-mode"><div class="highlight-lines"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><div class="highlighted"> </div><div class="highlighted"> </div><div class="highlighted"> </div><div class="highlighted"> </div><div class="highlighted"> </div><br><br><br><br><br><br><br><br></div><pre class="language-ini"><code><span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">base</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">debug_mode</span><span class="token punctuation">=</span><span class="token value attr-value">&quot;<span class="token inner-value">debug</span>&quot;</span>
+<span class="token key attr-name">time_location</span><span class="token punctuation">=</span><span class="token value attr-value">&quot;<span class="token inner-value">Asia/Chongqing</span>&quot;</span>
+<span class="token key attr-name">download_url</span><span class="token punctuation">=</span><span class="token value attr-value">&quot;http://127.0.0.1:8880&quot;  ## 已废弃，可不修改</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">http</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">addr</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;<span class="token inner-value">:8880&quot;                       # 监听地址, default &quot;:8700</span>&quot;</span>
+<span class="token key attr-name">read_timeout</span> <span class="token punctuation">=</span> <span class="token value attr-value">10                   # 读取超时时长</span>
+<span class="token key attr-name">write_timeout</span> <span class="token punctuation">=</span> <span class="token value attr-value">10                  # 写入超时时长</span>
+<span class="token key attr-name">max_header_bytes</span> <span class="token punctuation">=</span> <span class="token value attr-value">20               # 最大的header大小，二进制位长度</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">HostLostAlarms</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">enable</span> <span class="token punctuation">=</span> <span class="token value attr-value">false          ## 是否启用主机离线告警，启用后会持续监控主机在线，离线后通过下面的钉钉ac发送告警</span>
+<span class="token key attr-name">accessToken</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;xxxxx&quot;   ## 钉钉accessToken</span>
+<span class="token key attr-name">secret</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;xxxx&quot;         ## 钉钉secret</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">dingProxyAgent</span><span class="token punctuation">]</span></span>       
+<span class="token key attr-name">enable</span> <span class="token punctuation">=</span> <span class="token value attr-value">false            ## 是否启用钉钉发送代理，适用于无外网环境下钉钉消息的发送</span>
+<span class="token key attr-name">addr</span> <span class="token punctuation">=</span> <span class="token value attr-value">127.0.0.1:39999</span>    
+<span class="token key attr-name">title</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;<span class="token inner-value">测试</span>&quot;</span>
+<span class="token key attr-name">content</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;<span class="token inner-value">测试环境</span>&quot;</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">log</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">log_level</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;trace&quot;         #日志打印最低级别</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">log_file_writer</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">on</span> <span class="token punctuation">=</span> <span class="token value attr-value">true</span>
+<span class="token key attr-name">log_path</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;<span class="token inner-value">./logs/gin-mysqlbak.inf.log</span>&quot;</span>
+<span class="token key attr-name">rotate_log_path</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;<span class="token inner-value">./logs/gin-mysqlbak.inf.log.%Y%M%D%H</span>&quot;</span>
+<span class="token key attr-name">wf_log_path</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;<span class="token inner-value">./logs/gin-mysqlbak.wf.log</span>&quot;</span>
+<span class="token key attr-name">rotate_wf_log_path</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;<span class="token inner-value">./logs/gin-mysqlbak.wf.log.%Y%M%D%H</span>&quot;</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">log_console_writer</span><span class="token punctuation">]</span></span>      
+<span class="token key attr-name">on</span> <span class="token punctuation">=</span> <span class="token value attr-value">false   #工作台输出</span>
+<span class="token key attr-name">color</span> <span class="token punctuation">=</span> <span class="token value attr-value">false</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">swagger</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">title</span><span class="token punctuation">=</span><span class="token value attr-value">&quot;<span class="token inner-value">gin-mysqlbak swagger API</span>&quot;</span>
+<span class="token key attr-name">desc</span><span class="token punctuation">=</span><span class="token value attr-value">&quot;<span class="token inner-value">This is a sample server celler server.</span>&quot;</span>
+<span class="token key attr-name">host</span><span class="token punctuation">=</span><span class="token value attr-value">&quot;<span class="token inner-value">127.0.0.1:8880</span>&quot;</span>
+<span class="token key attr-name">base_path</span><span class="token punctuation">=</span><span class="token value attr-value">&quot;&quot;</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">jaeger</span><span class="token punctuation">]</span></span> 
+<span class="token key attr-name">enable</span> <span class="token punctuation">=</span> <span class="token value attr-value">false  ## 是否开启链路追踪,如开启后需要部署jaeger</span>
+<span class="token key attr-name">addr</span> <span class="token punctuation">=</span> <span class="token value attr-value">127.0.0.1:6831</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">mysql</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">host</span> <span class="token punctuation">=</span> <span class="token value attr-value">127.0.0.1  ## 数据库地址连接信息</span>
+<span class="token key attr-name">port</span> <span class="token punctuation">=</span> <span class="token value attr-value">3306</span>
+<span class="token key attr-name">user</span> <span class="token punctuation">=</span> <span class="token value attr-value">root</span>
+<span class="token key attr-name">password</span> <span class="token punctuation">=</span> <span class="token value attr-value">{{your_password}}</span>
+<span class="token key attr-name">dbname</span> <span class="token punctuation">=</span> <span class="token value attr-value">gin-mysqlbak</span>
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">app</span><span class="token punctuation">]</span></span> ## 应用相关配置，用于主机管理头像，可不修改
+mysqlAvatar: http://qiniu.yunxue521.top/mysql.jpeg  
+elasticAvatar: http://qiniu.yunxue521.top/elastic.jpg
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">cluster</span><span class="token punctuation">]</span></span>
+<span class="token comment">## 集群任务同步周期(分钟)</span>
+<span class="token key attr-name">clusterSyncPeriod</span> <span class="token punctuation">=</span> <span class="token value attr-value">&quot;*/30 * * * *&quot;  ## 半小时同步一次集群内所有任务到服务端统一管理</span>
+</code></pre><div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br></div></div><h3 id="_3、初始化数据库"><a href="#_3、初始化数据库" class="header-anchor">#</a> 3、初始化数据库</h3> <p>将工程内sql文件夹下的init_3.0.0.sql拷贝至mysql主机根目录下</p> <p>当前版本仍需要手动刷入sql文件，自动初始化数据库将在3.0.1支持</p> <div class="language-sql line-numbers-mode"><pre class="language-sql"><code><span class="token comment">## 创建数据库</span>
+<span class="token keyword">CREATE</span> <span class="token keyword">DATABASE</span> <span class="token identifier"><span class="token punctuation">`</span>gin-mysqlbak<span class="token punctuation">`</span></span><span class="token punctuation">;</span>
+<span class="token keyword">use</span> gin<span class="token operator">-</span>mysqlbak<span class="token punctuation">;</span>
+<span class="token comment">## 刷入初始化sql文件</span>
+source <span class="token operator">/</span>init_3<span class="token punctuation">.</span><span class="token number">0.0</span><span class="token punctuation">.</span><span class="token keyword">sql</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><h3 id="_4、编译二进制文件并运行"><a href="#_4、编译二进制文件并运行" class="header-anchor">#</a> 4、编译二进制文件并运行</h3> <p>手动编译或选择直接下载<a href="https://github.com/noovertime7/gin-mysqlbak/releases/tag/v3.0.0/" target="_blank" rel="noopener noreferrer">release<span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a>中的文件</p> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code>go build <span class="token parameter variable">-o</span> gin-mysqlbak-server main.go
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h3 id="_5、运行"><a href="#_5、运行" class="header-anchor">#</a> 5、运行</h3> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code>./gin-mysqlbak-server
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h2 id="容器部署"><a href="#容器部署" class="header-anchor">#</a> 容器部署</h2> <p>部署开始前,请先创建config.ini配置文件夹，并根据实际修改相关配置,通过--volume参数可以挂载到容器内部</p> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code><span class="token function">docker</span> run <span class="token parameter variable">-itd</span> <span class="token parameter variable">--name</span> gin-mysql-server <span class="token punctuation">\</span>
+<span class="token parameter variable">-p</span> <span class="token number">8880</span>:8880 <span class="token punctuation">\</span>
+<span class="token parameter variable">--restart</span><span class="token operator">=</span>always <span class="token punctuation">\</span>
+<span class="token parameter variable">-v</span> /root/config.ini:/app/conf/config.ini <span class="token punctuation">\</span>
+chenteng/gin-mysqlbak-server:3.0.0-SP1
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br></div></div><h2 id="kubernetes部署"><a href="#kubernetes部署" class="header-anchor">#</a> Kubernetes部署</h2> <div class="custom-block tip"><p class="custom-block-title">提示</p> <p>安装开始前，请确认拥有一个健康可用的Kubernetes集群，支持K3S</p></div> <h3 id="_1、创建命名空间"><a href="#_1、创建命名空间" class="header-anchor">#</a> 1、创建命名空间</h3> <p>命名空间不存在请先创建命名空间，修改命名空间请修改yaml中namespace选项</p> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code>kubectl create ns mysqlbak
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br></div></div><h3 id="_2、创建configmap挂载配置文件"><a href="#_2、创建configmap挂载配置文件" class="header-anchor">#</a> 2、创建configmap挂载配置文件</h3> <p>新建mysqlbak-ini.yaml文件内容如下</p> <div class="language-yaml line-numbers-mode"><pre class="language-yaml"><code><span class="token punctuation">---</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">data</span><span class="token punctuation">:</span>
+  <span class="token key atrule">config.ini</span><span class="token punctuation">:</span> <span class="token punctuation">|</span><span class="token scalar string">
+    [base]
+    debug_mode=&quot;debug&quot;
+    time_location=&quot;Asia/Chongqing&quot;
+    download_url=&quot;http://127.0.0.1:19009&quot;   ## 用于下载备份文件使用，需要与server端svc开放的地址端口相同
+    [http]
+    addr = &quot;:8880&quot;                       # 监听地址, default &quot;:8700&quot;
+    read_timeout = 10                   # 读取超时时长
+    write_timeout = 10                  # 写入超时时长
+    max_header_bytes = 20               # 最大的header大小，二进制位长度
+    [HostLostAlarms]
+    enable = false  ## 是否启动主机检测 
+    accessToken = &quot;xxx&quot;  ## 主机检测钉钉报警配置
+    secret = &quot;xxx&quot;
+    [dingProxyAgent]
+    enable = false    ## 用于无外网环境下发送钉钉消息
+    addr = 127.0.0.1:39999
+    title = &quot;公司测试环境备份平台&quot;
+    content = &quot;公司测试环境备份平台&quot;
+    [swagger]
+    title=&quot;gin-mysqlbak swagger API&quot;
+    desc=&quot;This is a sample server celler server.&quot;
+    host=&quot;127.0.0.1:8880&quot;
+    base_path=&quot;&quot;
+    [jaeger]
+    enable = false
+    addr = 127.0.0.1:6831
+    [mysql]
+    host = 127.0.0.1
+    port = 3306
+    user = root
+    password = chenteng
+    dbname = gin-mysqlbak
+    [app] ## 应用相关配置
+    mysqlAvatar: http://qiniu.yunxue521.top/mysql.jpeg
+    elasticAvatar: http://qiniu.yunxue521.top/elastic.jpg
+    [cluster]
+    ## 集群任务同步周期(分钟)
+    clusterSyncPeriod = &quot;*/30 * * * *&quot;</span>
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> ConfigMap
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">annotations</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> mysqlbak<span class="token punctuation">-</span>ini<span class="token punctuation">-</span>conf
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> mysqlbak
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br></div></div><h3 id="_3、创建deployment控制器-service"><a href="#_3、创建deployment控制器-service" class="header-anchor">#</a> 3、创建deployment控制器 &amp; service</h3> <p>新建gin-mysqlbak-server-deploy.yaml，文件内容去下</p> <div class="language-yaml line-numbers-mode"><pre class="language-yaml"><code><span class="token punctuation">---</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> apps/v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Deployment
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> gin<span class="token punctuation">-</span>mysqlbak<span class="token punctuation">-</span>server
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> mysqlbak
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">progressDeadlineSeconds</span><span class="token punctuation">:</span> <span class="token number">600</span>
+  <span class="token key atrule">replicas</span><span class="token punctuation">:</span> <span class="token number">1</span>
+  <span class="token key atrule">revisionHistoryLimit</span><span class="token punctuation">:</span> <span class="token number">10</span>
+  <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+    <span class="token key atrule">matchLabels</span><span class="token punctuation">:</span>
+      <span class="token key atrule">app</span><span class="token punctuation">:</span> gin<span class="token punctuation">-</span>mysqlbak<span class="token punctuation">-</span>server
+  <span class="token key atrule">strategy</span><span class="token punctuation">:</span>
+    <span class="token key atrule">rollingUpdate</span><span class="token punctuation">:</span>
+      <span class="token key atrule">maxSurge</span><span class="token punctuation">:</span> 25%
+      <span class="token key atrule">maxUnavailable</span><span class="token punctuation">:</span> 25%
+    <span class="token key atrule">type</span><span class="token punctuation">:</span> RollingUpdate
+  <span class="token key atrule">template</span><span class="token punctuation">:</span>
+    <span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+      <span class="token key atrule">creationTimestamp</span><span class="token punctuation">:</span> <span class="token null important">null</span>
+      <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+        <span class="token key atrule">app</span><span class="token punctuation">:</span> gin<span class="token punctuation">-</span>mysqlbak<span class="token punctuation">-</span>server
+    <span class="token key atrule">spec</span><span class="token punctuation">:</span>
+      <span class="token key atrule">containers</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">image</span><span class="token punctuation">:</span> <span class="token string">'chenteng/gin-mysqlbak-server:3.0.0'</span>
+          <span class="token key atrule">imagePullPolicy</span><span class="token punctuation">:</span> IfNotPresent
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> gin<span class="token punctuation">-</span>mysqlbak<span class="token punctuation">-</span>server
+          <span class="token key atrule">terminationMessagePath</span><span class="token punctuation">:</span> /dev/termination<span class="token punctuation">-</span>log
+          <span class="token key atrule">terminationMessagePolicy</span><span class="token punctuation">:</span> File
+          <span class="token key atrule">volumeMounts</span><span class="token punctuation">:</span>
+            <span class="token punctuation">-</span> <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /app/conf/config.ini
+              <span class="token key atrule">name</span><span class="token punctuation">:</span> iniconf
+              <span class="token key atrule">subPath</span><span class="token punctuation">:</span> config.ini
+            <span class="token punctuation">-</span> <span class="token key atrule">mountPath</span><span class="token punctuation">:</span> /app/bakfile
+              <span class="token key atrule">name</span><span class="token punctuation">:</span> mysqlbak<span class="token punctuation">-</span>data
+              <span class="token key atrule">subPath</span><span class="token punctuation">:</span> mysql<span class="token punctuation">-</span>data
+      <span class="token key atrule">dnsPolicy</span><span class="token punctuation">:</span> ClusterFirst
+      <span class="token key atrule">restartPolicy</span><span class="token punctuation">:</span> Always
+      <span class="token key atrule">schedulerName</span><span class="token punctuation">:</span> default<span class="token punctuation">-</span>scheduler
+      <span class="token key atrule">terminationGracePeriodSeconds</span><span class="token punctuation">:</span> <span class="token number">30</span>
+      <span class="token key atrule">volumes</span><span class="token punctuation">:</span>
+        <span class="token punctuation">-</span> <span class="token key atrule">hostPath</span><span class="token punctuation">:</span>
+            <span class="token key atrule">path</span><span class="token punctuation">:</span> /data/gin<span class="token punctuation">-</span>mysqlbak
+            <span class="token key atrule">type</span><span class="token punctuation">:</span> DirectoryOrCreate
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> mysqlbak<span class="token punctuation">-</span>data
+        <span class="token punctuation">-</span> <span class="token key atrule">configMap</span><span class="token punctuation">:</span>
+            <span class="token key atrule">defaultMode</span><span class="token punctuation">:</span> <span class="token number">420</span>
+            <span class="token key atrule">name</span><span class="token punctuation">:</span> mysqlbak<span class="token punctuation">-</span>ini<span class="token punctuation">-</span>conf
+          <span class="token key atrule">name</span><span class="token punctuation">:</span> iniconf
+<span class="token punctuation">---</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> Service
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app</span><span class="token punctuation">:</span> gin<span class="token punctuation">-</span>mysqlbak<span class="token punctuation">-</span>server
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> gin<span class="token punctuation">-</span>mysqlbak<span class="token punctuation">-</span>server
+  <span class="token key atrule">namespace</span><span class="token punctuation">:</span> mysqlbak
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">externalTrafficPolicy</span><span class="token punctuation">:</span> Cluster
+  <span class="token key atrule">ipFamilyPolicy</span><span class="token punctuation">:</span> SingleStack
+  <span class="token key atrule">ports</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">nodePort</span><span class="token punctuation">:</span> <span class="token number">19009</span>   <span class="token comment">## server端地址</span>
+      <span class="token key atrule">port</span><span class="token punctuation">:</span> <span class="token number">8880</span>
+      <span class="token key atrule">protocol</span><span class="token punctuation">:</span> TCP
+      <span class="token key atrule">targetPort</span><span class="token punctuation">:</span> <span class="token number">8880</span>
+  <span class="token key atrule">selector</span><span class="token punctuation">:</span>
+    <span class="token key atrule">app</span><span class="token punctuation">:</span> gin<span class="token punctuation">-</span>mysqlbak<span class="token punctuation">-</span>server
+  <span class="token key atrule">sessionAffinity</span><span class="token punctuation">:</span> None
+  <span class="token key atrule">type</span><span class="token punctuation">:</span> NodePort
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br></div></div><h4 id="_4、部署到k8s集群"><a href="#_4、部署到k8s集群" class="header-anchor">#</a> 4、部署到K8S集群</h4> <div class="language-shell line-numbers-mode"><pre class="language-shell"><code>kubectl apply <span class="token parameter variable">-f</span> mysqlbak-ini.yaml <span class="token operator">&amp;&amp;</span> kubectl apply <span class="token parameter variable">-f</span> gin-mysqlbak-server-deploy.yaml
+
+kubectl get pod <span class="token parameter variable">-n</span> mysqlbak  <span class="token comment">## pod状态均为Running则部署成功</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br></div></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><!----> <span class="next"><a href="/pages/help/use.html">
+        开始使用
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"><!----></div></div>
+    <script src="/assets/js/app.db16fe23.js" defer></script><script src="/assets/js/2.67a348e6.js" defer></script><script src="/assets/js/16.09e93c15.js" defer></script>
+  </body>
+</html>
