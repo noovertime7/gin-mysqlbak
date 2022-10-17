@@ -108,10 +108,10 @@ func (d *DashboardService) GetTaskNumByDate(ctx *gin.Context, info *dto.AgentDat
 		}
 		out = append(out, outItem)
 	}
-	log.Logger.Debug("TaskNum out[0] = ", out[0])
-	log.Logger.Debug("TaskNum out[len(out)-1 = ", out[len(out)-1])
-	latestInfo := out[0]
-	oldInfo := out[len(out)-1]
+	log.Logger.Debug("oldInfo = ", out[0])
+	log.Logger.Debug("latestInfo = ", out[len(out)-1])
+	oldInfo := out[0]
+	latestInfo := out[len(out)-1]
 	//如果最新的小于之前的任务数，代表减少了
 	if latestInfo.TaskNum < oldInfo.TaskNum {
 		taskIncreaseNum = 0

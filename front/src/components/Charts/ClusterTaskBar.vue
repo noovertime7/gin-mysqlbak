@@ -49,8 +49,8 @@ export default {
           alias: '日期'
         },
         {
-          dataKey: 'finish_num',
-          alias: '完成数'
+          dataKey: 'task_num',
+          alias: '任务数'
         }]
     }
   }

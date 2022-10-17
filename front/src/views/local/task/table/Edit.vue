@@ -25,7 +25,7 @@
         hasFeedback
         validateStatus="success"
       >
-        <a-input style="width: 100%" placeholder="请输入数据库名" v-decorator="['db_name', {rules: [{ required: true, message: '请输入规则编号',whitespace: true }]}]" />
+        <a-input style="width: 100%" placeholder="请输入数据库名" v-decorator="['db_name', {rules: [{ required: true, message: '请输入数据库名',whitespace: true }]}]" />
       </a-form-item>
 
       <a-form-item
