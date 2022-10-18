@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [AvatarList 用户头像列表](#avatarlist-%E7%94%A8%E6%88%B7%E5%A4%B4%E5%83%8F%E5%88%97%E8%A1%A8)
+  - [代码演示  demo](#%E4%BB%A3%E7%A0%81%E6%BC%94%E7%A4%BA--demo)
+  - [API](#api)
+    - [AvatarList](#avatarlist)
+    - [AvatarList.Item](#avatarlistitem)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # AvatarList 用户头像列表
 
 

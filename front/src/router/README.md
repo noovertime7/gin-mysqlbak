@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [路由/菜单说明](#%E8%B7%AF%E7%94%B1%E8%8F%9C%E5%8D%95%E8%AF%B4%E6%98%8E)
+  - [格式和说明](#%E6%A0%BC%E5%BC%8F%E5%92%8C%E8%AF%B4%E6%98%8E)
+  - [路由例子](#%E8%B7%AF%E7%94%B1%E4%BE%8B%E5%AD%90)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 路由/菜单说明
 ====
 

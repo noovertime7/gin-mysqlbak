@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [为首屏增加 加载动画](#%E4%B8%BA%E9%A6%96%E5%B1%8F%E5%A2%9E%E5%8A%A0-%E5%8A%A0%E8%BD%BD%E5%8A%A8%E7%94%BB)
+  - [需求](#%E9%9C%80%E6%B1%82)
+  - [实现方案](#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88)
+  - [写在最后](#%E5%86%99%E5%9C%A8%E6%9C%80%E5%90%8E)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 为首屏增加 加载动画
 ====
 
