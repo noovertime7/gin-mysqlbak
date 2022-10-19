@@ -5,8 +5,8 @@
 - [gin-mysqlbak](#gin-mysqlbak)
   - [一、现在开始](#%E4%B8%80%E7%8E%B0%E5%9C%A8%E5%BC%80%E5%A7%8B)
   - [二、功能演示](#%E4%BA%8C%E5%8A%9F%E8%83%BD%E6%BC%94%E7%A4%BA)
-  - [四、FAQ](#%E5%9B%9Bfaq)
-  - [五、其他](#%E4%BA%94%E5%85%B6%E4%BB%96)
+  - [三、FAQ](#%E5%9B%9Bfaq)
+  - [四、其他](#%E4%BA%94%E5%85%B6%E4%BB%96)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
