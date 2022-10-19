@@ -43,6 +43,7 @@ func NewTaskEndpoints() []*api.Endpoint {
 
 type TaskService interface {
 	TaskAdd(ctx context.Context, in *TaskAddInput, opts ...client.CallOption) (*TaskOneMessage, error)
+	TaskAutoCreate(ctx context.Context, in *TaskAutoCreateInPut, opts ...client.CallOption) (*TaskOneMessage, error)
 	TaskDelete(ctx context.Context, in *TaskIDInput, opts ...client.CallOption) (*TaskOneMessage, error)
 	TaskUpdate(ctx context.Context, in *TaskUpdateInput, opts ...client.CallOption) (*TaskOneMessage, error)
 	TaskList(ctx context.Context, in *TaskListInput, opts ...client.CallOption) (*TaskListOutPut, error)
@@ -67,6 +68,16 @@ func NewTaskService(name string, c client.Client) TaskService {
 
 func (c *taskService) TaskAdd(ctx context.Context, in *TaskAddInput, opts ...client.CallOption) (*TaskOneMessage, error) {
 	req := c.c.NewRequest(c.name, "Task.TaskAdd", in)
+	out := new(TaskOneMessage)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskService) TaskAutoCreate(ctx context.Context, in *TaskAutoCreateInPut, opts ...client.CallOption) (*TaskOneMessage, error) {
+	req := c.c.NewRequest(c.name, "Task.TaskAutoCreate", in)
 	out := new(TaskOneMessage)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -159,6 +170,7 @@ func (c *taskService) GetDateNumInfo(ctx context.Context, in *DateNumInfoInput, 
 
 type TaskHandler interface {
 	TaskAdd(context.Context, *TaskAddInput, *TaskOneMessage) error
+	TaskAutoCreate(context.Context, *TaskAutoCreateInPut, *TaskOneMessage) error
 	TaskDelete(context.Context, *TaskIDInput, *TaskOneMessage) error
 	TaskUpdate(context.Context, *TaskUpdateInput, *TaskOneMessage) error
 	TaskList(context.Context, *TaskListInput, *TaskListOutPut) error
@@ -172,6 +184,7 @@ type TaskHandler interface {
 func RegisterTaskHandler(s server.Server, hdlr TaskHandler, opts ...server.HandlerOption) error {
 	type task interface {
 		TaskAdd(ctx context.Context, in *TaskAddInput, out *TaskOneMessage) error
+		TaskAutoCreate(ctx context.Context, in *TaskAutoCreateInPut, out *TaskOneMessage) error
 		TaskDelete(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error
 		TaskUpdate(ctx context.Context, in *TaskUpdateInput, out *TaskOneMessage) error
 		TaskList(ctx context.Context, in *TaskListInput, out *TaskListOutPut) error
@@ -194,6 +207,10 @@ type taskHandler struct {
 
 func (h *taskHandler) TaskAdd(ctx context.Context, in *TaskAddInput, out *TaskOneMessage) error {
 	return h.TaskHandler.TaskAdd(ctx, in, out)
+}
+
+func (h *taskHandler) TaskAutoCreate(ctx context.Context, in *TaskAutoCreateInPut, out *TaskOneMessage) error {
+	return h.TaskHandler.TaskAutoCreate(ctx, in, out)
 }
 
 func (h *taskHandler) TaskDelete(ctx context.Context, in *TaskIDInput, out *TaskOneMessage) error {

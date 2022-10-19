@@ -5,6 +5,7 @@ option go_package = "./;task";
 
 service Task {
   rpc TaskAdd(TaskAddInput) returns (TaskOneMessage) {}
+  rpc TaskAutoCreate(TaskAutoCreateInPut) returns (TaskOneMessage) {}
   rpc TaskDelete(TaskIDInput) returns (TaskOneMessage) {}
   rpc TaskUpdate(TaskUpdateInput) returns (TaskOneMessage) {}
   rpc TaskList(TaskListInput) returns (TaskListOutPut) {}
@@ -171,4 +172,22 @@ message DateNumInfoOut {
   int64 TaskNum =2;
   // @inject_tag: json:"finish_num"
   int64 FinishNum=3;
+}
+
+
+message TaskAutoCreateInPut {
+  int64 HostID = 1;
+  string BackupCycle = 3;
+  int64 KeepNumber = 4 ;
+  int64 IsAllDBBak = 5;
+  int64 IsDingSend = 6;
+  string DingAccessToken = 7;
+  string DingSecret = 8;
+  int64 OssType = 9;
+  int64 IsOssSave = 10;
+  string Endpoint = 11;
+  string OssAccess = 12;
+  string OssSecret = 13;
+  string BucketName = 14;
+  string Directory = 15;
 }

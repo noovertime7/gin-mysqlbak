@@ -58,6 +58,37 @@ func (t *TaskService) TaskAdd(ctx *gin.Context, params *agentdto.TaskAddInput) e
 	return nil
 }
 
+func (t *TaskService) TaskAutoAdd(ctx *gin.Context, params *agentdto.TaskAutoAddInput) error {
+	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
+	if err != nil {
+		return err
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+	taskAddinput := &task.TaskAutoCreateInPut{
+		HostID:          params.HostID,
+		BackupCycle:     params.BackupCycle,
+		KeepNumber:      params.KeepNumber,
+		IsAllDBBak:      params.IsAllDBBak,
+		IsDingSend:      params.IsDingSend,
+		DingAccessToken: params.DingAccessToken,
+		DingSecret:      params.DingSecret,
+		OssType:         params.OssType,
+		IsOssSave:       params.IsOssSave,
+		Endpoint:        params.Endpoint,
+		OssAccess:       params.OssAccess,
+		OssSecret:       params.OssSecret,
+		BucketName:      params.BucketName,
+		Directory:       params.Directory,
+	}
+	data, err := taskService.TaskAutoCreate(ctx, taskAddinput, ops)
+	if err != nil || !data.OK {
+		return err
+	}
+	return nil
+}
+
 func (t *TaskService) TaskList(ctx context.Context, params *agentdto.TaskListInput) (*task.TaskListOutPut, error) {
 	taskService, addr, err := pkg.GetTaskService(params.ServiceName)
 	if err != nil {

@@ -16,6 +16,7 @@ type AgentTaskController struct {
 func AgentTaskRegister(group *gin.RouterGroup) {
 	task := &AgentTaskController{service: agentservice.GetClusterTaskService()}
 	group.POST("/taskadd", task.TaskAdd)
+	group.POST("/task_auto_add", task.TaskAutoAdd)
 	group.GET("/tasklist", task.TaskList)
 	group.GET("/taskdetail", task.TaskDetail)
 	group.DELETE("/taskdelete", task.TaskDelete)
@@ -31,12 +32,28 @@ func (a *AgentTaskController) TaskAdd(ctx *gin.Context) {
 		return
 	}
 	if err := a.service.TaskAdd(ctx, params); err != nil {
-		log.Logger.Error("agent添加主机失败", err)
+		log.Logger.Error("agent添加任务失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskAddError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, "添加成功")
-	log.Logger.Info("agent添加主机成功")
+	log.Logger.Info("agent添加任务成功")
+}
+
+func (a *AgentTaskController) TaskAutoAdd(ctx *gin.Context) {
+	params := &agentdto.TaskAutoAddInput{}
+	if err := params.BindValidParams(ctx); err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	if err := a.service.TaskAutoAdd(ctx, params); err != nil {
+		log.Logger.Error("agent自动创建任务成功失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskAddError, err))
+		return
+	}
+	middleware.ResponseSuccess(ctx, "自动创建任务成功")
+	log.Logger.Info("agent自动创建任务成功成功")
 }
 
 func (a *AgentTaskController) TaskList(ctx *gin.Context) {
@@ -64,12 +81,12 @@ func (a *AgentTaskController) TaskDetail(ctx *gin.Context) {
 	}
 	data, err := a.service.TaskDetail(ctx, params)
 	if err != nil {
-		log.Logger.Error("agent查询主机详情失败", err)
+		log.Logger.Error("agent查询任务详情失败", err)
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
 	middleware.ResponseSuccess(ctx, data)
-	log.Logger.Info("agent查询主机详情成功")
+	log.Logger.Info("agent查询任务详情成功")
 }
 
 func (a *AgentTaskController) TaskDelete(ctx *gin.Context) {
@@ -84,7 +101,7 @@ func (a *AgentTaskController) TaskDelete(ctx *gin.Context) {
 		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.TaskDeleteError, err))
 	}
 	middleware.ResponseSuccess(ctx, "删除成功")
-	log.Logger.Info("agent删除主机成功")
+	log.Logger.Info("agent删除任务成功")
 }
 
 func (a *AgentTaskController) TaskRestore(ctx *gin.Context) {
@@ -115,5 +132,5 @@ func (a *AgentTaskController) TaskUpdate(ctx *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(ctx, "更新成功")
-	log.Logger.Info("agent更新主机成功")
+	log.Logger.Info("agent更新任务成功")
 }
