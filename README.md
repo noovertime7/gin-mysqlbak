@@ -61,6 +61,7 @@ agent部署成功后，会向server端发起注册，注册成功服务信息保
 
 ![历史记录](http://qiniu.yunxue521.top/mysqlbak/history.jpg)
 
+[更多功能演示](https://noovertime7.github.io/mysqlbak-website/pages/show/show.html)
 
 ## 三、FAQ
 
