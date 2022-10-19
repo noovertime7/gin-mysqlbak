@@ -19,13 +19,14 @@
         ></a-input>
       </a-form-item>
       <a-form-item
+        v-show="!auto"
         :labelCol="labelCol"
         :wrapperCol="wrapperCol"
         label="数据库"
         hasFeedback
         validateStatus="success"
       >
-        <a-input style="width: 100%" placeholder="请输入数据库名" v-decorator="['db_name', {rules: [{ required: true, message: '请输入数据库名',whitespace: true }]}]" />
+        <a-input style="width: 100%" placeholder="请输入数据库名" v-decorator="['db_name', { rules: []}]" />
       </a-form-item>
 
       <a-form-item
@@ -35,7 +36,7 @@
         hasFeedback
         validateStatus="success"
       >
-        <a-input style="width: 100%" placeholder="请输入备份周期 ex：30 12 * * *" v-decorator="['backup_cycle', {rules: [{ required: true }]}]" />
+        <a-input style="width: 100%" placeholder="请输入备份周期 ex：30 12 * * *" v-decorator="['backup_cycle', {rules: [{ required: true,message: '请输入备份周期 ex：30 12 * * *' }]}]" />
       </a-form-item>
 
       <a-form-item
@@ -45,7 +46,7 @@
         hasFeedback
         validateStatus="success"
       >
-        <a-input-number :min="1" style="width: 100%" placeholder="请输入数据保留周期(天)" v-decorator="['keep_number', {rules: [{ required: true }]}]" />
+        <a-input-number :min="1" style="width: 100%" placeholder="请输入数据保留周期(天)" v-decorator="['keep_number', {rules: [{ required: true,message: '请输入数据保留周期(天)' }]}]" />
       </a-form-item>
 
       <a-form-item
@@ -157,7 +158,7 @@
 <script>
 
 import pick from 'lodash.pick'
-import { AddAgentTask, GetAgentTaskDetail, UpdateAgentTask } from '@/api/agent-task'
+import { AddAgentTask, AutoAddAgentTask, GetAgentTaskDetail, UpdateAgentTask } from '@/api/agent-task'
 
 export default {
   name: 'TableEdit',
@@ -169,6 +170,10 @@ export default {
     host: {
       type: Number,
       default: 0
+    },
+    auto: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -235,17 +240,31 @@ export default {
                  }
                })
              } else {
-               values['service_name'] = this.service_name
-               values['host_id'] = this.host
-               values['is_ding_send'] = this.BoolToInt(this.dingStatus)
-               values['is_oss_save'] = this.BoolToInt(this.ossStatus)
-               values['oss_type'] = this.ossType
-               AddAgentTask(values).then((res) => {
-                 if (res) {
-                   this.$message.success(res.data)
-                   this.handleGoBack()
-                 }
-               })
+               if (this.auto) {
+                 values['service_name'] = this.service_name
+                 values['host_id'] = this.host
+                 values['is_ding_send'] = this.BoolToInt(this.dingStatus)
+                 values['is_oss_save'] = this.BoolToInt(this.ossStatus)
+                 values['oss_type'] = this.ossType
+                 AutoAddAgentTask(values).then((res) => {
+                   if (res) {
+                     this.$message.success(res.data)
+                     this.handleGoBack()
+                   }
+                 })
+               } else {
+                 values['service_name'] = this.service_name
+                 values['host_id'] = this.host
+                 values['is_ding_send'] = this.BoolToInt(this.dingStatus)
+                 values['is_oss_save'] = this.BoolToInt(this.ossStatus)
+                 values['oss_type'] = this.ossType
+                 AddAgentTask(values).then((res) => {
+                   if (res) {
+                     this.$message.success(res.data)
+                     this.handleGoBack()
+                   }
+                 })
+               }
              }
            }
       })

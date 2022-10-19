@@ -32,6 +32,14 @@ export function AddAgentTask (data) {
   })
 }
 
+export function AutoAddAgentTask (data) {
+  return request({
+    url: '/agent/task_auto_add',
+    method: 'post',
+    data
+  })
+}
+
 export function UpdateAgentTask (query) {
   return request({
     url: '/agent/taskupdate',

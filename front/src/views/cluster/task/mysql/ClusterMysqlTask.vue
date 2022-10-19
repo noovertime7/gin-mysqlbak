@@ -5,6 +5,7 @@
       @onGoBack="handleGoBack"
       :hostByEdit="hostByEdit"
       :host="hostID"
+      :auto="auto"
       :record="record"
       :is="currentComponet"></component>
   </a-card>
@@ -31,11 +32,13 @@ export default {
       currentComponet: 'List',
       record: '',
       hostID: 0,
+      auto: false,
       hostByEdit: ''
     }
   },
   methods: {
-    handleEdit (record) {
+    handleEdit (record, isAuto) {
+      this.auto = isAuto
       this.record = record || ''
       this.hostByEdit = record.host
       this.hostID = record.host_id_by_list

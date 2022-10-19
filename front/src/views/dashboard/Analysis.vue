@@ -120,8 +120,8 @@
                   status="down"
                   :decreaseTotal="serviceNums.task_decrease_num">
                   <span slot="subtitle">
-                    <span>任务完成数</span>
-                    <a-tooltip title="每天的任务完成数" slot="action">
+                    <span>任务数量</span>
+                    <a-tooltip title="每天的任务数量" slot="action">
                       <a-icon type="info-circle-o" :style="{ marginLeft: '8px' }" />
                     </a-tooltip>
                   </span>

@@ -23,8 +23,7 @@
           </a-col>
           <a-col :md="8" :sm="24">
             <span
-              class="table-page-search-submitButtons"
-              :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+              class="table-page-search-submitButtons">
               <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
               <a-button style="margin-left: 8px" @click="() => queryParam = {}">重置</a-button>
             </span>
@@ -35,6 +34,7 @@
 
     <div class="table-operator">
       <a-button type="primary" icon="plus" @click="handleEdit">新建</a-button>
+      <a-button type="primary" icon="plus" @click="handleAutoEdit">自动新建</a-button>
       <a-button type="primary" ghost="ghost" icon="rocket" @click="startBakByHost()">start all</a-button>
       <a-button type="primary" ghost="ghost" icon="poweroff" @click="stopBakByHost()">stop all</a-button>
     </div>
@@ -274,6 +274,10 @@ clear: () => {
     handleEdit (record) {
       record.host_id_by_list = this.getvalue(this.select_host)
       this.$emit('onEdit', record)
+    },
+    handleAutoEdit (record) {
+      record.host_id_by_list = this.getvalue(this.select_host)
+      this.$emit('onEdit', record, true)
     },
     handleOk () {
 
