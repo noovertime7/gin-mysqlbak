@@ -4,7 +4,7 @@ ENV GOOS linux
 ENV GOPROXY https://goproxy.cn,direct
 WORKDIR /build
 COPY . .
-RUN go mod tidy
+RUN go mod download
 RUN go build -ldflags="-s -w" -o gin-mysqlbak ./main.go
 
 FROM centos
