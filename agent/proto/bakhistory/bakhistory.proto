@@ -61,6 +61,10 @@ message HistoryListOutItem {
   string BakTime = 9;
   // @inject_tag: json:"status"
   int64 Status = 10;
+  // @inject_tag: json:"cleaned_status"
+  int64 CleanedStatus = 11;
+  // @inject_tag: json:"encryption_status"
+  int64 EncryptionStatus =12;
 }
 
 message HistoryNumInfoOut {
