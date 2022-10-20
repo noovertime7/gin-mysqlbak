@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { Encrypt } from '@/utils/security'
 
 export function GetAgentHostList (query) {
   return request({
@@ -25,6 +26,7 @@ export function GetHostNames (query) {
 }
 
 export function CreateAgentHost (data) {
+  data.password = Encrypt(data.password)
   return request({
     url: '/agent/hostadd',
     method: 'post',
