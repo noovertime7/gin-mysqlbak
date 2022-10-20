@@ -5,6 +5,7 @@ import (
 	"github.com/noovertime7/gin-mysqlbak/agent/agentdto"
 	"github.com/noovertime7/gin-mysqlbak/agent/agentservice"
 	"github.com/noovertime7/gin-mysqlbak/middleware"
+	"github.com/noovertime7/gin-mysqlbak/public"
 	"github.com/noovertime7/gin-mysqlbak/public/globalError"
 	"github.com/noovertime7/mysqlbak/pkg/log"
 )
@@ -29,6 +30,14 @@ func (a *AgentHostController) AddHost(c *gin.Context) {
 		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
+	var err error
+	params.Password, err = public.RsaDecode(params.Password)
+	if err != nil {
+		log.Logger.Error("rsa解密失败", err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ServerError, err))
+		return
+	}
+	log.Logger.Info("主机添加RSA解密成功")
 	data, err := a.service.AddHost(c, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent添加主机失败", err)
@@ -61,6 +70,14 @@ func (a *AgentHostController) UpdateHost(c *gin.Context) {
 		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ParamBindError, err))
 		return
 	}
+	var err error
+	params.Password, err = public.RsaDecode(params.Password)
+	if err != nil {
+		log.Logger.Error("rsa解密失败", err)
+		middleware.ResponseError(c, globalError.NewGlobalError(globalError.ServerError, err))
+		return
+	}
+	log.Logger.Info("主机更新RSA解密成功")
 	data, err := a.service.UpdateHost(c, params)
 	if err != nil || !data.OK {
 		log.Logger.Error("agent更新主机失败", err)

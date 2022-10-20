@@ -54,8 +54,6 @@ message ListItem {
   string Host = 4 ;
   // @inject_tag: json:"username"
   string UserName = 5 ;
-  // @inject_tag: json:"password"
-  string Password = 6 ;
   // @inject_tag: json:"host_status"
   int64 HostStatus = 7 ;
   // @inject_tag: json:"content"
