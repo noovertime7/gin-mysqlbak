@@ -227,8 +227,9 @@ clear: () => {
         'type': 2
       }
       GetHostNames(query).then((res) => {
-        if (res.data.hosts === null) {
-          this.$message.error('当前服务为空请先添加主机，页面加载失败!')
+        if (res.data.list === null) {
+          this.$message.warn('当前应用列表为空，请先添加ElasticSearch应用')
+          this.$router.push('/cluster/app')
         }
         this.host_list = res.data.list
         if (this.hostByEdit !== '' || undefined) {
