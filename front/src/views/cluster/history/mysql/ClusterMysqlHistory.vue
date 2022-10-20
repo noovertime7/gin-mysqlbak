@@ -42,6 +42,9 @@
         <span slot="status" slot-scope="text">
           <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
         </span>
+        <span slot="clean_status" slot-scope="text">
+          <a-badge :status="text | cleanStatusTypeFilter" :text="text | cleanStatusFilter" />
+        </span>
         <span slot="action" slot-scope="text, record">
           <a @click="deleteHistory(record)">删除</a>
           <a-divider type="vertical"/>
@@ -84,6 +87,17 @@ const statusMap = {
   2: {
     status: 'processing',
     text: '未启用'
+  }
+}
+
+const cleanStatusMap = {
+  0: {
+    status: 'success',
+    text: '未清理'
+  },
+  1: {
+    status: 'default',
+    text: '已清理'
   }
 }
 
@@ -141,6 +155,18 @@ export default {
           align: 'center'
         },
         {
+          title: '清理状态',
+          dataIndex: 'cleaned_status',
+          scopedSlots: { customRender: 'clean_status' },
+          align: 'center'
+        },
+        {
+          title: '加密状态',
+          dataIndex: 'encryption_status',
+          scopedSlots: { customRender: 'status' },
+          align: 'center'
+        },
+        {
           title: '备份时间',
           dataIndex: 'bak_time',
           align: 'center'
@@ -178,6 +204,12 @@ export default {
     },
     statusTypeFilter (type) {
       return statusMap[type].status
+    },
+    cleanStatusFilter (type) {
+      return cleanStatusMap[type].text
+    },
+    cleanStatusTypeFilter (type) {
+      return cleanStatusMap[type].status
     }
   },
   created () {
