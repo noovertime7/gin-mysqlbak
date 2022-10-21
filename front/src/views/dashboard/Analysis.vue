@@ -387,7 +387,9 @@ export default {
     getAgentServiceList () {
        const query = {
          'sortField': 'task_num',
-         'sortOrder': 'descend'
+         'sortOrder': 'descend',
+         'page_no': 1,
+         'page_size': 6
        }
       GetServiceList(query).then((res) => {
         if (res) {
@@ -407,7 +409,9 @@ export default {
     getAgentServiceListByFinish () {
       const query = {
         'sortField': 'finish_num',
-        'sortOrder': 'descend'
+        'sortOrder': 'descend',
+        'page_no': 1,
+        'page_size': 6
       }
       GetServiceList(query).then((res) => {
         if (res) {

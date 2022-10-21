@@ -234,7 +234,7 @@ clear: () => {
       GetHostNames(query).then((res) => {
         console.log(res.data)
         if (res.data.list === null) {
-          this.$message.warn('当前应用列表为空，请先添加Mysql应用')
+          this.$message.warn('当前应用列表为空，请先添加Mysql或ES应用')
           this.$router.push('/cluster/app')
         }
         this.host_list = res.data.list
