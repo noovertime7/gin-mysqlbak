@@ -19,6 +19,12 @@ var decrypt = &cobra.Command{
 	Long:    "Use 16-bit (AES-128) 24-byte (AES-192) or 32-byte (AES-256) key to decrypt the file, the key must be the same as the key of the encrypted file",
 	Example: "crypt decrypt -k 0123456789abcdeasbgted3jikydj3ss -t txt text.data => text.txt",
 	Run: func(cmd *cobra.Command, args []string) {
+		//设置recover,
+		defer func() {
+			if err := recover(); err != nil { //产生了panic异常
+				fmt.Println("encrypt err ", err)
+			}
+		}()
 		if len(args) != 1 {
 			HandleErr("You have entered the wrong parameter, Usage: crypt decrypt -k 0123456789abcdeasbgted3jikydj3ss -t pdf text.bak", errors.New("params error"))
 		}

@@ -9,7 +9,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(encrypt)
-	encrypt.Flags().StringP("fileType", "t", "txt", "File suffix after encryption")
+	encrypt.Flags().StringP("fileType", "t", "data", "File suffix after encryption")
 }
 
 var encrypt = &cobra.Command{
@@ -19,6 +19,12 @@ var encrypt = &cobra.Command{
 	Long:    "Use 16-bit (AES-128) 24-byte (AES-192) or 32-byte (AES-256) key to encrypt the file, the key must be the same as the key of the encrypted file",
 	Example: "crypt encrypt -k 0123456789abcdeasbgted3jikydj3ss -t data text.txt => text.data",
 	Run: func(cmd *cobra.Command, args []string) {
+		//设置recover,
+		defer func() {
+			if err := recover(); err != nil { //产生了panic异常
+				fmt.Println("encrypt err ", err)
+			}
+		}()
 		if len(args) != 1 {
 			HandleErr("You have entered the wrong parameter, Usage: crypt encrypt -k 0123456789abcdeasbgted3jikydj3ss -t data text.txt", errors.New("params error"))
 		}
