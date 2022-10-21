@@ -56,11 +56,11 @@ agent部署成功后，会向server端发起注册，注册成功服务信息保
  任务总览
 任务总览界面包含集群内所有注册服务的任务列表，可以很方便的启动停止任务，同步周期取决与配置文件中的clusterSyncPeriod
 
-![任务总览](http://qiniu.yunxue521.top/mysqlbak/task_overview.jpg)
+![任务总览](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/task_overview.jpg?raw=true)
  历史记录
 包括mysql历史记录与elastic快照记录
 
-![历史记录](http://qiniu.yunxue521.top/mysqlbak/history.jpg)
+![历史记录](https://github.com/noovertime7/gin-mysqlbak/blob/main/img/history.jpg?raw=true)
 
 [更多功能演示](https://noovertime7.github.io/mysqlbak-website/pages/show/show.html)
 
