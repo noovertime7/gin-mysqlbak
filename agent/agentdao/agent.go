@@ -69,6 +69,7 @@ func (s *AgentDB) PageList(c context.Context, tx *gorm.DB, params *agentdto.Agen
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
 	query = query.Table(s.TableName()).Where("is_deleted=0")
+	query.Find(&list).Count(&total)
 	if params.Info != "" {
 		query = query.Where("( service_name like ?)", "%"+params.Info+"%")
 	}
@@ -86,6 +87,5 @@ func (s *AgentDB) PageList(c context.Context, tx *gorm.DB, params *agentdto.Agen
 	if err := query.Limit(params.PageSize).Offset(offset).Order(fmt.Sprintf("%s %s", params.SortField, sortRules)).Find(&list).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, 0, err
 	}
-	query.Find(&list).Count(&total)
 	return list, int(total), nil
 }
