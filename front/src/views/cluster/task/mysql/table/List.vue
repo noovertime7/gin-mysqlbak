@@ -72,6 +72,9 @@
           </a>
           <a-menu slot="overlay">
             <a-menu-item>
+              <a @click="handleTest(record)">测试</a>
+            </a-menu-item>
+            <a-menu-item>
               <a @click="handleDetail">详情</a>
             </a-menu-item>
             <a-menu-item>
@@ -92,7 +95,7 @@ import {
   StartAgentHostTask,
   StartAgentTask,
   StopAgentHostTask,
-  StopAgentTask
+  StopAgentTask, TestAgentTask
 } from '@/api/agent-task'
 import { GetHostNames } from '@/api/agent-host'
 
@@ -217,6 +220,18 @@ clear: () => {
     this.getHostList()
   },
   methods: {
+    handleTest (record) {
+      const query = {
+        'service_name': this.service_name,
+        'task_id': record.id
+      }
+      TestAgentTask(query).then((res) => {
+        if (res) {
+          this.$message.success(res.data)
+          this.$refs.table.refresh()
+        }
+      })
+    },
     // 获取主机ID
     getvalue (inhost) {
       for (let i = 0; i < this.TestMap.length; i++) {

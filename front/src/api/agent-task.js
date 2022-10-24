@@ -56,6 +56,14 @@ export function StartAgentTask (query) {
   })
 }
 
+export function TestAgentTask (query) {
+  return request({
+    url: '/agent/bak_test',
+    method: 'put',
+    params: query
+  })
+}
+
 export function StopAgentTask (query) {
   return request({
     url: '/agent/bakstop',
