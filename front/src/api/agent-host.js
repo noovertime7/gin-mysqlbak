@@ -35,6 +35,7 @@ export function CreateAgentHost (data) {
 }
 
 export function UpdateAgentHost (query) {
+  query.password = Encrypt(query.password)
   return request({
     url: '/agent/hostupdate',
     method: 'put',

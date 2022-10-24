@@ -17,8 +17,8 @@
       </div>
       <div class="table-operator">
         <a-button type="primary" icon="plus" @click="handleAdd()">新建</a-button>
-        <a-button type="primary" ghost="ghost" icon="lock" @click="startBakByHost()">锁定</a-button>
-        <a-button type="primary" ghost="ghost" icon="unlock" @click="stopBakByHost()">解锁</a-button>
+        <a-button type="primary" ghost="ghost" icon="lock" @click="LockHost()">锁定</a-button>
+        <a-button type="primary" ghost="ghost" icon="unlock" @click="UnLockHost()">解锁</a-button>
       </div>
       <s-table
         ref="table"
@@ -195,6 +195,12 @@ export default {
     this.getServiceList()
   },
   methods: {
+    LockHost () {
+      this.$message.warn('正在开发中...')
+    },
+    UnLockHost () {
+      this.$message.warn('正在开发中...')
+    },
     handleAdd () {
       this.mdl = null
       this.visible = true
@@ -269,7 +275,6 @@ export default {
       }, 1000)
     },
     onSelectChange (selectedRowKeys) {
-      console.log('selectedRowKeys changed: ', selectedRowKeys)
       this.selectedRowKeys = selectedRowKeys
     },
     handleCancel () {
@@ -282,55 +287,39 @@ export default {
       this.confirmLoading = true
       form.validateFields((errors, values) => {
         if (!errors) {
-          console.log('values', values)
           // 获取serviceName
           values['service_name'] = this.select_service
           if (values.id > 0) {
             // 修改 e.g.
-            new Promise((resolve, reject) => {
               UpdateAgentHost(values).then((res) => {
                 if (res) {
-                  resolve(res)
+                  this.visible = false
+                  this.confirmLoading = false
+                  // 重置表单数据
+                  form.resetFields()
+                  // 刷新表格
+                  this.$refs.table.refresh()
+                  this.$message.success(res.data)
                 } else {
-                  reject(Error('修改失败'))
+                  this.confirmLoading = false
                 }
               })
-            }).then(res => {
-              // 刷新表格
-              this.$refs.table.refresh()
-              this.$message.success('修改成功')
-            }).finally(() => {
-              this.visible = false
-              this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              }
-            )
           } else {
             // 新增
-            new Promise((resolve, reject) => {
               CreateAgentHost(values).then((res) => {
                 if (res) {
-                  resolve(res.data)
+                  this.visible = false
+                  this.confirmLoading = false
+                  // 重置表单数据
+                  form.resetFields()
+                  // 刷新表格
+                  this.$refs.table.refresh()
+                  this.$message.success(res.data)
                 } else {
-                  reject(Error('添加失败'))
+                  this.confirmLoading = false
                 }
               })
-            }).then(res => {
-              this.visible = false
-              this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              // 刷新表格
-              this.$refs.table.refresh()
-              this.$message.success(res)
-            }).finally(() => {
-              this.visible = false
-              this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-            })
-          }
+            }
         } else {
           this.confirmLoading = false
         }
