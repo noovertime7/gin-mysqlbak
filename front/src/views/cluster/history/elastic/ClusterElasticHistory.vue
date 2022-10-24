@@ -175,7 +175,7 @@ export default {
         this.week_nums = res.data.week_nums.toString()
         this.all_nums = res.data.all_nums.toString()
         this.fail_nums = res.data.fail_nums.toString()
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     getServiceList () {
@@ -190,7 +190,7 @@ export default {
     },
     handleSelectChange (value) {
       this.getMysqlHistoryNunInfo()
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleDetail (value) {
       this.$router.push('/cluster/history/detail/' + value.id + '/' + this.select_service)
@@ -202,16 +202,16 @@ export default {
       }
       deleteEsHistory(deleteQuery).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     handlerSearch () {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
       this.searchData = ''
     },
     handleRadioClick () {
       this.queryParam = { 'status': this.radioStatus }
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleDownLoad () {
       this.$message.warn('功能正在开发中...')

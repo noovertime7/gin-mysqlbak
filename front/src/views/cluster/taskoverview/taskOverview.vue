@@ -65,7 +65,7 @@
                 <a @click="handleRestore(record)">还原</a>
               </a-menu-item>
               <a-menu-item>
-                <a @click="handleDelete(record)">删除</a>
+                <a v-action:delete @click="handleDelete(record)">删除</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -269,13 +269,13 @@ export default {
       this.selectedRows = selectedRows
     },
     handlerSearch () {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleSelectChange (value) {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleRadioClick () {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleRestore (record) {
       const query = {
@@ -287,7 +287,7 @@ export default {
       restoreOverviewBak(query).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -301,7 +301,7 @@ export default {
       startOverviewBak(query).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -309,7 +309,7 @@ export default {
       batchStartOverviewBak(this.selectedRows).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -317,7 +317,7 @@ export default {
       batchStopOverviewBak(this.selectedRows).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -331,7 +331,7 @@ export default {
       stopOverviewBak(query).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -370,7 +370,7 @@ export default {
       syncOverviewBak().then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     }

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/noovertime7/gin-mysqlbak/dao"
 	"github.com/noovertime7/gin-mysqlbak/dao/roledao"
@@ -16,6 +17,7 @@ type roleService struct{}
 func (r *roleService) GetRoleInfo(ctx *gin.Context, uid int) (*dto.RoleInfo, error) {
 	tx := database.GetDB()
 	adminDB := &dao.Admin{Id: uid}
+	fmt.Println("uid = ", uid)
 	admin, err := adminDB.Find(ctx, tx, adminDB)
 	//首先查询用户所属的用户组
 	groupDB := &roledao.UserGroupDB{Id: admin.GroupId}

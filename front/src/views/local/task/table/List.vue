@@ -214,7 +214,7 @@ export default {
       }
       startBak(query).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     startBakByHost () {
@@ -224,7 +224,7 @@ export default {
       startAllBakByHost(query).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -235,7 +235,7 @@ export default {
       stopAllBakByHost(query).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -246,7 +246,7 @@ export default {
       }
       stopBak(query).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     delete (record) {
@@ -255,7 +255,7 @@ export default {
       }
       taskDelete(query).then((res) => {
         this.$success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     handleDelete (record) {

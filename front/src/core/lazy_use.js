@@ -18,6 +18,7 @@ import {
   Modal,
   Table,
   Tabs,
+  Tree,
   Icon,
   Badge,
   Popover,
@@ -85,6 +86,7 @@ Vue.use(Spin)
 Vue.use(Menu)
 Vue.use(Drawer)
 Vue.use(Tooltip)
+Vue.use(Tree)
 Vue.use(Alert)
 Vue.use(Tag)
 Vue.use(Divider)

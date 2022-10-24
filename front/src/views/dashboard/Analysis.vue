@@ -99,7 +99,7 @@
                 <cluster-task-bar :data="dataSource" title="服务任务趋势" />
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
-                <cluster-task-rank-list title="服务任务数排行" :list="serviceListData" />
+                <cluster-task-rank-list title="服务任务数排行" :list="taskRankList" />
               </a-col>
             </a-row>
           </a-tab-pane>
@@ -156,7 +156,7 @@
                 row-key="index"
                 size="small"
                 :columns="searchTableColumns"
-                :dataSource="serviceListData"
+                :dataSource="tableServiceList"
                 :pagination="{ pageSize: 5 }"
               >
                 <span slot="status" slot-scope="text">
@@ -264,7 +264,7 @@ export default {
     return {
       loading: true,
       // 搜索用户数
-      serviceListData: [],
+      tableServiceList: [],
       // 左下角集群服务统计相关
       dataSource: [],
       serviceNums: {},
@@ -291,6 +291,7 @@ export default {
       success_persent: 0,
       success_persent_str: '',
       // 中间排行榜数据
+      taskRankList: [],
       finishRankList: [],
       // 饼状图数据
       pieData: [],
@@ -361,22 +362,23 @@ export default {
     this.getAgentServiceListByFinish()
     this.getTaskOverview()
     this.GetSvcFinishNum()
+    this.getAgentServiceListByTask()
     this.loading = !this.loading
   },
   methods: {
-      async  GetClusterDataByDate () {
-        const query = { 'day': 7 }
-        const res = await clusterDataByDate(query)
-        if (res) {
-          this.dataSource = res.data.list
-          this.serviceNums.task_total = res.data.task_total
-          this.serviceNums.finish_total = res.data.finish_total
-          this.serviceNums.task_increase_num = res.data.task_increase_num
-          this.serviceNums.task_decrease_num = res.data.task_decrease_num
-          this.serviceNums.finish_increase_num = res.data.finish_increase_num
-          this.serviceNums.finish_decrease_num = res.data.finish_decrease_num
-        }
-      },
+    async GetClusterDataByDate () {
+      const query = { 'day': 7 }
+      const res = await clusterDataByDate(query)
+      if (res) {
+        this.dataSource = res.data.list
+        this.serviceNums.task_total = res.data.task_total
+        this.serviceNums.finish_total = res.data.finish_total
+        this.serviceNums.task_increase_num = res.data.task_increase_num
+        this.serviceNums.task_decrease_num = res.data.task_decrease_num
+        this.serviceNums.finish_increase_num = res.data.finish_increase_num
+        this.serviceNums.finish_decrease_num = res.data.finish_decrease_num
+      }
+    },
     GetSvcTNum () {
       getSvcTNum().then((res) => {
         if (res) {
@@ -384,25 +386,37 @@ export default {
         }
       })
     },
+    // 获取左上角服务数量
     getAgentServiceList () {
-       const query = {
-         'sortField': 'task_num',
-         'sortOrder': 'descend',
-         'page_no': 1,
-         'page_size': 6
-       }
+      const query = {
+        'sortField': 'task_num',
+        'sortOrder': 'descend'
+      }
       GetServiceList(query).then((res) => {
         if (res) {
-          this.serviceListData = res.data.list
+          this.tableServiceList = res.data.list
           this.serviceTotal = res.data.total
-          for (let i = 0; i < this.serviceListData.length; i++) {
-             if (this.serviceListData[i].agent_status === 1) {
-                  this.onlineService++
-             } else {
-               this.offlineService++
-             }
+          for (let i = 0; i < res.data.list.length; i++) {
+            if (res.data.list[i].agent_status === 1) {
+              this.onlineService++
+            } else {
+              this.offlineService++
+            }
           }
           this.onlineServicePercent = Math.round(this.onlineService / this.serviceTotal * 100)
+        }
+      })
+    },
+    getAgentServiceListByTask () {
+      const query = {
+        'sortField': 'task_num',
+        'sortOrder': 'descend',
+        'page_no': 1,
+        'page_size': 6
+      }
+      GetServiceList(query).then((res) => {
+        if (res) {
+          this.taskRankList = res.data.list
         }
       })
     },
@@ -422,24 +436,26 @@ export default {
     getTaskOverview () {
       const queryParam = { 'type': 0 }
       GetAgentTaskOverViewList(queryParam).then((res) => {
-          if (res) {
-            this.task_total = res.data.total
-            this.taskList = res.data.list
-            for (let i = 0; i < res.data.list.length; i++) {
-              this.finish_total += this.taskList[i].finish_num
-              if (res.data.list[i].type === 1) {
-                this.mysql_finish += this.taskList[i].finish_num
-                this.mysql_task++
-              } else {
-                this.elastic_finish += this.taskList[i].finish_num
-                this.elastic_task++
-              }
+        if (res) {
+          this.task_total = res.data.total
+          this.taskList = res.data.list
+          for (let i = 0; i < res.data.list.length; i++) {
+            this.finish_total += this.taskList[i].finish_num
+            if (this.taskList[i].type === 1) {
+              this.mysql_finish += this.taskList[i].finish_num
+              this.mysql_task++
+            } else {
+              this.elastic_finish += this.taskList[i].finish_num
+              this.elastic_task++
             }
-            this.finish_by_service = Math.round(this.finish_total / this.serviceTotal)
-            this.task_by_service = Math.round(this.task_total / this.serviceTotal)
           }
+          console.log(this.finish_total)
+          this.finish_by_service = Math.round(this.finish_total / this.serviceTotal)
+          this.task_by_service = Math.round(this.task_total / this.serviceTotal)
+        }
       })
     },
+    // 计算成功占比
     GetSvcFinishNum () {
       getSvcFinishNum().then((res) => {
         if (res) {

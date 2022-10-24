@@ -342,7 +342,7 @@ export const asyncRouterMap = [
           {
             path: '/settings/list/user-list',
             name: 'UserList',
-            component: () => import('@/views/settings/TreeList'),
+            component: () => import('@/views/settings/UserList'),
             meta: { title: '用户管理', keepAlive: true }
           }
           // {

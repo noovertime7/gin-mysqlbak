@@ -251,7 +251,7 @@ export default {
       this.queryParam = {
         key: e.key
       }
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     // handleAdd (item) {
     //   console.log('add button, item', item)
@@ -287,7 +287,7 @@ export default {
             values.group_name = this.handleGroupName(values.group_name)
             UpdateUserInfo(values).then((res) => {
               this.$message.success(res.data)
-              this.$refs.table.refresh(true)
+              this.$refs.table.refresh()
               this.visible = false
               this.confirmLoading = false
             })
@@ -325,7 +325,7 @@ export default {
       }
       DeleteUser(query).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
         if (record.name === this.userInfo().name) {
           this.$store.dispatch('Logout')
         }

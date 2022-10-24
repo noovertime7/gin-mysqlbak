@@ -46,8 +46,8 @@
           <a-badge :status="text | cleanStatusTypeFilter" :text="text | cleanStatusFilter" />
         </span>
         <span slot="action" slot-scope="text, record">
-          <a @click="deleteHistory(record)">删除</a>
-          <a-divider type="vertical"/>
+          <a v-action:delete @click="deleteHistory(record)">删除</a>
+          <a-divider v-action:delete type="vertical"/>
           <a-dropdown>
             <a class="ant-dropdown-link">
               更多 <a-icon type="down"/>
@@ -231,20 +231,20 @@ export default {
       }
       DeleteHistory(deleteQuery).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     handlerSearch () {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
       this.searchData = ''
     },
     handleRadioClick () {
       this.queryParam = { 'status': this.radioStatus }
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleSelectChange (value) {
       this.getMysqlHistoryNunInfo()
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleDownLoad () {
       this.$message.warn('功能正在开发中...')
@@ -260,7 +260,7 @@ export default {
         this.service_list = res.data.list
         this.select_service = this.service_list[0].service_name
         this.getMysqlHistoryNunInfo()
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     }
   }

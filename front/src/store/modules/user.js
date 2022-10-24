@@ -39,7 +39,6 @@ const user = {
     Login ({ commit }, userInfo) {
       return new Promise((resolve, reject) => {
         login(userInfo).then(response => {
-          console.log(response)
           const result = response.data
           storage.set(ACCESS_TOKEN, result.token, new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
           commit('SET_TOKEN', result.token)
@@ -68,7 +67,7 @@ const user = {
             role.permissionList = role.permissions.map(permission => { return permission.permissionId })
             // 覆盖响应体的 role, 供下游使用
             result.role = role
-
+            console.log('roles = ', role)
             commit('SET_ROLES', role)
             commit('SET_INFO', result)
             commit('SET_NAME', { name: result.name, welcome: welcome() })

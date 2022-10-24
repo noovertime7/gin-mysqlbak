@@ -214,7 +214,7 @@ Table 重封装组件说明
 
 通过 `this.$refs.table` 调用
 
-`this.$refs.table.refresh(true)` 刷新列表 (用户新增/修改数据后，重载列表数据)
+`this.$refs.table.refresh()` 刷新列表 (用户新增/修改数据后，重载列表数据)
 
 > 注意：要调用 `refresh(bool)` 需要给表格组件设定 `ref` 值
 >

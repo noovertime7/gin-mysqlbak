@@ -171,16 +171,16 @@ export default {
       }
       deleteLocalHistory(deleteQuery).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     handlerSearch () {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
       this.searchData = ''
     },
     handleRadioClick () {
       this.queryParam = { 'status': this.radioStatus }
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     handleDownLoad () {
       this.$message.warn('功能正在开发中...')

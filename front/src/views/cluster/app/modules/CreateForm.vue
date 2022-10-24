@@ -9,7 +9,6 @@
   >
     <a-spin :spinning="loading">
       <a-form :form="form">
-        <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
         <a-form-item
           v-show="model && model.id > 0"
           label="应用ID"

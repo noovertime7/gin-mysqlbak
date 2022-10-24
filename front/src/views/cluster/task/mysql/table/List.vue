@@ -75,7 +75,7 @@
               <a @click="handleDetail">详情</a>
             </a-menu-item>
             <a-menu-item>
-              <a @click="handleDelete(record)">删除</a>
+              <a v-action:delete @click="handleDelete(record)">删除</a>
             </a-menu-item>
           </a-menu>
         </a-dropdown>
@@ -247,7 +247,7 @@ clear: () => {
           id: item.host_id,
           Host: item.host
         }))
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     tableOption () {
@@ -288,7 +288,7 @@ clear: () => {
       this.$message.warn('正在开发中...')
     },
     handleSelectChange (value) {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     startTask (record) {
       const query = {
@@ -297,7 +297,7 @@ clear: () => {
       }
       StartAgentTask(query).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     startBakByHost () {
@@ -308,7 +308,7 @@ clear: () => {
       StartAgentHostTask(query).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -320,7 +320,7 @@ clear: () => {
       StopAgentHostTask(query).then((res) => {
         if (res) {
           this.$message.success(res.data)
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
         }
       })
     },
@@ -331,7 +331,7 @@ clear: () => {
       }
       StopAgentTask(query).then((res) => {
         this.$message.success(res.data)
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     handleDelete (record) {

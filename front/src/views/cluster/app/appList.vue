@@ -45,7 +45,7 @@
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a style="color: red" @click="handleDelete(record)">删除</a>
+                <a style="color: red" v-action:delete @click="handleDelete(record)">删除</a>
               </a-menu-item>
               <a-menu-item>
                 <a @click="handleTest(record)">测试</a>
@@ -250,15 +250,15 @@ export default {
         }
         this.service_list = res.data.list
         this.select_service = this.service_list[0].service_name
-        this.$refs.table.refresh(true)
+        this.$refs.table.refresh()
       })
     },
     handlerSearch () {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
       this.searchData = ''
     },
     handleSelectChange (value) {
-      this.$refs.table.refresh(true)
+      this.$refs.table.refresh()
     },
     start () {
       this.loading = true
