@@ -41,6 +41,22 @@ func (b *BakService) StartBak(ctx *gin.Context, params *agentdto.StartBakInput) 
 	return bakService.StartBak(ctx, bakStartInput, ops)
 }
 
+func (b *BakService) TestBak(ctx *gin.Context, params *agentdto.StartBakInput) (*bak.BakOneMessage, error) {
+	bakService, addr, err := pkg.GetBakService(params.ServiceName)
+	if err != nil {
+		return nil, err
+	}
+	var ops client.CallOption = func(options *client.CallOptions) {
+		options.Address = []string{addr}
+	}
+	bakStartInput := &bak.StartBakInput{
+		TaskID:      params.TaskID,
+		ServiceName: params.ServiceName,
+	}
+	log.Logger.Info("agent开始启动测试任务", bakStartInput)
+	return bakService.TestBak(ctx, bakStartInput, ops)
+}
+
 func (b *BakService) StopBak(ctx *gin.Context, params *agentdto.StopBakInput) (*bak.BakOneMessage, error) {
 	bakService, addr, err := pkg.GetBakService(params.ServiceName)
 	if err != nil {

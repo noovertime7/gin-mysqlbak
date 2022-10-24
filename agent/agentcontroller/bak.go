@@ -17,6 +17,7 @@ func BakRegister(group *gin.RouterGroup) {
 		bakService: agentservice.GetClusterBakService(),
 	}
 	group.PUT("/bakstart", bak.StartBak)
+	group.PUT("/bak_test", bak.TestBak)
 	group.PUT("/bakstop", bak.StopBak)
 	group.PUT("/bakhoststart", bak.StartBakByHost)
 	group.PUT("/bakhoststop", bak.StopBakByHost)
@@ -35,6 +36,21 @@ func (b *BakController) StartBak(ctx *gin.Context) {
 	}
 	middleware.ResponseSuccess(ctx, "任务启动成功")
 }
+
+func (b *BakController) TestBak(ctx *gin.Context) {
+	params := &agentdto.StartBakInput{}
+	if err := params.BindValidParams(ctx); err != nil {
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	data, err := b.bakService.TestBak(ctx, params)
+	if err != nil || !data.OK {
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.BakStartError, err))
+		return
+	}
+	middleware.ResponseSuccess(ctx, "测试任务启动成功")
+}
+
 func (b *BakController) StopBak(ctx *gin.Context) {
 	params := &agentdto.StopBakInput{}
 	if err := params.BindValidParams(ctx); err != nil {
