@@ -4,7 +4,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"io/ioutil"
-	"log"
 )
 
 func Decrypt(key, filePath, fileType string) (string, error) {
@@ -14,17 +13,17 @@ func Decrypt(key, filePath, fileType string) (string, error) {
 	}
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
-		log.Panic(err)
+		return "", err
 	}
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		log.Panic(err)
+		return "", err
 	}
 	nonce := ciphertext[:gcm.NonceSize()]
 	ciphertext = ciphertext[gcm.NonceSize():]
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		log.Panic(err)
+		return "", err
 	}
 	tempPath := GetFilePath(filePath)
 	deFileName := tempPath + "." + fileType
