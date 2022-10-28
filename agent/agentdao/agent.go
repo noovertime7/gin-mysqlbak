@@ -27,6 +27,13 @@ func (a *AgentDB) TableName() string {
 	return "t_agent"
 }
 
+func (a *AgentDB) Destroy(c context.Context, tx *gorm.DB) error {
+	if a.Id == 0 {
+		return errors.New("id is null")
+	}
+	return tx.WithContext(c).Table(a.TableName()).Delete(a).Error
+}
+
 func (a *AgentDB) Find(c context.Context, tx *gorm.DB, search *AgentDB) (*AgentDB, error) {
 	out := &AgentDB{}
 	err := tx.WithContext(c).Where(search).Find(out).Error
@@ -37,7 +44,6 @@ func (a *AgentDB) Find(c context.Context, tx *gorm.DB, search *AgentDB) (*AgentD
 }
 
 func (a *AgentDB) Save(c *gin.Context, tx *gorm.DB) error {
-
 	return tx.WithContext(c).Save(a).Error
 }
 
@@ -63,12 +69,12 @@ func (a *AgentDB) UpdateStatus(c *gin.Context, tx *gorm.DB) error {
 	}).Error
 }
 
-func (s *AgentDB) PageList(c context.Context, tx *gorm.DB, params *agentdto.AgentListInput) ([]AgentDB, int, error) {
+func (a *AgentDB) PageList(c context.Context, tx *gorm.DB, params *agentdto.AgentListInput) ([]AgentDB, int, error) {
 	var total int64 = 0
 	var list []AgentDB
 	offset := (params.PageNo - 1) * params.PageSize
 	query := tx.WithContext(c)
-	query = query.Table(s.TableName()).Where("is_deleted=0")
+	query = query.Table(a.TableName()).Where("is_deleted=0")
 	query.Find(&list).Count(&total)
 	if params.Info != "" {
 		query = query.Where("( service_name like ?)", "%"+params.Info+"%")

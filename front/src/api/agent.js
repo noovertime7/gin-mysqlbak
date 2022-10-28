@@ -14,3 +14,11 @@ export function GetServiceNumInfo () {
     method: 'get'
   })
 }
+
+export function DeleteService (query) {
+  return request({
+    url: '/public/delete_agent',
+    method: 'delete',
+    params: query
+  })
+}

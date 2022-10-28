@@ -49,6 +49,14 @@ type AgentServiceNumInfoOutput struct {
 	AllFinishTasks int `json:"all_finish_tasks"`
 }
 
+type AgentDeleteInput struct {
+	ServiceName string `json:"service_name" form:"service_name"`
+}
+
+func (a *AgentDeleteInput) BindValidParams(ctx *gin.Context) error {
+	return public.DefaultGetValidParams(ctx, a)
+}
+
 func (a *AgentRegisterInput) BindValidParams(ctx *gin.Context) error {
 	return public.DefaultGetValidParams(ctx, a)
 }

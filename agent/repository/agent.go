@@ -45,6 +45,15 @@ func (a *AgentService) DeRegister(ctx *gin.Context, serviceName string) error {
 	return agent.UpdateStatus(ctx, database.GetDB())
 }
 
+func (a *AgentService) Delete(ctx context.Context, agentInfo *agentdto.AgentDeleteInput) error {
+	agentDb := &agentdao.AgentDB{ServiceName: agentInfo.ServiceName}
+	agent, err := agentDb.Find(ctx, database.GetDB(), agentDb)
+	if err != nil {
+		return err
+	}
+	return agent.Destroy(ctx, database.GetDB())
+}
+
 func (a *AgentService) GetAgentList(ctx context.Context, agentInfo *agentdto.AgentListInput) (*agentdto.AgentListOutPut, error) {
 	agentDB := &agentdao.AgentDB{}
 	agents, total, err := agentDB.PageList(ctx, database.GetDB(), agentInfo)

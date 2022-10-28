@@ -32,7 +32,7 @@
             </a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a @click="handleDeleteService">删除</a>
+                <a @click="handleDeleteService(record)">删除</a>
               </a-menu-item>
               <a-menu-item>
                 <a @click="handleRestart">重启</a>
@@ -50,7 +50,7 @@
 
 <script>
 import { STable } from '@/components'
-import { GetServiceList, GetServiceNumInfo } from '@/api/agent'
+import { DeleteService, GetServiceList, GetServiceNumInfo } from '@/api/agent'
 import Info from './components/Info'
 
 const statusMap = {
@@ -168,8 +168,27 @@ export default {
     handleRestart () {
       this.$message.warn('功能开发中...')
     },
-    handleDeleteService () {
-      this.$message.warn('功能开发中...')
+    handleDeleteService (record) {
+      const self = this
+      this.$confirm({
+        title: '您确认要删除此服务吗?',
+        content: '用于清理服务，删除后请手动停止客户端，避免服务注册',
+        destroyOnClose: true,
+        onOk () {
+          return new Promise((resolve, reject) => {
+            console.log(record)
+            const query = { 'service_name': record.service_name }
+            DeleteService(query).then((res) => {
+              if (res) {
+                self.$message.success(res.data)
+                self.$refs.table.refresh()
+                resolve()
+              }
+            })
+          })
+        },
+        onCancel () {}
+      })
     },
     GetServiceNum () {
       GetServiceNumInfo().then((res) => {

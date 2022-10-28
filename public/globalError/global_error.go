@@ -51,6 +51,7 @@ const (
 	AgentDeRegisterError = 20502
 	AgentGetError        = 20503
 	AgentGetAddressError = 20504
+	AgentDeleteError     = 20505
 
 	BakStartError      = 20601 // 请勿重复提交
 	BakStopError       = 20602 // 请勿重复提交
@@ -96,6 +97,7 @@ var codeTag = map[int]string{
 	AgentDeRegisterError: "客户端注销失败",
 	AgentGetError:        "客户端查询失败，请联系管理员",
 	AgentGetAddressError: "客户端获取地址失败",
+	AgentDeleteError:     "客户端删除失败",
 
 	BakStartError:      "启动备份任务失败",
 	BakStopError:       "停止备份任务失败",

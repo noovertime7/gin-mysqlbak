@@ -20,6 +20,7 @@ func AgentRegister(group *gin.RouterGroup) {
 	group.GET("/agentlist", agent.GetAgentList)
 	group.GET("/service_num_info", agent.GetServiceNumInfo)
 	group.POST("/register", agent.Register)
+	group.DELETE("/delete_agent", agent.Delete)
 	group.PUT("/deregister", agent.DeRegister)
 }
 
@@ -65,6 +66,21 @@ func (a *AgentController) Register(ctx *gin.Context) {
 	go ListenRegister(ctx, params.ServiceName, listenChan)
 	middleware.ResponseSuccess(ctx, "注册成功")
 	listenChan <- struct{}{}
+}
+
+func (a *AgentController) Delete(ctx *gin.Context) {
+	params := &agentdto.AgentDeleteInput{}
+	if err := params.BindValidParams(ctx); err != nil {
+		log.Logger.Error(err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.ParamBindError, err))
+		return
+	}
+	if err := AgentService.Delete(ctx, params); err != nil {
+		log.Logger.Error("删除服务失败", err)
+		middleware.ResponseError(ctx, globalError.NewGlobalError(globalError.AgentDeleteError, err))
+		return
+	}
+	middleware.ResponseSuccess(ctx, "删除成功")
 }
 
 func (a *AgentController) DeRegister(ctx *gin.Context) {
